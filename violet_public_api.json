@@ -56,6 +56,22 @@
       {
          "name": "Checkout - Completion",
          "description": ""
+      },
+      {
+         "name": "Event",
+         "description": ""
+      },
+      {
+         "name": "Events - Webhooks",
+         "description": ""
+      },
+      {
+         "name": "Events - Webhook Events",
+         "description": ""
+      },
+      {
+         "name": "Events - Webhook Headers",
+         "description": ""
       }
    ],
    "paths": {
@@ -2268,13 +2284,13 @@
             }
          }
       },
-      "/apps/{app_id}/webhooks": {
+      "/events/webhooks/{webhook_id}": {
          "get": {
             "tags": [
-               "Webhooks"
+               "Events - Webhooks"
             ],
-            "summary": "List Webhooks",
-            "description": "Retrieves a list of previously created webhooks.",
+            "summary": "Get Webhook",
+            "description": "Gets webhook by ID.",
             "parameters": [
                {
                   "name": "X-Violet-Token",
@@ -2295,16 +2311,202 @@
                   "in": "header",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
                   "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "webhook_id",
                   "in": "path",
                   "required": true,
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "description": "successful operation",
+                  "content": {
+                     "*/*": {
+                        "schema": {
+                           "$ref": "#/components/schemas/Webhook"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "put": {
+            "tags": [
+               "Events - Webhooks"
+            ],
+            "summary": "Update Webhook",
+            "description": "Updates Webhook.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "webhook_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "*/*": {
+                     "schema": {
+                        "$ref": "#/components/schemas/Webhook"
+                     }
+                  }
+               },
+               "required": false
+            },
+            "responses": {
+               "200": {
+                  "description": "successful operation",
+                  "content": {
+                     "*/*": {
+                        "schema": {
+                           "$ref": "#/components/schemas/Webhook"
+                        }
+                     }
+                  }
+               }
+            },
+            "x-codegen-request-body-name": "body"
+         },
+         "delete": {
+            "tags": [
+               "Events - Webhooks"
+            ],
+            "summary": "Delete Webhook",
+            "description": "Deletes Webhook. Events will immedietly stop posting to this endpoint upon deletion.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "webhook_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               }
+            ],
+            "responses": {
+               "default": {
+                  "description": "successful operation",
+                  "content": {}
+               }
+            }
+         }
+      },
+      "/events/webhooks": {
+         "get": {
+            "tags": [
+               "Events - Webhooks"
+            ],
+            "summary": "Get Webhooks",
+            "description": "Gets webhooks.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
                   }
                },
                {
@@ -2319,7 +2521,7 @@
                "200": {
                   "description": "successful operation",
                   "content": {
-                     "application/json": {
+                     "*/*": {
                         "schema": {
                            "type": "array",
                            "items": {
@@ -2333,10 +2535,10 @@
          },
          "post": {
             "tags": [
-               "Webhooks"
+               "Events - Webhooks"
             ],
             "summary": "Create Webhook",
-            "description": "Creates a new webhook for the desired event. The remote endpoint must be HTTPS.<br><br>We currently limit webhooks to one per event per app. If the event is already active on a previously created webhook that existing webhook will be updated with the new endpoint.",
+            "description": "Creates a new webhook for the desired event. The remote endpoint must be HTTPS.",
             "parameters": [
                {
                   "name": "X-Violet-Token",
@@ -2357,22 +2559,21 @@
                   "in": "header",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
                   "name": "app_id",
-                  "in": "path",
-                  "required": true,
+                  "in": "query",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                }
             ],
             "requestBody": {
                "content": {
-                  "application/json": {
+                  "*/*": {
                      "schema": {
                         "$ref": "#/components/schemas/Webhook"
                      }
@@ -2384,142 +2585,7 @@
                "200": {
                   "description": "successful operation",
                   "content": {
-                     "application/json": {
-                        "schema": {
-                           "$ref": "#/components/schemas/Webhook"
-                        }
-                     }
-                  }
-               }
-            },
-            "x-codegen-request-body-name": "body"
-         }
-      },
-      "/apps/{app_id}/webhooks/{webhook_id}": {
-         "get": {
-            "tags": [
-               "Webhooks"
-            ],
-            "summary": "Get Webhook by ID",
-            "description": "Retrieves a single webhook by ID.",
-            "parameters": [
-               {
-                  "name": "X-Violet-Token",
-                  "in": "header",
-                  "schema": {
-                     "type": "string"
-                  }
-               },
-               {
-                  "name": "X-Violet-App-Secret",
-                  "in": "header",
-                  "schema": {
-                     "type": "string"
-                  }
-               },
-               {
-                  "name": "X-Violet-App-Id",
-                  "in": "header",
-                  "schema": {
-                     "type": "integer",
-                     "format": "int64"
-                  }
-               },
-               {
-                  "name": "app_id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {
-                     "type": "integer",
-                     "format": "int64"
-                  }
-               },
-               {
-                  "name": "webhook_id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {
-                     "type": "integer",
-                     "format": "int64"
-                  }
-               }
-            ],
-            "responses": {
-               "200": {
-                  "description": "successful operation",
-                  "content": {
-                     "application/json": {
-                        "schema": {
-                           "$ref": "#/components/schemas/Webhook"
-                        }
-                     }
-                  }
-               }
-            }
-         },
-         "put": {
-            "tags": [
-               "Webhooks"
-            ],
-            "summary": "Update Webhook",
-            "description": "Modifies an existing webhook by ID.",
-            "parameters": [
-               {
-                  "name": "X-Violet-Token",
-                  "in": "header",
-                  "schema": {
-                     "type": "string"
-                  }
-               },
-               {
-                  "name": "X-Violet-App-Secret",
-                  "in": "header",
-                  "schema": {
-                     "type": "string"
-                  }
-               },
-               {
-                  "name": "X-Violet-App-Id",
-                  "in": "header",
-                  "schema": {
-                     "type": "integer",
-                     "format": "int64"
-                  }
-               },
-               {
-                  "name": "app_id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {
-                     "type": "integer",
-                     "format": "int64"
-                  }
-               },
-               {
-                  "name": "webhook_id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {
-                     "type": "integer",
-                     "format": "int64"
-                  }
-               }
-            ],
-            "requestBody": {
-               "content": {
-                  "application/json": {
-                     "schema": {
-                        "$ref": "#/components/schemas/Webhook"
-                     }
-                  }
-               },
-               "required": false
-            },
-            "responses": {
-               "200": {
-                  "description": "successful operation",
-                  "content": {
-                     "application/json": {
+                     "*/*": {
                         "schema": {
                            "$ref": "#/components/schemas/Webhook"
                         }
@@ -2531,10 +2597,10 @@
          },
          "delete": {
             "tags": [
-               "Webhooks"
+               "Events - Webhooks"
             ],
-            "summary": "Delete Webhook",
-            "description": "Removes a webhook. Events will immedietly stop posting to this endpoint upon deletion.",
+            "summary": "Delete Channel Webhooks",
+            "description": "Deletes All Channel Webhooks. Events will immedietly stop posting to this endpoint upon deletion.",
             "parameters": [
                {
                   "name": "X-Violet-Token",
@@ -2555,25 +2621,15 @@
                   "in": "header",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
                   "name": "app_id",
-                  "in": "path",
-                  "required": true,
+                  "in": "query",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
-                  }
-               },
-               {
-                  "name": "webhook_id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {
-                     "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                }
             ],
@@ -2585,13 +2641,13 @@
             }
          }
       },
-      "/apps/{app_id}/webhooks/all/events": {
-         "get": {
+      "/events/webhooks/status/{status}": {
+         "put": {
             "tags": [
-               "WebhookEvents"
+               "Events - Webhooks"
             ],
-            "summary": "Get All WebhookEvents",
-            "description": "Retrieves WebhookEvents from All Webhooks.",
+            "summary": "Update Webhooks Status",
+            "description": "Updates All Webhooks Status.",
             "parameters": [
                {
                   "name": "X-Violet-Token",
@@ -2612,16 +2668,70 @@
                   "in": "header",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
                   "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "status",
                   "in": "path",
                   "required": true,
                   "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "default": {
+                  "description": "successful operation",
+                  "content": {}
+               }
+            }
+         }
+      },
+      "/events/webhooks/all/events": {
+         "get": {
+            "tags": [
+               "Events - Webhook Events"
+            ],
+            "summary": "Get All Webhook Events",
+            "description": "Retrieves WebhookEvents from all Webhooks.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
                   }
                },
                {
@@ -2629,8 +2739,7 @@
                   "in": "query",
                   "schema": {
                      "type": "integer",
-                     "format": "int32",
-                     "default": 0
+                     "format": "int64"
                   }
                },
                {
@@ -2656,7 +2765,7 @@
                "200": {
                   "description": "successful operation",
                   "content": {
-                     "application/json": {
+                     "*/*": {
                         "schema": {
                            "type": "array",
                            "items": {
@@ -2669,13 +2778,13 @@
             }
          }
       },
-      "/apps/{app_id}/webhooks/{webhook_id}/events": {
+      "/events/webhooks/{webhook_id}/events": {
          "get": {
             "tags": [
-               "WebhookEvents"
+               "Events - Webhook Events"
             ],
-            "summary": "Get WebhookEvents",
-            "description": "Retrieves WebhookEvents from a Single Webhook.",
+            "summary": "Get Webhook Events",
+            "description": "Retrieves WebhookEvents from a single Webhook.",
             "parameters": [
                {
                   "name": "X-Violet-Token",
@@ -2696,16 +2805,15 @@
                   "in": "header",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
                   "name": "app_id",
-                  "in": "path",
-                  "required": true,
+                  "in": "query",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
@@ -2714,7 +2822,7 @@
                   "required": true,
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
@@ -2722,8 +2830,7 @@
                   "in": "query",
                   "schema": {
                      "type": "integer",
-                     "format": "int32",
-                     "default": 0
+                     "format": "int64"
                   }
                },
                {
@@ -2749,7 +2856,7 @@
                "200": {
                   "description": "successful operation",
                   "content": {
-                     "application/json": {
+                     "*/*": {
                         "schema": {
                            "type": "array",
                            "items": {
@@ -2762,12 +2869,12 @@
             }
          }
       },
-      "/apps/{app_id}/webhooks/{webhook_id}/events/{event_id}": {
+      "/events/webhooks/{webhook_id}/events/{event_id}": {
          "get": {
             "tags": [
-               "WebhookEvents"
+               "Events - Webhook Events"
             ],
-            "summary": "Get WebhookEvent",
+            "summary": "Get Webhook Event",
             "description": "Retrieves a single WebhookEvent by ID.",
             "parameters": [
                {
@@ -2789,16 +2896,15 @@
                   "in": "header",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
                   "name": "app_id",
-                  "in": "path",
-                  "required": true,
+                  "in": "query",
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
@@ -2807,7 +2913,7 @@
                   "required": true,
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                },
                {
@@ -2816,7 +2922,7 @@
                   "required": true,
                   "schema": {
                      "type": "integer",
-                     "format": "int64"
+                     "format": "int32"
                   }
                }
             ],
@@ -2824,12 +2930,362 @@
                "200": {
                   "description": "successful operation",
                   "content": {
-                     "application/json": {
+                     "*/*": {
                         "schema": {
                            "$ref": "#/components/schemas/WebhookEvent"
                         }
                      }
                   }
+               }
+            }
+         }
+      },
+      "/events/webhooks/{webhook_id}/headers": {
+         "get": {
+            "tags": [
+               "Events - Webhook Headers"
+            ],
+            "summary": "Get Webhook Headers",
+            "description": "Retrieves a list of WebhookHeaders by WebhookId.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "webhook_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "description": "successful operation",
+                  "content": {
+                     "*/*": {
+                        "schema": {
+                           "type": "array",
+                           "items": {
+                              "$ref": "#/components/schemas/WebhookHeader"
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post": {
+            "tags": [
+               "Events - Webhook Headers"
+            ],
+            "summary": "Create Webhook Header",
+            "description": "Create new Webhook Header.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "webhook_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "*/*": {
+                     "schema": {
+                        "$ref": "#/components/schemas/WebhookHeader"
+                     }
+                  }
+               },
+               "required": false
+            },
+            "responses": {
+               "200": {
+                  "description": "successful operation",
+                  "content": {
+                     "*/*": {
+                        "schema": {
+                           "$ref": "#/components/schemas/WebhookHeader"
+                        }
+                     }
+                  }
+               }
+            },
+            "x-codegen-request-body-name": "body"
+         }
+      },
+      "/events/webhooks/{webhook_id}/headers/{header_id}": {
+         "get": {
+            "tags": [
+               "Events - Webhook Headers"
+            ],
+            "summary": "Get Webhook Header",
+            "description": "Retrieves a Webhook Header by ID.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "webhook_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "header_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "description": "successful operation",
+                  "content": {
+                     "*/*": {
+                        "schema": {
+                           "$ref": "#/components/schemas/WebhookHeader"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "put": {
+            "tags": [
+               "Events - Webhook Headers"
+            ],
+            "summary": "Update Webhook Header",
+            "description": "Updates Webhook Header.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "webhook_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "header_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "*/*": {
+                     "schema": {
+                        "$ref": "#/components/schemas/WebhookHeader"
+                     }
+                  }
+               },
+               "required": false
+            },
+            "responses": {
+               "200": {
+                  "description": "successful operation",
+                  "content": {
+                     "*/*": {
+                        "schema": {
+                           "$ref": "#/components/schemas/WebhookHeader"
+                        }
+                     }
+                  }
+               }
+            },
+            "x-codegen-request-body-name": "body"
+         },
+         "delete": {
+            "tags": [
+               "Events - Webhook Headers"
+            ],
+            "summary": "Delete Webhook Header",
+            "description": "Deletes Webhook Header.",
+            "parameters": [
+               {
+                  "name": "X-Violet-Token",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Secret",
+                  "in": "header",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "name": "X-Violet-App-Id",
+                  "in": "header",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "app_id",
+                  "in": "query",
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "webhook_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               },
+               {
+                  "name": "header_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                     "type": "integer",
+                     "format": "int32"
+                  }
+               }
+            ],
+            "responses": {
+               "default": {
+                  "description": "successful operation",
+                  "content": {}
                }
             }
          }
@@ -4808,57 +5264,6 @@
             },
             "description": "Refresh Token Response"
          },
-         "Webhook": {
-            "required": [
-               "event",
-               "remote_endpoint"
-            ],
-            "type": "object",
-            "properties": {
-               "id": {
-                  "type": "integer",
-                  "format": "int64"
-               },
-               "app_id": {
-                  "type": "integer",
-                  "format": "int64"
-               },
-               "event": {
-                  "type": "string",
-                  "description": "The event being triggered",
-                  "enum": [
-                     "order_updated",
-                     "order_shipped",
-                     "order_completed",
-                     "order_canceled"
-                  ]
-               },
-               "remote_endpoint": {
-                  "type": "string",
-                  "description": "Remote endpoint the webhook posts against."
-               },
-               "status": {
-                  "type": "string",
-                  "description": "Status of the webhook",
-                  "enum": [
-                     "inactive",
-                     "active",
-                     "disabled"
-                  ]
-               },
-               "date_created": {
-                  "type": "string",
-                  "description": "Date of webhook creation",
-                  "format": "date-time"
-               },
-               "date_last_modified": {
-                  "type": "string",
-                  "description": "Date of last webhook update",
-                  "format": "date-time"
-               }
-            },
-            "description": "External Hook Event"
-         },
          "Event": {
             "required": [
                "app_id",
@@ -4906,149 +5311,6 @@
                   "format": "date-time"
                }
             }
-         },
-         "WebhookHeader": {
-            "type": "object",
-            "properties": {
-               "id": {
-                  "type": "integer",
-                  "format": "int64"
-               },
-               "app_id": {
-                  "type": "integer",
-                  "description": "App ID",
-                  "format": "int64"
-               },
-               "webhook_id": {
-                  "type": "integer",
-                  "description": "ID of the webhook the header belongs to",
-                  "format": "int64"
-               },
-               "key": {
-                  "type": "string",
-                  "description": "Header Key"
-               },
-               "value": {
-                  "type": "string",
-                  "description": "Header Value"
-               },
-               "date_created": {
-                  "type": "string",
-                  "description": "Date of webhook header creation",
-                  "format": "date-time"
-               },
-               "date_last_modified": {
-                  "type": "string",
-                  "description": "Date of last webhook header update",
-                  "format": "date-time"
-               }
-            },
-            "description": "Webhook Header"
-         },
-         "WebhookError": {
-            "required": [
-               "status_code"
-            ],
-            "type": "object",
-            "properties": {
-               "id": {
-                  "type": "integer",
-                  "format": "int64"
-               },
-               "app_id": {
-                  "type": "integer",
-                  "description": "App ID",
-                  "format": "int64"
-               },
-               "webhook_id": {
-                  "type": "integer",
-                  "description": "ID of the webhook the error occurred on",
-                  "format": "int64"
-               },
-               "status_code": {
-                  "type": "integer",
-                  "description": "HTTP Status Code",
-                  "format": "int32"
-               },
-               "response": {
-                  "type": "string",
-                  "description": "Response from the remote url"
-               },
-               "date_created": {
-                  "type": "string",
-                  "description": "Date of webhook error creation",
-                  "format": "date-time"
-               },
-               "date_last_modified": {
-                  "type": "string",
-                  "description": "Date of last webhook error update",
-                  "format": "date-time"
-               }
-            },
-            "description": "Webhook Error"
-         },
-         "WebhookEvent": {
-            "type": "object",
-            "properties": {
-               "id": {
-                  "type": "integer",
-                  "format": "int64"
-               },
-               "app_id": {
-                  "type": "integer",
-                  "description": "App ID",
-                  "format": "int64"
-               },
-               "webhook_id": {
-                  "type": "integer",
-                  "description": "ID of the webhook the error occurred on",
-                  "format": "int64"
-               },
-               "entity_id": {
-                  "type": "integer",
-                  "description": "ID of entity this event occurred for",
-                  "format": "int64"
-               },
-               "status_code": {
-                  "type": "integer",
-                  "description": "HTTP Status Code",
-                  "format": "int32"
-               },
-               "response": {
-                  "type": "string",
-                  "description": "Response from the remote url"
-               },
-               "event_type": {
-                  "type": "string",
-                  "description": "Type of webhook event",
-                  "enum": [
-                     "ORDER_UPDATED",
-                     "ORDER_SHIPPED",
-                     "ORDER_COMPLETED",
-                     "ORDER_CANCELED",
-                     "ORDER_REFUNDED",
-                     "ORDER_RETURNED",
-                     "MERCHANT_CONNECTED",
-                     "MERCHANT_DISCONNECTED"
-                  ]
-               },
-               "is_error": {
-                  "type": "boolean",
-                  "description": "Was response an error response",
-                  "default": false
-               },
-               "date_created": {
-                  "type": "string",
-                  "description": "Date of creation",
-                  "format": "date-time"
-               },
-               "date_last_modified": {
-                  "type": "string",
-                  "description": "Date of last update",
-                  "format": "date-time"
-               }
-            },
-            "description": "Webhook Event"
          },
          "App": {
             "required": [
@@ -5164,6 +5426,189 @@
                   "format": "date-time"
                }
             }
+         },
+         "WebhookEvent": {
+            "required": [
+               "status"
+            ],
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "integer",
+                  "format": "int32",
+                  "readOnly": true
+               },
+               "app_id": {
+                  "type": "integer",
+                  "description": "App ID",
+                  "format": "int32"
+               },
+               "webhook_id": {
+                  "type": "integer",
+                  "description": "ID of the webhook the event occurred on",
+                  "format": "int32"
+               },
+               "entity_id": {
+                  "type": "integer",
+                  "description": "ID of entity this event occurred for",
+                  "format": "int64"
+               },
+               "status_code": {
+                  "type": "integer",
+                  "description": "HTTP Status Code",
+                  "format": "int32"
+               },
+               "response": {
+                  "type": "string",
+                  "description": "Response from the remote url"
+               },
+               "event_type": {
+                  "type": "string",
+                  "description": "Type of webhook event",
+                  "enum": [
+                     "ORDER_UPDATED",
+                     "ORDER_SHIPPED",
+                     "ORDER_COMPLETED",
+                     "ORDER_CANCELED",
+                     "ORDER_REFUNDED",
+                     "ORDER_RETURNED",
+                     "MERCHANT_CONNECTED",
+                     "MERCHANT_DISCONNECTED",
+                     "OFFER_CREATED",
+                     "OFFER_UPDATED",
+                     "OFFER_REMOVED"
+                  ]
+               },
+               "attempts": {
+                  "type": "integer",
+                  "description": "Deliver attempts of the webhook the event",
+                  "format": "int32"
+               },
+               "status": {
+                  "type": "string",
+                  "description": "Status of webhook event",
+                  "enum": [
+                     "CREATED",
+                     "IN_PROGRESS",
+                     "SUCCEEDED",
+                     "FAILED"
+                  ]
+               },
+               "date_created": {
+                  "type": "string",
+                  "description": "Date of creation",
+                  "format": "date-time",
+                  "readOnly": true
+               },
+               "date_last_modified": {
+                  "type": "string",
+                  "description": "Date of last update",
+                  "format": "date-time",
+                  "readOnly": true
+               }
+            },
+            "description": "Webhook Event"
+         },
+         "WebhookHeader": {
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "integer",
+                  "format": "int32",
+                  "readOnly": true
+               },
+               "app_id": {
+                  "type": "integer",
+                  "description": "App ID",
+                  "format": "int32"
+               },
+               "webhook_id": {
+                  "type": "integer",
+                  "description": "ID of the webhook the header belongs to",
+                  "format": "int32"
+               },
+               "key": {
+                  "type": "string",
+                  "description": "Header Key"
+               },
+               "value": {
+                  "type": "string",
+                  "description": "Header Value"
+               },
+               "date_created": {
+                  "type": "string",
+                  "description": "Date of creation",
+                  "format": "date-time",
+                  "readOnly": true
+               },
+               "date_last_modified": {
+                  "type": "string",
+                  "description": "Date of last update",
+                  "format": "date-time",
+                  "readOnly": true
+               }
+            },
+            "description": "Webhook Header"
+         },
+         "Webhook": {
+            "required": [
+               "event",
+               "remote_endpoint"
+            ],
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "integer",
+                  "format": "int32",
+                  "readOnly": true
+               },
+               "app_id": {
+                  "type": "integer",
+                  "format": "int32",
+                  "readOnly": true
+               },
+               "event": {
+                  "type": "string",
+                  "description": "The event being triggered",
+                  "enum": [
+                     "ORDER_UPDATED",
+                     "ORDER_SHIPPED",
+                     "ORDER_COMPLETED",
+                     "ORDER_CANCELLED",
+                     "ORDER_REFUNDED",
+                     "ORDER_RETURNED",
+                     "OFFER_CREATED",
+                     "OFFER_UPDATED",
+                     "OFFER_REMOVED"
+                  ]
+               },
+               "remote_endpoint": {
+                  "type": "string",
+                  "description": "Remote endpoint the webhook posts against."
+               },
+               "status": {
+                  "type": "string",
+                  "description": "Status of the webhook",
+                  "enum": [
+                     "INACTIVE",
+                     "ACTIVE",
+                     "DISABLED"
+                  ]
+               },
+               "date_created": {
+                  "type": "string",
+                  "description": "Date of creation",
+                  "format": "date-time",
+                  "readOnly": true
+               },
+               "date_last_modified": {
+                  "type": "string",
+                  "description": "Date of last update",
+                  "format": "date-time",
+                  "readOnly": true
+               }
+            },
+            "description": "External Hook Event"
          }
       }
    },
