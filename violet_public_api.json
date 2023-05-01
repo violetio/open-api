@@ -42,6 +42,10 @@
          "description": ""
       },
       {
+         "name": "Checkout - Discounts",
+         "description": ""
+      },
+      {
          "name": "Checkout - Customer",
          "description": ""
       },
@@ -1520,6 +1524,150 @@
             "x-codegen-request-body-name": "body"
          }
       },
+      "/checkout/cart/{cart_id}/discounts": {
+         "post": {
+           "tags": [
+             "Checkout - Discounts"
+           ],
+           "summary": "Add Discount to Cart",
+           "operationId": "addDiscountToCart_1",
+           "parameters": [
+             {
+               "name": "X-Violet-Token",
+               "in": "header",
+               "schema": {
+                 "type": "string"
+               }
+             },
+             {
+               "name": "X-Violet-App-Secret",
+               "in": "header",
+               "schema": {
+                 "type": "string"
+               }
+             },
+             {
+               "name": "X-Violet-App-Id",
+               "in": "header",
+               "schema": {
+                 "type": "integer",
+                 "format": "int32"
+               }
+             },
+             {
+               "name": "cart_id",
+               "in": "path",
+               "required": true,
+               "schema": {
+                 "type": "integer",
+                 "format": "int64"
+               }
+             },
+             {
+               "name": "price_cart",
+               "in": "query",
+               "schema": {
+                 "type": "boolean",
+                 "default": false
+               }
+             }
+           ],
+           "requestBody": {
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/DiscountRequest"
+                 }
+               }
+             },
+             "required": false
+           },
+           "responses": {
+             "200": {
+               "description": "successful operation",
+               "content": {
+                 "application/json": {
+                   "schema": {
+                     "$ref": "#/components/schemas/Order"
+                   }
+                 }
+               }
+             }
+           },
+           "x-codegen-request-body-name": "body"
+         }
+       },
+       "/checkout/cart/{cart_id}/discounts/{discount_id}": {
+         "delete": {
+           "tags": [
+             "Checkout - Discounts"
+           ],
+           "summary": "Remove Discount from Cart",
+           "operationId": "removeDiscountFromCart_1",
+           "parameters": [
+             {
+               "name": "X-Violet-Token",
+               "in": "header",
+               "schema": {
+                 "type": "string"
+               }
+             },
+             {
+               "name": "X-Violet-App-Secret",
+               "in": "header",
+               "schema": {
+                 "type": "string"
+               }
+             },
+             {
+               "name": "X-Violet-App-Id",
+               "in": "header",
+               "schema": {
+                 "type": "integer",
+                 "format": "int32"
+               }
+             },
+             {
+               "name": "cart_id",
+               "in": "path",
+               "required": true,
+               "schema": {
+                 "type": "integer",
+                 "format": "int64"
+               }
+             },
+             {
+               "name": "discount_id",
+               "in": "path",
+               "required": true,
+               "schema": {
+                 "type": "integer",
+                 "format": "int64"
+               }
+             },
+             {
+               "name": "price_cart",
+               "in": "query",
+               "schema": {
+                 "type": "boolean",
+                 "default": false
+               }
+             }
+           ],
+           "responses": {
+             "200": {
+               "description": "successful operation",
+               "content": {
+                 "application/json": {
+                   "schema": {
+                     "$ref": "#/components/schemas/Order"
+                   }
+                 }
+               }
+             }
+           }
+         }
+       },
       "/checkout/cart/{cart_id}/shipping": {
          "post": {
             "tags": [
@@ -4454,113 +4602,177 @@
          },
          "Order": {
             "required": [
-               "status"
+              "status"
             ],
             "type": "object",
             "properties": {
-               "id": {
-                  "type": "integer",
-                  "format": "int64"
-               },
-               "token": {
-                  "type": "string"
-               },
-               "seller_id": {
-                  "type": "integer",
-                  "description": "ID of the Seller",
-                  "format": "int64"
-               },
-               "user_id": {
-                  "type": "integer",
-                  "description": "ID of the User placing the order",
-                  "format": "int64"
-               },
-               "app_id": {
-                  "type": "integer",
-                  "description": "ID of the App creating the order",
-                  "format": "int64"
-               },
-               "customer": {
-                  "$ref": "#/components/schemas/OrderCustomer"
-               },
-               "bags": {
-                  "type": "array",
-                  "description": "Bags in the Order",
-                  "items": {
-                     "$ref": "#/components/schemas/Bag"
-                  }
-               },
-               "shipping_address": {
-                  "$ref": "#/components/schemas/OrderAddress"
-               },
-               "billing_address": {
-                  "$ref": "#/components/schemas/OrderAddress"
-               },
-               "payment_method": {
-                  "$ref": "#/components/schemas/OrderPaymentMethod"
-               },
-               "sub_total": {
-                  "type": "integer",
-                  "description": "Subtotal of the Order",
-                  "format": "int32"
-               },
-               "shipping_total": {
-                  "type": "integer",
-                  "description": "Shipping Total of the Order",
-                  "format": "int32"
-               },
-               "tax_total": {
-                  "type": "integer",
-                  "description": "Tax Total of the Order",
-                  "format": "int32"
-               },
-               "total": {
-                  "type": "integer",
-                  "description": "Total of the Order",
-                  "format": "int32"
-               },
-               "app_customer_id": {
-                  "type": "string",
-                  "description": "App Customer ID"
-               },
-               "app_order_id": {
-                  "type": "string",
-                  "description": "App Order ID"
-               },
-               "status": {
-                  "type": "string",
-                  "description": "Status of the Order",
-                  "enum": [
-                     "in_progress",
-                     "processing",
-                     "completed",
-                     "canceled",
-                     "partially_refunded",
-                     "refunded"
-                  ]
-               },
-               "date_created": {
-                  "type": "string",
-                  "description": "Date of order creation",
-                  "format": "date-time"
-               },
-               "date_last_modified": {
-                  "type": "string",
-                  "description": "Date of last order update",
-                  "format": "date-time"
-               },
-               "guest": {
-                  "type": "boolean",
-                  "description": "Is the customer a guest or an authed user.",
-                  "default": false
-               },
-               "referral_id": {
-                  "type": "string",
-                  "description": "Optional value used to represent an identifier in your system. Max length of 128 characters."
-               }
+              "id": {
+                "type": "integer",
+                "format": "int64",
+                "readOnly": true
+              },
+              "token": {
+                "type": "string",
+                "readOnly": true
+              },
+              "user_id": {
+                "type": "integer",
+                "description": "ID of the User placing the order",
+                "format": "int64"
+              },
+              "app_id": {
+                "type": "integer",
+                "description": "ID of the App creating the order",
+                "format": "int32"
+              },
+              "developer_id": {
+                "type": "integer",
+                "description": "ID of the Developer who placed",
+                "format": "int32"
+              },
+              "customer": {
+                "$ref": "#/components/schemas/OrderCustomer"
+              },
+              "bags": {
+                "type": "array",
+                "description": "Bags in the Order",
+                "items": {
+                  "$ref": "#/components/schemas/Bag"
+                }
+              },
+              "shipping_address": {
+                "$ref": "#/components/schemas/OrderAddress"
+              },
+              "billing_address": {
+                "$ref": "#/components/schemas/OrderAddress"
+              },
+              "payment_method": {
+                "$ref": "#/components/schemas/OrderPaymentMethod"
+              },
+              "sub_total": {
+                "type": "integer",
+                "description": "Subtotal of the Order",
+                "format": "int32"
+              },
+              "shipping_total": {
+                "type": "integer",
+                "description": "Shipping Total of the Order",
+                "format": "int32"
+              },
+              "tax_total": {
+                "type": "integer",
+                "description": "Tax Total of the Order",
+                "format": "int32"
+              },
+              "discount_total": {
+                "type": "integer",
+                "description": "Discount Total of the Order",
+                "format": "int32"
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total of the Order",
+                "format": "int32"
+              },
+              "app_customer_id": {
+                "type": "string",
+                "description": "App Customer ID"
+              },
+              "app_order_id": {
+                "type": "string",
+                "description": "App Order ID"
+              },
+              "status": {
+                "type": "string",
+                "description": "Status of the Order",
+                "enum": [
+                  "in_progress",
+                  "processing",
+                  "completed",
+                  "canceled",
+                  "partially_refunded",
+                  "refunded",
+                  "requires_action"
+                ]
+              },
+              "is_guest": {
+                "type": "boolean",
+                "description": "Order is Guest"
+              },
+              "date_created": {
+                "type": "string",
+                "description": "Date of order creation",
+                "format": "date-time"
+              },
+              "date_last_modified": {
+                "type": "string",
+                "description": "Date of last order update",
+                "format": "date-time"
+              },
+              "priced": {
+                "type": "boolean",
+                "description": "Is the cart priced"
+              },
+              "wallet_based_checkout": {
+                "type": "boolean",
+                "description": "Is this cart going to be placed through wallet-based checkout"
+              },
+              "currency": {
+                "type": "string",
+                "description": "Base currency of cart"
+              },
+              "referral_id": {
+                "type": "string",
+                "description": "Optional value used to represent an identifier in your system."
+              },
+              "errors": {
+                "type": "array",
+                "description": "Errors on the Order",
+                "items": {
+                  "$ref": "#/components/schemas/OrderError"
+                }
+              },
+              "currency_symbol": {
+                "type": "string",
+                "description": "Symbol representing the desired currency"
+              },
+              "app_name": {
+                "type": "string",
+                "description": "Name of app that originated the order."
+              },
+              "stripe_key": {
+                "type": "string",
+                "description": "Stripe publishable key. Use for tokenizing payment methods."
+              },
+              "payment_intent_client_secret": {
+                "type": "string",
+                "description": "Payment intent client secret"
+              },
+              "guest": {
+                "type": "boolean"
+              },
+              "intentBasedCheckout": {
+                "type": "boolean"
+              },
+              "orderId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "orderStatus": {
+                "type": "string",
+                "enum": [
+                  "IN_PROGRESS",
+                  "PROCESSING",
+                  "COMPLETED",
+                  "CANCELED",
+                  "PARTIALLY_REFUNDED",
+                  "REFUNDED",
+                  "REQUIRES_ACTION"
+                ]
+              }
             },
             "description": "Order"
-         },
+          },
          "OrderTax": {
             "required": [
                "amount",
@@ -4613,6 +4825,21 @@
             },
             "description": "Taxes belonging to an Order Bag"
          },
+         "DiscountRequest": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Discount code being applied"
+              },
+              "merchant_id": {
+                "type": "integer",
+                "description": "ID of the Merchant the discount belongs to",
+                "format": "int32"
+              }
+            },
+            "description": "Discount request"
+          },
          "BagShippingMethod": {
             "type": "object",
             "properties": {
@@ -4871,130 +5098,346 @@
          },
          "Bag": {
             "required": [
-               "app_id",
-               "merchant_id",
-               "order_id",
-               "shipping_method",
-               "taxes"
+              "app_id",
+              "merchant_id",
+              "order_id",
+              "shipping_method",
+              "taxes"
             ],
             "type": "object",
             "properties": {
-               "id": {
-                  "type": "integer",
-                  "format": "int64"
-               },
-               "order_id": {
-                  "type": "integer",
-                  "description": "ID of the Order the Bag belongs to",
-                  "format": "int64"
-               },
-               "merchant_id": {
-                  "type": "integer",
-                  "description": "ID of the Merchant the Bag references",
-                  "format": "int32"
-               },
-               "app_id": {
-                  "type": "integer",
-                  "description": "ID of the App creating this Bag",
-                  "format": "int64"
-               },
-               "external_id": {
-                  "type": "string",
-                  "description": "ID of the Order on the External Ecommerce Platform"
-               },
-               "status": {
-                  "type": "string",
-                  "description": "Status",
-                  "enum": [
-                     "in_progress",
-                     "submitted",
-                     "accepted",
-                     "shipped",
-                     "completed",
-                     "rejected",
-                     "canceled"
-                  ]
-               },
-               "fulfillment_status": {
-                  "type": "string",
-                  "description": "Fulfillment Status",
-                  "enum": [
-                     "unshipped",
-                     "shipped",
-                     "partially_shipped",
-                     "returned"
-                  ]
-               },
-               "financial_status": {
-                  "type": "string",
-                  "description": "Financial Status",
-                  "enum": [
-                     "unpaid",
-                     "authorized",
-                     "pending",
-                     "paid",
-                     "partially_paid",
-                     "refunded",
-                     "partially_refunded",
-                     "voided"
-                  ]
-               },
-               "skus": {
-                  "type": "array",
-                  "description": "SKUs added to the bag",
-                  "items": {
-                     "$ref": "#/components/schemas/OrderSku"
-                  }
-               },
-               "shipping_method": {
-                  "$ref": "#/components/schemas/OrderShippingMethod"
-               },
-               "taxes": {
-                  "type": "array",
-                  "description": "Taxes applied to the bag",
-                  "items": {
-                     "$ref": "#/components/schemas/OrderTax"
-                  }
-               },
-               "sub_total": {
-                  "type": "integer",
-                  "description": "Subtotal of the bag",
-                  "format": "int32"
-               },
-               "shipping_total": {
-                  "type": "integer",
-                  "description": "Shipping Total of the bag",
-                  "format": "int32"
-               },
-               "tax_total": {
-                  "type": "integer",
-                  "description": "Tax Total of the bag",
-                  "format": "int32"
-               },
-               "total": {
-                  "type": "integer",
-                  "description": "Total price of the bag",
-                  "format": "int32"
-               },
-               "transactions": {
-                  "type": "array",
-                  "description": "Transactions of the bag",
-                  "items": {
-                     "$ref": "#/components/schemas/Transaction"
-                  }
-               },
-               "external_checkout": {
-                  "type": "boolean",
-                  "description": "If bag is tracked externally",
-                  "default": false
-               },
-               "merchant_name": {
-                  "type": "string",
-                  "description": "Name of Merchant"
-               }
+              "id": {
+                "type": "integer",
+                "format": "int64",
+                "readOnly": true
+              },
+              "order_id": {
+                "type": "integer",
+                "description": "ID of the Order the Bag belongs to",
+                "format": "int64"
+              },
+              "merchant_id": {
+                "type": "integer",
+                "description": "ID of the Merchant the Bag references",
+                "format": "int32"
+              },
+              "app_id": {
+                "type": "integer",
+                "description": "ID of the App creating this Bag",
+                "format": "int32"
+              },
+              "external_id": {
+                "type": "string",
+                "description": "ID of the Order on the External Ecommerce Platform"
+              },
+              "status": {
+                "type": "string",
+                "description": "Status",
+                "enum": [
+                  "IN_PROGRESS",
+                  "SUBMITTED",
+                  "ACCEPTED",
+                  "COMPLETED",
+                  "PARTIALLY_REFUNDED",
+                  "REFUNDED",
+                  "REJECTED",
+                  "CANCELED",
+                  "BACKORDERD"
+                ]
+              },
+              "fulfillment_status": {
+                "type": "string",
+                "description": "Fulfillment Status",
+                "enum": [
+                  "PROCESSING",
+                  "FULFILLED",
+                  "PARTIALLY_FULFILLED",
+                  "DELIVERED",
+                  "COULD_NOT_DELIVER",
+                  "RETURNED"
+                ]
+              },
+              "financial_status": {
+                "type": "string",
+                "description": "Financial Status",
+                "enum": [
+                  "UNPAID",
+                  "AUTHORIZED",
+                  "PENDING",
+                  "PAID",
+                  "PARTIALLY_PAID",
+                  "REFUNDED",
+                  "PARTIALLY_REFUNDED",
+                  "VOIDED"
+                ]
+              },
+              "skus": {
+                "type": "array",
+                "description": "SKUs added to the bag",
+                "items": {
+                  "$ref": "#/components/schemas/OrderSku"
+                }
+              },
+              "shipping_method": {
+                "$ref": "#/components/schemas/OrderShippingMethod"
+              },
+              "taxes": {
+                "type": "array",
+                "description": "Taxes applied to the bag",
+                "items": {
+                  "$ref": "#/components/schemas/OrderTax"
+                }
+              },
+              "sub_total": {
+                "type": "integer",
+                "description": "Subtotal of the bag",
+                "format": "int32"
+              },
+              "shipping_total": {
+                "type": "integer",
+                "description": "Shipping Total of the bag",
+                "format": "int32"
+              },
+              "tax_total": {
+                "type": "integer",
+                "description": "Tax Total of the bag",
+                "format": "int32"
+              },
+              "discount_total": {
+                "type": "integer",
+                "description": "Discount Total of the bag",
+                "format": "int32"
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total price of the bag",
+                "format": "int32"
+              },
+              "taxes_included": {
+                "type": "boolean",
+                "description": "Are taxes included in the cart total."
+              },
+              "transactions": {
+                "type": "array",
+                "description": "Transactions of the bag",
+                "items": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              },
+              "external_checkout": {
+                "type": "boolean",
+                "description": "If bag is tracked externally"
+              },
+              "commission_rate": {
+                "type": "number",
+                "description": "The developer commission rate",
+                "format": "double"
+              },
+              "date_created": {
+                "type": "string",
+                "description": "Date of creation",
+                "format": "date-time"
+              },
+              "remorse_period_ends": {
+                "type": "string",
+                "description": "Date when the bag can no longer be refunded",
+                "format": "date-time"
+              },
+              "currency": {
+                "type": "string",
+                "description": "Base currency of cart"
+              },
+              "external_currency": {
+                "type": "string",
+                "description": "Currency of cart on external ecommerce platform"
+              },
+              "currency_exchange_rate": {
+                "type": "number",
+                "description": "Exchange rate of currency and external currency, if different, at the time the bag was last priced."
+              },
+              "channel": {
+                "type": "string",
+                "description": "The channel that originated this order.",
+                "enum": [
+                  "APP",
+                  "MARKETPLACE",
+                  "FACEBOOK",
+                  "INSTAGRAM",
+                  "WALMART",
+                  "GOOGLE",
+                  "TIKTOK",
+                  "SNAPCHAT",
+                  "PINTEREST"
+                ]
+              },
+              "app_order_id": {
+                "type": "string",
+                "description": "App Order ID"
+              },
+              "platform": {
+                "type": "string",
+                "description": "The commerce platform used by this merchant.",
+                "enum": [
+                  "OTHER",
+                  "SHOPIFY",
+                  "MAGENTO",
+                  "MAGENTO_ONE",
+                  "WOOCOMMERCE",
+                  "BIGCOMMERCE",
+                  "LIGHTSPEED",
+                  "ECWID",
+                  "YAAS",
+                  "SPREECOMMERCE",
+                  "DEMANDWARE",
+                  "VOLUSION",
+                  "PRESTASHOP",
+                  "THREEDCART",
+                  "SYLIUS",
+                  "WIX",
+                  "SWELL",
+                  "MIVA",
+                  "WEBSPHERE",
+                  "ORACLECC",
+                  "SAPCC",
+                  "SQUARESPACE",
+                  "SHOPWARE",
+                  "COMMERCETOOLS",
+                  "MEDUSA",
+                  "ABICART",
+                  "SPRYKER",
+                  "MYSTORE",
+                  "CENTRA",
+                  "XCART",
+                  "VTEX",
+                  "KIBO",
+                  "SALEOR",
+                  "VENDO",
+                  "DIGITALRIVER",
+                  "CUSTOM"
+                ]
+              },
+              "fulfillments": {
+                "uniqueItems": true,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BagFulfillment"
+                }
+              },
+              "discounts": {
+                "uniqueItems": true,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BagDiscount"
+                }
+              },
+              "wallet_based_checkout": {
+                "type": "boolean",
+                "description": "Is this bag going to be placed through wallet-based checkout"
+              },
+              "app_name": {
+                "type": "string",
+                "description": "Name of app that originated the order."
+              },
+              "bagId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "bagStatus": {
+                "type": "string",
+                "enum": [
+                  "IN_PROGRESS",
+                  "SUBMITTED",
+                  "ACCEPTED",
+                  "COMPLETED",
+                  "PARTIALLY_REFUNDED",
+                  "REFUNDED",
+                  "REJECTED",
+                  "CANCELED",
+                  "BACKORDERED"
+                ]
+              },
+              "merchant_name": {
+                "type": "string",
+                "description": "Name of Merchant"
+              }
             },
             "description": "Per Merchant Bag in Order"
-         },
+          },
+          "BagDiscount": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64",
+                "readOnly": true
+              },
+              "bag_id": {
+                "type": "integer",
+                "description": "ID of the Bag this discount belong to",
+                "format": "int64"
+              },
+              "status": {
+                "type": "string",
+                "description": "Status of discount",
+                "enum": [
+                  "PENDING",
+                  "APPLIED",
+                  "INVALID",
+                  "NOT_SUPPORTED",
+                  "ERROR"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of discount",
+                "enum": [
+                  "CODE"
+                ]
+              },
+              "value_type": {
+                "type": "string",
+                "description": "Value type of discount",
+                "enum": [
+                  "AMOUNT",
+                  "PERCENTAGE"
+                ]
+              },
+              "code": {
+                "type": "string",
+                "description": "Code of discount"
+              },
+              "external_id": {
+                "type": "string",
+                "description": "External ID of discount"
+              },
+              "amount": {
+                "type": "integer",
+                "description": "Amount of discount",
+                "format": "int32"
+              },
+              "percentage": {
+                "type": "number",
+                "description": "Percentage of discount",
+                "format": "double"
+              },
+              "amount_total": {
+                "type": "integer",
+                "description": "Total amount of discount applied to bag",
+                "format": "int32"
+              },
+              "date_created": {
+                "type": "string",
+                "description": "Date of creation",
+                "format": "date-time"
+              },
+              "date_last_modified": {
+                "type": "string",
+                "description": "Date of last bag discount update",
+                "format": "date-time"
+              }
+            },
+            "description": "Bag Discount"
+          },
          "CurrentPaymentToken": {
             "type": "object",
             "properties": {
