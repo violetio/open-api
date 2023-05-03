@@ -5,7 +5,7 @@ info:
     title: "Event-Service"
     contact:
         name: "Violet.io"
-host: "https://sandbox-api.violet.io"
+host: "sandbox-api.violet.io"
 basePath: "/v1/events"
 tags:
     - name: "Event"
