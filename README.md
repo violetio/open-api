@@ -1,9 +1,5 @@
-# api-client-code-samples
+# open-api
 
-The intent of this project is to provide small code samples of how to use Violet api.
+The intent of this project is to concentrate all generated swagger files from our services.
 
-## Getting started
-
-1. Make sure you have a developer account created at https://my.violet.io/
-2. Get familiar with Violet documentation https://violetio.readme.io/docs
-3. Check the samples!
+Check the [releases](https://github.com/violetio/open-api/releases) for latest artifacts.
