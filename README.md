@@ -1,5 +1,5 @@
 # open-api
 
-The intent of this project is to concentrate all generated swagger files from our services.
+Auto-generated Violet swagger files.
 
-Check the [releases](https://github.com/violetio/open-api/releases) for latest artifacts.
+Do not manually update the files as they might get overwritten.
