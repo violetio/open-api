@@ -2116,13 +2116,13 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
       sort:
         $ref: "#/definitions/Sort"
       first:
         type: "boolean"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
       last:
         type: "boolean"
       pageable:
@@ -2148,13 +2148,13 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
       sort:
         $ref: "#/definitions/Sort"
       first:
         type: "boolean"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
       last:
         type: "boolean"
       pageable:
@@ -2180,13 +2180,13 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
       sort:
         $ref: "#/definitions/Sort"
       first:
         type: "boolean"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
       last:
         type: "boolean"
       pageable:
