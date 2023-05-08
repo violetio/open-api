@@ -1,0 +1,192 @@
+---
+swagger: "2.0"
+info:
+  description: "Econ Sync Service API"
+  version: "v1"
+  title: "Econ-Sync-Service"
+  contact:
+    name: "Violet.io"
+    url: "https://violet.io"
+host: "sandbox-api.violet.io"
+basePath: "/v1"
+tags:
+- name: "1.0"
+schemes:
+- "https"
+paths:
+  /sync/proxy/{subResources}:
+    get:
+      tags:
+      - "1.0"
+      operationId: "sendRequestToSPMGET"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    head:
+      tags:
+      - "1.0"
+      operationId: "sendRequestToSPMHEAD"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    post:
+      tags:
+      - "1.0"
+      operationId: "sendRequestToSPMPOST"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    put:
+      tags:
+      - "1.0"
+      operationId: "sendRequestToSPMPUT"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      tags:
+      - "1.0"
+      operationId: "sendRequestToSPMDELETE"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    options:
+      tags:
+      - "1.0"
+      operationId: "sendRequestToSPMOPTIONS"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+    patch:
+      tags:
+      - "1.0"
+      operationId: "sendRequestToSPMPATCH"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"

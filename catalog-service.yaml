@@ -1,0 +1,1512 @@
+---
+swagger: "2.0"
+info:
+  description: "Catalog Service API"
+  version: "v1"
+  title: "Catalog-Service"
+  contact:
+    name: "Violet.io"
+    url: "https://violet.io"
+host: "sandbox-api.violet.io"
+basePath: "/v1"
+tags:
+- name: "1.0"
+- name: "Catalog"
+  description: ""
+- name: "Catalog - Categories"
+  description: ""
+- name: "Catalog - Offers"
+  description: ""
+- name: "Catalog - Products"
+  description: ""
+- name: "Catalog - Skus"
+  description: ""
+schemes:
+- "https"
+paths:
+  /catalog/categories:
+    get:
+      tags:
+      - "Catalog - Categories"
+      summary: "Get Categories"
+      description: ""
+      operationId: "getCategories"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Category"
+  /catalog/categories/search/{query}:
+    get:
+      tags:
+      - "Catalog - Categories"
+      summary: "Search Categories"
+      description: ""
+      operationId: "searchCategories"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "query"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Category"
+  /catalog/categories/slug/{slug}:
+    get:
+      tags:
+      - "Catalog - Categories"
+      summary: "Get Category by Slug"
+      description: ""
+      operationId: "getCategoryBySlug"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "slug"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Category"
+  /catalog/categories/{id}:
+    get:
+      tags:
+      - "Catalog - Categories"
+      summary: "Get Category by ID"
+      description: ""
+      operationId: "getCategoryById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Category"
+  /catalog/categories/{id}/tree:
+    get:
+      tags:
+      - "Catalog - Categories"
+      summary: "Get Category Tree"
+      description: ""
+      operationId: "getCategoryTree"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Category"
+  /catalog/offers/merchants/{merchant_id}:
+    get:
+      tags:
+      - "Catalog"
+      summary: "Get All Merchant Offers"
+      description: ""
+      operationId: "getMerchantOffers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "X-Violet-Api-Features"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "merchant_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "since"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      - name: "map_variants"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "base_currency"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PageOffer"
+  /catalog/offers/search:
+    post:
+      tags:
+      - "Catalog - Offers"
+      summary: "Search Offers"
+      description: "Maximum size limit of 100 results."
+      operationId: "searchOffers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      - name: "exclude_public"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "exclude_hidden"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: true
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PageOffer"
+  /catalog/offers/{offer_id}:
+    get:
+      tags:
+      - "Catalog - Offers"
+      summary: "Get Offer by ID"
+      description: ""
+      operationId: "getOfferById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "X-Violet-Api-Features"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "offer_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "base_currency"
+        in: "query"
+        required: false
+        type: "string"
+        default: "USD"
+      - name: "exchange_rate"
+        in: "query"
+        required: false
+        type: "number"
+        format: "double"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Offer"
+  /catalog/products:
+    get:
+      tags:
+      - "Catalog - Products"
+      summary: "Get Products"
+      description: "Products will be wrapped in a Page container."
+      operationId: "getProducts"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      - name: "exclude_public"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "exclude_hidden"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: true
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Product"
+  /catalog/products/random:
+    get:
+      tags:
+      - "Catalog - Products"
+      summary: "Get Random Products"
+      description: "Maximum size limit of 50 results."
+      operationId: "getRandomProducts"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      - name: "exclude_public"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Page"
+  /catalog/products/search:
+    post:
+      tags:
+      - "Catalog - Products"
+      summary: "Search Products"
+      description: "Maximum size limit of 50 results."
+      operationId: "searchProducts"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      - name: "exclude_public"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "exclude_hidden"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "extended"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "validate"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Page"
+  /catalog/products/{product_id}:
+    get:
+      tags:
+      - "Catalog - Products"
+      summary: "Get Product by ID"
+      description: ""
+      operationId: "getProductById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "product_id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "extended"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "include_disabled"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "base_currency"
+        in: "query"
+        required: false
+        type: "string"
+        default: "USD"
+      - name: "sort_skus"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "validate"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Product"
+  /catalog/skus/{sku_id}:
+    get:
+      tags:
+      - "Catalog - Skus"
+      summary: "Get Sku by ID"
+      description: ""
+      operationId: "getSkuById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "sku_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "base_currency"
+        in: "query"
+        required: false
+        type: "string"
+        default: "USD"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Sku"
+definitions:
+  Album:
+    type: "object"
+    required:
+    - "parent_id"
+    - "type"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      parent_id:
+        type: "integer"
+        format: "int64"
+        description: "ID of the parent entity"
+      type:
+        type: "string"
+        description: "Parent Type"
+        enum:
+        - "OFFER"
+        - "SKU"
+      name:
+        type: "string"
+        description: "Name of Album"
+      media:
+        type: "array"
+        description: "Album media"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Media"
+      primary_media:
+        readOnly: true
+        $ref: "#/definitions/Media"
+    description: "Product Image Container"
+  Category:
+    type: "object"
+    required:
+    - "depth"
+    - "name"
+    - "slug"
+    properties:
+      id:
+        type: "string"
+        readOnly: true
+      name:
+        type: "string"
+        description: "Category Name"
+      slug:
+        type: "string"
+        description: "Category Slug"
+      parent_id:
+        type: "string"
+        description: "Parent ID"
+      depth:
+        type: "integer"
+        format: "int32"
+        description: "Category Depth"
+    description: "Product Category"
+  Media:
+    type: "object"
+    required:
+    - "album_id"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      album_id:
+        type: "integer"
+        format: "int64"
+        description: "Album ID"
+      external_id:
+        type: "string"
+        description: "External ID"
+      cloud_id:
+        type: "string"
+        description: "ID of hosted cloud entity"
+      url:
+        type: "string"
+        description: "Media URL"
+      source_url:
+        type: "string"
+        description: "Media Source URL"
+      type:
+        type: "string"
+        description: "Media Type"
+        enum:
+        - "IMAGE"
+        - "VIDEO"
+      display_order:
+        type: "integer"
+        format: "int32"
+        description: "Display Order"
+      primary:
+        type: "boolean"
+        description: "Primary Media"
+    description: "Product and SKU Media"
+  Meta:
+    type: "object"
+    required:
+    - "key"
+    - "offer_id"
+    - "value"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      offer_id:
+        type: "integer"
+        format: "int64"
+        description: "Offer Id"
+      key:
+        type: "string"
+        description: "Key"
+      value:
+        type: "string"
+        description: "Value"
+    description: "Additional Product MetaData"
+  Offer:
+    type: "object"
+    required:
+    - "available"
+    - "merchant_id"
+    - "min_price"
+    - "name"
+    - "product_id"
+    - "source"
+    - "visible"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      product_id:
+        type: "string"
+        description: "The parent/container product ID"
+      external_id:
+        type: "string"
+        description: "External ID"
+      external_url:
+        type: "string"
+        description: "External URL"
+      name:
+        type: "string"
+        description: "Name of Product in Offer"
+      description:
+        type: "string"
+        description: "Product Description"
+      source:
+        type: "string"
+        description: "Source Platform"
+        enum:
+        - "OTHER"
+        - "SHOPIFY"
+        - "MAGENTO"
+        - "MAGENTO_ONE"
+        - "WOOCOMMERCE"
+        - "BIGCOMMERCE"
+        - "LIGHTSPEED"
+        - "ECWID"
+        - "YAAS"
+        - "SPREECOMMERCE"
+        - "DEMANDWARE"
+        - "VOLUSION"
+        - "PRESTASHOP"
+        - "THREEDCART"
+        - "SYLIUS"
+        - "WIX"
+        - "SWELL"
+        - "MIVA"
+        - "WEBSPHERE"
+        - "ORACLECC"
+        - "SAPCC"
+        - "SQUARESPACE"
+        - "SHOPWARE"
+        - "COMMERCETOOLS"
+        - "MEDUSA"
+        - "ABICART"
+        - "SPRYKER"
+        - "MYSTORE"
+        - "CENTRA"
+        - "XCART"
+        - "VTEX"
+        - "KIBO"
+        - "SALEOR"
+        - "VENDO"
+        - "DIGITALRIVER"
+        - "CUSTOM"
+      seller:
+        type: "string"
+        description: "Name of Merchant Selling Product"
+      vendor:
+        type: "string"
+        description: "Name of Original Vendor"
+      merchant_id:
+        type: "integer"
+        format: "int32"
+        description: "Merchant ID"
+      available:
+        type: "boolean"
+        description: "Is Product Available"
+      visible:
+        type: "boolean"
+        description: "Is Product Visible"
+      min_price:
+        type: "integer"
+        format: "int32"
+        description: "Minimum Price the Product sells for"
+      max_price:
+        type: "integer"
+        format: "int32"
+        description: "Maximum Price the Product sells for"
+      currency:
+        type: "string"
+        description: "Base Currency of Offer"
+      source_category_name:
+        type: "string"
+        description: "Original Category on Source Platform"
+      meta:
+        type: "array"
+        description: "Additional Meta Data of the Offer"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Meta"
+      variants:
+        type: "array"
+        description: "Product Variations"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Variant"
+      skus:
+        type: "array"
+        description: "Product SKUs"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Sku"
+      albums:
+        type: "array"
+        description: "Product Albums"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Album"
+      three_d_enables:
+        type: "boolean"
+        description: "Is the product 3D Enabled"
+      three_d_resource:
+        type: "string"
+        description: "3D Resource Object"
+      type:
+        type: "string"
+        description: "Product Type"
+        enum:
+        - "PHYSICAL"
+        - "DIGITAL"
+        - "VIRTUAL"
+      status:
+        type: "string"
+        description: "Status"
+        enum:
+        - "AVAILABLE"
+        - "UNAVAILABLE"
+        - "DISABLED_AVAILABLE"
+        - "DISABLED_UNAVAILABLE"
+        - "ARCHIVED"
+        - "FOR_DELETION"
+      publishing_status:
+        type: "string"
+        description: "Publishing Status"
+        enum:
+        - "NOT_PUBLISHED"
+        - "PUBLISHED"
+      date_created:
+        type: "string"
+        format: "date-time"
+        description: "Date of offer creation"
+      date_last_modified:
+        type: "string"
+        format: "date-time"
+        description: "Date of last offer update"
+      commission_rate:
+        type: "number"
+        format: "double"
+        description: "Amount given by merchant"
+      weight_unit:
+        type: "string"
+        description: "Weight Unit"
+        enum:
+        - "OUNCES"
+        - "POUNDS"
+        - "GRAMS"
+        - "KILOGRAMS"
+        - "CARATS"
+        - "TONNES"
+        - "MILLIGRAMS"
+        - "LITERS"
+        - "MILLILITERS"
+        - "QUARTS"
+        - "QUARTERS"
+        - "GALLONS"
+        - "PINTS"
+      size_unit:
+        type: "string"
+        description: "Size Unit"
+        enum:
+        - "MILLIMETERS"
+        - "CENTIMETERS"
+        - "INCHES"
+        - "FEET"
+        - "METERS"
+        - "YARDS"
+      currency_symbol:
+        type: "string"
+        description: "Symbol representing the desired currency"
+      presented_currency:
+        type: "string"
+        description: "The presented currency of this SKU"
+      subscription_status:
+        type: "string"
+        description: "Subscription status"
+        enum:
+        - "NOT_SUBSCRIBED"
+        - "SUBSCRIBED"
+      tags:
+        type: "array"
+        items:
+          type: "string"
+    description: "Product Offer"
+  Page:
+    type: "object"
+    properties:
+      totalElements:
+        type: "integer"
+        format: "int64"
+      totalPages:
+        type: "integer"
+        format: "int32"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      first:
+        type: "boolean"
+      last:
+        type: "boolean"
+      sort:
+        $ref: "#/definitions/Sort"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          type: "object"
+      number:
+        type: "integer"
+        format: "int32"
+      empty:
+        type: "boolean"
+  PageOffer:
+    type: "object"
+    properties:
+      totalElements:
+        type: "integer"
+        format: "int64"
+      totalPages:
+        type: "integer"
+        format: "int32"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      first:
+        type: "boolean"
+      last:
+        type: "boolean"
+      sort:
+        $ref: "#/definitions/Sort"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          $ref: "#/definitions/Offer"
+      number:
+        type: "integer"
+        format: "int32"
+      empty:
+        type: "boolean"
+  PageProduct:
+    type: "object"
+    properties:
+      totalElements:
+        type: "integer"
+        format: "int64"
+      totalPages:
+        type: "integer"
+        format: "int32"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      first:
+        type: "boolean"
+      last:
+        type: "boolean"
+      sort:
+        $ref: "#/definitions/Sort"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          $ref: "#/definitions/Product"
+      number:
+        type: "integer"
+        format: "int32"
+      empty:
+        type: "boolean"
+  Pageable:
+    type: "object"
+    properties:
+      unpaged:
+        type: "boolean"
+      pageNumber:
+        type: "integer"
+        format: "int32"
+      pageSize:
+        type: "integer"
+        format: "int32"
+      paged:
+        type: "boolean"
+      sort:
+        $ref: "#/definitions/Sort"
+      offset:
+        type: "integer"
+        format: "int64"
+  Product:
+    type: "object"
+    required:
+    - "name"
+    - "slug"
+    properties:
+      id:
+        type: "string"
+        readOnly: true
+      name:
+        type: "string"
+        description: "Product Name"
+      description:
+        type: "string"
+        description: "Product Description"
+      long_description:
+        type: "string"
+        description: "Product Long Description"
+      slug:
+        type: "string"
+        description: "Product Slug/Handle"
+      brand:
+        type: "string"
+        description: "Brand"
+      available:
+        type: "boolean"
+        description: "Is the Product Available"
+      visible:
+        type: "boolean"
+        description: "Is the Product Visible"
+      total_sales:
+        type: "integer"
+        format: "int32"
+        description: "Number of times this product has been sold"
+      type:
+        type: "string"
+        description: "Product Type"
+        enum:
+        - "physical"
+        - "digital"
+        - "virtual"
+      currency:
+        type: "string"
+        enum:
+        - "USD"
+        - "GBP"
+      min_price:
+        type: "integer"
+        format: "int32"
+        description: "Minimum Price of the Product"
+      max_price:
+        type: "integer"
+        format: "int32"
+        description: "Maximum Price of the Product"
+      variants:
+        type: "array"
+        description: "Product Variants"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/ProductVariant"
+      offers:
+        type: "array"
+        description: "Merchant Offerings"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Offer"
+      categories:
+        type: "array"
+        description: "Categories"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Category"
+      gender:
+        type: "string"
+        description: "Gender"
+        enum:
+        - "MALE"
+        - "FEMALE"
+        - "UNISEX"
+      meta:
+        type: "array"
+        description: "Meta Data"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Meta"
+      tags:
+        type: "array"
+        description: "Tags"
+        uniqueItems: true
+        items:
+          type: "string"
+      related_product_ids:
+        type: "array"
+        description: "ID's of related products."
+        uniqueItems: true
+        items:
+          type: "string"
+      cross_sale_product_ids:
+        type: "array"
+        description: "ID's of Cross Saleable Products."
+        uniqueItems: true
+        items:
+          type: "string"
+      gtins:
+        type: "array"
+        description: "List of Global Trade Item Numbers"
+        uniqueItems: true
+        items:
+          type: "string"
+      default_image_url:
+        type: "string"
+        description: "The default/cover image of the Product"
+      qty_available:
+        type: "integer"
+        format: "int32"
+        description: "Overall Quantity"
+      merchant_ids:
+        type: "array"
+        description: "List of merchants selling this product."
+        uniqueItems: true
+        items:
+          type: "integer"
+          format: "int32"
+      date_created:
+        type: "string"
+        format: "date-time"
+        description: "Date of product creation"
+      date_last_modified:
+        type: "string"
+        format: "date-time"
+        description: "Date of last product update"
+      channelReady:
+        type: "boolean"
+      requires:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+          enum:
+          - "TAXONOMY"
+          - "GENDER"
+          - "GTINS"
+      offersAvailable:
+        type: "integer"
+        format: "int32"
+    description: "Products"
+  ProductVariant:
+    type: "object"
+    required:
+    - "name"
+    - "product_id"
+    properties:
+      id:
+        type: "string"
+        readOnly: true
+      product_id:
+        type: "string"
+        description: "Product ID"
+      name:
+        type: "string"
+        description: "Name"
+      visual:
+        type: "boolean"
+        description: "Is this a visual variant"
+      values:
+        type: "array"
+        description: "Product Variant values"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/ProductVariantValue"
+      display_order:
+        type: "integer"
+        format: "int32"
+        description: "Display Order"
+    description: "Product Variant"
+  ProductVariantValue:
+    type: "object"
+    required:
+    - "variant_id"
+    properties:
+      id:
+        type: "string"
+        readOnly: true
+      variant_id:
+        type: "string"
+        description: "ID of the Variation"
+      name:
+        type: "string"
+        description: "Name"
+      display_order:
+        type: "integer"
+        format: "int32"
+        description: "Display Order"
+      swatch:
+        type: "string"
+        description: "Color/Pattern Swatch URL"
+      hex:
+        type: "string"
+        description: "Hex Code"
+    description: "Product Variant Value"
+  Sku:
+    type: "object"
+    required:
+    - "currency"
+    - "merchant_id"
+    - "offer_id"
+    - "sale_price"
+    - "type"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      offer_id:
+        type: "integer"
+        format: "int64"
+        description: "ID of the Offer"
+      merchant_id:
+        type: "integer"
+        format: "int32"
+        description: "ID of the Merchant"
+      external_id:
+        type: "string"
+        description: "ID of the SKU on the External Ecom Platform"
+      name:
+        type: "string"
+        description: "Sku Name"
+      asin:
+        type: "string"
+        description: "Amazon Standard Identification Number"
+      gtin:
+        type: "string"
+        description: "Global Trade Item Number"
+      upc:
+        type: "string"
+        description: "Universal Product Code"
+      ean:
+        type: "string"
+        description: "European Article Number"
+      isbn:
+        type: "string"
+        description: "International Standard Book Number"
+      in_stock:
+        type: "boolean"
+        description: "Is the Product in Stock"
+      quantity_available:
+        type: "integer"
+        format: "int32"
+        description: "Quantity Available"
+      inventory_tracked:
+        type: "boolean"
+        description: "Is the SKUs inventory tracked"
+      sale_price:
+        type: "integer"
+        format: "int32"
+        description: "Sale Price of the SKU"
+      retail_price:
+        type: "integer"
+        format: "int32"
+        description: "Retail Price of the SKU"
+      currency:
+        type: "string"
+        description: "The base currency of this SKU"
+      presented_currency:
+        type: "string"
+        description: "The presented currency of this SKU"
+      taxable:
+        type: "boolean"
+        description: "Is the product taxable"
+      tax_type:
+        type: "string"
+        description: "Type of Tax on this SKU"
+        enum:
+        - "default"
+        - "apparel"
+        - "service"
+      albums:
+        type: "array"
+        description: "Sku Albums"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/Album"
+      variant_values:
+        type: "array"
+        description: "Variant Values that apply to this SKU"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/SkuVariantValue"
+      type:
+        type: "string"
+        enum:
+        - "physical"
+        - "digital"
+        - "virtual"
+      status:
+        type: "string"
+        description: "SKU Status"
+        enum:
+        - "AVAILABLE"
+        - "UNAVAILABLE"
+        - "DISABLED_AVAILABLE"
+        - "DISABLED_UNAVAILABLE"
+        - "ARCHIVED"
+        - "FOR_DELETION"
+      date_created:
+        type: "string"
+        format: "date-time"
+        description: "Date of SKU creation"
+      date_last_modified:
+        type: "string"
+        format: "date-time"
+        description: "Date of last SKU update"
+      sku_dimensions:
+        description: "Dimensions of the SKU"
+        $ref: "#/definitions/SkuDimensions"
+      display_order:
+        type: "integer"
+        format: "int32"
+        description: "Order to display SKU"
+    description: "Stock Keeping Unit"
+  SkuDimensions:
+    type: "object"
+    properties:
+      sku_id:
+        type: "integer"
+        format: "int64"
+        description: "ID of SKU Dimensions Belong To"
+      weight:
+        type: "number"
+        format: "double"
+        description: "Weight of SKU"
+      height:
+        type: "number"
+        format: "double"
+        description: "Height of SKU"
+      width:
+        type: "number"
+        format: "double"
+        description: "Width of SKU"
+      length:
+        type: "number"
+        format: "double"
+        description: "Length of SKU"
+      type:
+        type: "string"
+        description: "Dimensions Type"
+        enum:
+        - "SKU"
+        - "SHIPPING"
+    description: "Individual Sku Dimensions"
+  SkuVariantValue:
+    type: "object"
+    required:
+    - "value"
+    - "variant"
+    properties:
+      variant:
+        type: "string"
+        description: "Variant Name"
+      value:
+        type: "string"
+        description: "Variant Value"
+    description: "Individual Variation Value for a Sku"
+  Sort:
+    type: "object"
+    properties:
+      unsorted:
+        type: "boolean"
+      sorted:
+        type: "boolean"
+      empty:
+        type: "boolean"
+  Variant:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      product_variant_id:
+        type: "string"
+        description: "ID of the Product Variant"
+      external_id:
+        type: "string"
+        description: "ID of the Variant on the External Ecommerce Platform"
+      name:
+        type: "string"
+        description: "Variant Name"
+      visual:
+        type: "boolean"
+        description: "Is the variant visual"
+      values:
+        type: "array"
+        description: "Variant Values"
+        items:
+          $ref: "#/definitions/VariantValue"
+    description: "Variation Data"
+  VariantValue:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      product_variant_value_id:
+        type: "string"
+        description: "ID of the Product Variation Value"
+      external_id:
+        type: "string"
+        description: "ID of the Variant in the External Ecommerce Platform"
+      name:
+        type: "string"
+        description: "Variant Value Name"
+      sku_ids:
+        type: "array"
+        description: "ID's of SKU's containing this Variant Value"
+        uniqueItems: true
+        items:
+          type: "integer"
+          format: "int64"
+    description: "Individual Variation Value"
