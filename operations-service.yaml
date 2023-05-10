@@ -162,7 +162,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       app_id:
         type: "integer"
         format: "int32"
@@ -185,7 +185,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       total_connected:
         type: "integer"
         format: "int32"
@@ -204,7 +204,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       default_rate:
         type: "number"
         format: "double"
@@ -229,7 +229,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       results:
         description: "The results of the merchant payout account check"
         $ref: "#/definitions/PayoutAccount"
@@ -327,6 +327,22 @@ definitions:
         $ref: "#/definitions/ChannelConnections"
     description: "The container for all status objects comprising merchant connection\
       \ health"
+  Error:
+    type: "object"
+    properties:
+      error:
+        type: "string"
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+      id:
+        type: "object"
+      ids:
+        type: "array"
+        items:
+          type: "object"
   InvalidProducts:
     type: "object"
     properties:
@@ -340,7 +356,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       results:
         description: "The results of the merchant invalid products check"
         $ref: "#/definitions/InvalidProductsResults"
@@ -378,7 +394,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       results:
         type: "string"
         description: "The results of the merchant payout account migration check"
@@ -402,7 +418,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       results:
         description: "The results of the merchant offers published check"
         $ref: "#/definitions/OffersPublishedResults"
@@ -566,16 +582,6 @@ definitions:
       legal_entity_address_line_2:
         type: "string"
         description: "Legal Entity Address Line Two"
-  RestError:
-    type: "object"
-    properties:
-      message:
-        type: "string"
-      error:
-        type: "string"
-      code:
-        type: "integer"
-        format: "int32"
   ScopeValidation:
     type: "object"
     properties:
@@ -589,7 +595,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       results:
         description: "The results of the merchant scope validation check"
         $ref: "#/definitions/ScopeValidationResults"
@@ -665,7 +671,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       results:
         description: "The results of the merchant product sync status check"
         $ref: "#/definitions/ShopifyProductSyncs"
@@ -683,7 +689,7 @@ definitions:
         - "not_applicable"
       error:
         description: "The error encountered while retrieving status"
-        $ref: "#/definitions/RestError"
+        $ref: "#/definitions/Error"
       results:
         type: "array"
         description: "The results of the merchant terms of service acceptance check"
