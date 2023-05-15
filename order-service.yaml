@@ -1388,6 +1388,7 @@ definitions:
         - "INVALID"
         - "NOT_SUPPORTED"
         - "ERROR"
+        - "EXPIRED"
       type:
         type: "string"
         description: "Type of discount"
@@ -1631,12 +1632,7 @@ definitions:
       payment_intent_client_secret:
         type: "string"
         description: "Payment intent client secret"
-      orderId:
-        type: "integer"
-        format: "int64"
       guest:
-        type: "boolean"
-      intentBasedCheckout:
         type: "boolean"
       orderStatus:
         type: "string"
@@ -1648,6 +1644,11 @@ definitions:
         - "PARTIALLY_REFUNDED"
         - "REFUNDED"
         - "REQUIRES_ACTION"
+      orderId:
+        type: "integer"
+        format: "int64"
+      intentBasedCheckout:
+        type: "boolean"
     description: "Order"
   OrderAddress:
     type: "object"
@@ -2208,9 +2209,6 @@ definitions:
     properties:
       sort:
         $ref: "#/definitions/Sort"
-      pageSize:
-        type: "integer"
-        format: "int32"
       paged:
         type: "boolean"
       pageNumber:
@@ -2218,6 +2216,9 @@ definitions:
         format: "int32"
       unpaged:
         type: "boolean"
+      pageSize:
+        type: "integer"
+        format: "int32"
       offset:
         type: "integer"
         format: "int64"
