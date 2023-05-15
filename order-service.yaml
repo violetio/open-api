@@ -1632,7 +1632,12 @@ definitions:
       payment_intent_client_secret:
         type: "string"
         description: "Payment intent client secret"
+      orderId:
+        type: "integer"
+        format: "int64"
       guest:
+        type: "boolean"
+      intentBasedCheckout:
         type: "boolean"
       orderStatus:
         type: "string"
@@ -1644,11 +1649,6 @@ definitions:
         - "PARTIALLY_REFUNDED"
         - "REFUNDED"
         - "REQUIRES_ACTION"
-      orderId:
-        type: "integer"
-        format: "int64"
-      intentBasedCheckout:
-        type: "boolean"
     description: "Order"
   OrderAddress:
     type: "object"
@@ -2117,17 +2117,6 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
-      sort:
-        $ref: "#/definitions/Sort"
-      first:
-        type: "boolean"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      last:
-        type: "boolean"
-      pageable:
-        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -2138,6 +2127,17 @@ definitions:
       number:
         type: "integer"
         format: "int32"
+      first:
+        type: "boolean"
+      sort:
+        $ref: "#/definitions/Sort"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      last:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
       empty:
         type: "boolean"
   PageBag:
@@ -2149,17 +2149,6 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
-      sort:
-        $ref: "#/definitions/Sort"
-      first:
-        type: "boolean"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      last:
-        type: "boolean"
-      pageable:
-        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -2170,6 +2159,17 @@ definitions:
       number:
         type: "integer"
         format: "int32"
+      first:
+        type: "boolean"
+      sort:
+        $ref: "#/definitions/Sort"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      last:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
       empty:
         type: "boolean"
   PageOrder:
@@ -2181,17 +2181,6 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
-      sort:
-        $ref: "#/definitions/Sort"
-      first:
-        type: "boolean"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      last:
-        type: "boolean"
-      pageable:
-        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -2202,11 +2191,25 @@ definitions:
       number:
         type: "integer"
         format: "int32"
+      first:
+        type: "boolean"
+      sort:
+        $ref: "#/definitions/Sort"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      last:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
       empty:
         type: "boolean"
   Pageable:
     type: "object"
     properties:
+      offset:
+        type: "integer"
+        format: "int64"
       sort:
         $ref: "#/definitions/Sort"
       paged:
@@ -2219,9 +2222,6 @@ definitions:
       pageSize:
         type: "integer"
         format: "int32"
-      offset:
-        type: "integer"
-        format: "int64"
   Refund:
     type: "object"
     required:
