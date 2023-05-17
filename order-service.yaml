@@ -283,6 +283,46 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/customer:
+    post:
+      tags:
+      - "Checkout - Customer"
+      summary: "Apply Guest Customer to Cart"
+      description: ""
+      operationId: "applyGuestCustomerToCart"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "async"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
   /checkout/cart/{cart_id}/discounts:
     post:
       tags:
@@ -2111,12 +2151,23 @@ definitions:
   Page:
     type: "object"
     properties:
-      totalPages:
-        type: "integer"
-        format: "int32"
       totalElements:
         type: "integer"
         format: "int64"
+      totalPages:
+        type: "integer"
+        format: "int32"
+      sort:
+        $ref: "#/definitions/Sort"
+      first:
+        type: "boolean"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      last:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -2127,10 +2178,21 @@ definitions:
       number:
         type: "integer"
         format: "int32"
-      first:
+      empty:
         type: "boolean"
+  PageBag:
+    type: "object"
+    properties:
+      totalElements:
+        type: "integer"
+        format: "int64"
+      totalPages:
+        type: "integer"
+        format: "int32"
       sort:
         $ref: "#/definitions/Sort"
+      first:
+        type: "boolean"
       numberOfElements:
         type: "integer"
         format: "int32"
@@ -2138,17 +2200,6 @@ definitions:
         type: "boolean"
       pageable:
         $ref: "#/definitions/Pageable"
-      empty:
-        type: "boolean"
-  PageBag:
-    type: "object"
-    properties:
-      totalPages:
-        type: "integer"
-        format: "int32"
-      totalElements:
-        type: "integer"
-        format: "int64"
       size:
         type: "integer"
         format: "int32"
@@ -2159,10 +2210,21 @@ definitions:
       number:
         type: "integer"
         format: "int32"
-      first:
+      empty:
         type: "boolean"
+  PageOrder:
+    type: "object"
+    properties:
+      totalElements:
+        type: "integer"
+        format: "int64"
+      totalPages:
+        type: "integer"
+        format: "int32"
       sort:
         $ref: "#/definitions/Sort"
+      first:
+        type: "boolean"
       numberOfElements:
         type: "integer"
         format: "int32"
@@ -2170,17 +2232,6 @@ definitions:
         type: "boolean"
       pageable:
         $ref: "#/definitions/Pageable"
-      empty:
-        type: "boolean"
-  PageOrder:
-    type: "object"
-    properties:
-      totalPages:
-        type: "integer"
-        format: "int32"
-      totalElements:
-        type: "integer"
-        format: "int64"
       size:
         type: "integer"
         format: "int32"
@@ -2191,37 +2242,26 @@ definitions:
       number:
         type: "integer"
         format: "int32"
-      first:
-        type: "boolean"
-      sort:
-        $ref: "#/definitions/Sort"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      last:
-        type: "boolean"
-      pageable:
-        $ref: "#/definitions/Pageable"
       empty:
         type: "boolean"
   Pageable:
     type: "object"
     properties:
-      offset:
-        type: "integer"
-        format: "int64"
       sort:
         $ref: "#/definitions/Sort"
+      pageSize:
+        type: "integer"
+        format: "int32"
       paged:
+        type: "boolean"
+      unpaged:
         type: "boolean"
       pageNumber:
         type: "integer"
         format: "int32"
-      unpaged:
-        type: "boolean"
-      pageSize:
+      offset:
         type: "integer"
-        format: "int32"
+        format: "int64"
   Refund:
     type: "object"
     required:
