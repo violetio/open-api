@@ -11,8 +11,6 @@ host: "sandbox-api.violet.io"
 basePath: "/v1"
 tags:
 - name: "1.0"
-- name: "Catalog"
-  description: ""
 - name: "Catalog - Categories"
   description: ""
 - name: "Catalog - Offers"
@@ -223,7 +221,7 @@ paths:
   /catalog/offers/merchants/{merchant_id}:
     get:
       tags:
-      - "Catalog"
+      - "Catalog - Offers"
       summary: "Get All Merchant Offers"
       description: ""
       operationId: "getMerchantOffers"
@@ -984,17 +982,17 @@ definitions:
       totalPages:
         type: "integer"
         format: "int32"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      pageable:
-        $ref: "#/definitions/Pageable"
       first:
-        type: "boolean"
-      last:
         type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      last:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -1016,17 +1014,17 @@ definitions:
       totalPages:
         type: "integer"
         format: "int32"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      pageable:
-        $ref: "#/definitions/Pageable"
       first:
-        type: "boolean"
-      last:
         type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      last:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -1048,17 +1046,17 @@ definitions:
       totalPages:
         type: "integer"
         format: "int32"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      pageable:
-        $ref: "#/definitions/Pageable"
       first:
-        type: "boolean"
-      last:
         type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      last:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -1074,18 +1072,18 @@ definitions:
   Pageable:
     type: "object"
     properties:
-      unpaged:
+      sort:
+        $ref: "#/definitions/Sort"
+      paged:
         type: "boolean"
       pageNumber:
         type: "integer"
         format: "int32"
+      unpaged:
+        type: "boolean"
       pageSize:
         type: "integer"
         format: "int32"
-      paged:
-        type: "boolean"
-      sort:
-        $ref: "#/definitions/Sort"
       offset:
         type: "integer"
         format: "int64"
@@ -1455,9 +1453,9 @@ definitions:
   Sort:
     type: "object"
     properties:
-      unsorted:
-        type: "boolean"
       sorted:
+        type: "boolean"
+      unsorted:
         type: "boolean"
       empty:
         type: "boolean"
