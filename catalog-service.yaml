@@ -19,6 +19,8 @@ tags:
   description: ""
 - name: "Catalog - Skus"
   description: ""
+- name: "Currencies"
+  description: ""
 schemes:
 - "https"
 paths:
@@ -646,6 +648,47 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Sku"
+  /currencies/latest:
+    get:
+      tags:
+      - "Currencies"
+      summary: "Retrieves the latest currency exchange rates that are currently being\
+        \ utilized within Violet when calculating the prices of Offers and Carts with\
+        \ differing currencies."
+      description: "Retrieved exchange rates may cached. This cache will never exceed\
+        \ 24 hours."
+      operationId: "getLatestRates"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "base_currency"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "symbols"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Latest"
 definitions:
   Album:
     type: "object"
@@ -704,6 +747,23 @@ definitions:
         format: "int32"
         description: "Category Depth"
     description: "Product Category"
+  Latest:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+      timestamp:
+        type: "integer"
+        format: "int64"
+      base:
+        type: "string"
+      date:
+        type: "string"
+      rates:
+        type: "object"
+        additionalProperties:
+          type: "number"
+          format: "double"
   Media:
     type: "object"
     required:
@@ -982,17 +1042,17 @@ definitions:
       totalPages:
         type: "integer"
         format: "int32"
-      first:
-        type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
+      first:
+        type: "boolean"
       numberOfElements:
         type: "integer"
         format: "int32"
-      last:
-        type: "boolean"
       pageable:
         $ref: "#/definitions/Pageable"
+      last:
+        type: "boolean"
       size:
         type: "integer"
         format: "int32"
@@ -1014,17 +1074,17 @@ definitions:
       totalPages:
         type: "integer"
         format: "int32"
-      first:
-        type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
+      first:
+        type: "boolean"
       numberOfElements:
         type: "integer"
         format: "int32"
-      last:
-        type: "boolean"
       pageable:
         $ref: "#/definitions/Pageable"
+      last:
+        type: "boolean"
       size:
         type: "integer"
         format: "int32"
@@ -1046,17 +1106,17 @@ definitions:
       totalPages:
         type: "integer"
         format: "int32"
-      first:
-        type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
+      first:
+        type: "boolean"
       numberOfElements:
         type: "integer"
         format: "int32"
-      last:
-        type: "boolean"
       pageable:
         $ref: "#/definitions/Pageable"
+      last:
+        type: "boolean"
       size:
         type: "integer"
         format: "int32"
@@ -1076,11 +1136,11 @@ definitions:
         $ref: "#/definitions/Sort"
       paged:
         type: "boolean"
+      unpaged:
+        type: "boolean"
       pageNumber:
         type: "integer"
         format: "int32"
-      unpaged:
-        type: "boolean"
       pageSize:
         type: "integer"
         format: "int32"
