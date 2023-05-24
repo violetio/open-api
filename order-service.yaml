@@ -2157,6 +2157,16 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          type: "object"
+      number:
+        type: "integer"
+        format: "int32"
       sort:
         $ref: "#/definitions/Sort"
       first:
@@ -2168,16 +2178,6 @@ definitions:
         type: "boolean"
       pageable:
         $ref: "#/definitions/Pageable"
-      size:
-        type: "integer"
-        format: "int32"
-      content:
-        type: "array"
-        items:
-          type: "object"
-      number:
-        type: "integer"
-        format: "int32"
       empty:
         type: "boolean"
   PageBag:
@@ -2189,6 +2189,16 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          $ref: "#/definitions/Bag"
+      number:
+        type: "integer"
+        format: "int32"
       sort:
         $ref: "#/definitions/Sort"
       first:
@@ -2200,16 +2210,6 @@ definitions:
         type: "boolean"
       pageable:
         $ref: "#/definitions/Pageable"
-      size:
-        type: "integer"
-        format: "int32"
-      content:
-        type: "array"
-        items:
-          $ref: "#/definitions/Bag"
-      number:
-        type: "integer"
-        format: "int32"
       empty:
         type: "boolean"
   PageOrder:
@@ -2221,6 +2221,16 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          $ref: "#/definitions/Order"
+      number:
+        type: "integer"
+        format: "int32"
       sort:
         $ref: "#/definitions/Sort"
       first:
@@ -2232,21 +2242,14 @@ definitions:
         type: "boolean"
       pageable:
         $ref: "#/definitions/Pageable"
-      size:
-        type: "integer"
-        format: "int32"
-      content:
-        type: "array"
-        items:
-          $ref: "#/definitions/Order"
-      number:
-        type: "integer"
-        format: "int32"
       empty:
         type: "boolean"
   Pageable:
     type: "object"
     properties:
+      offset:
+        type: "integer"
+        format: "int64"
       sort:
         $ref: "#/definitions/Sort"
       paged:
@@ -2259,9 +2262,6 @@ definitions:
       pageSize:
         type: "integer"
         format: "int32"
-      offset:
-        type: "integer"
-        format: "int64"
   Refund:
     type: "object"
     required:
