@@ -98,6 +98,11 @@ paths:
         required: false
         type: "boolean"
         default: true
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/CartInitializationRequest"
       responses:
         200:
           description: "successful operation"
@@ -239,6 +244,11 @@ paths:
         required: false
         type: "boolean"
         default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderAddress"
       responses:
         200:
           description: "successful operation"
@@ -278,6 +288,11 @@ paths:
         required: false
         type: "boolean"
         default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderAddress"
       responses:
         200:
           description: "successful operation"
@@ -318,6 +333,11 @@ paths:
         required: false
         type: "boolean"
         default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderCustomer"
       responses:
         200:
           description: "successful operation"
@@ -358,6 +378,11 @@ paths:
         required: false
         type: "boolean"
         default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/DiscountRequest"
       responses:
         200:
           description: "successful operation"
@@ -438,6 +463,11 @@ paths:
         required: true
         type: "integer"
         format: "int64"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/PaymentMethodRequest"
       - name: "price_cart"
         in: "query"
         required: false
@@ -558,6 +588,13 @@ paths:
         required: false
         type: "boolean"
         default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/BagShippingMethod"
       responses:
         200:
           description: "successful operation"
@@ -678,6 +715,11 @@ paths:
         required: false
         type: "boolean"
         default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderAddress"
       responses:
         200:
           description: "successful operation"
@@ -717,6 +759,11 @@ paths:
         required: false
         type: "boolean"
         default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderAddress"
       responses:
         200:
           description: "successful operation"
@@ -762,6 +809,11 @@ paths:
         required: false
         type: "boolean"
         default: true
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderSku"
       responses:
         200:
           description: "successful operation"
@@ -812,6 +864,11 @@ paths:
         required: false
         type: "boolean"
         default: true
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderSku"
       responses:
         200:
           description: "successful operation"
@@ -896,6 +953,11 @@ paths:
         required: true
         type: "integer"
         format: "int64"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/CartSubmissionRequest"
       responses:
         200:
           description: "successful operation"
@@ -1389,9 +1451,6 @@ definitions:
       app_name:
         type: "string"
         description: "Name of app that originated the order."
-      bagId:
-        type: "integer"
-        format: "int64"
       bagStatus:
         type: "string"
         enum:
@@ -1404,6 +1463,9 @@ definitions:
         - "REJECTED"
         - "CANCELED"
         - "BACKORDERED"
+      bagId:
+        type: "integer"
+        format: "int64"
       merchant_name:
         type: "string"
         description: "Name of Merchant"
@@ -1554,6 +1616,82 @@ definitions:
         type: "integer"
         format: "int32"
         description: "Quantity of the this item fulfilled by this fulfillment."
+  BagShippingMethod:
+    type: "object"
+    properties:
+      bag_id:
+        type: "integer"
+        format: "int64"
+        description: "The ID of the bag the Shipping Method belongs to"
+      shipping_method_id:
+        type: "integer"
+        format: "int32"
+        description: "Price of the Shipping Method"
+      shipping_method_label:
+        type: "string"
+        description: "Label of the Shipping Method"
+    description: "Shipping Method applied to a Bag"
+  CartInitializationRequest:
+    type: "object"
+    properties:
+      base_currency:
+        type: "string"
+        description: "Base currency of cart"
+      skus:
+        type: "array"
+        description: "Optional collection of SKUs"
+        items:
+          $ref: "#/definitions/OrderSku"
+      referral_id:
+        type: "string"
+        description: "Associate the order with a user or affiliate in your system"
+      app_order_id:
+        type: "string"
+        description: "Map the order in Violet to an order record within your system"
+      customer:
+        description: "Customer data for initializing the cart"
+        $ref: "#/definitions/OrderCustomer"
+      discounts:
+        type: "array"
+        description: "Optional collection of Discounts"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/DiscountRequest"
+      wallet_based_checkout:
+        type: "boolean"
+        description: "Boolean denoting whether or not this order will be placed through\
+          \ a wallet based payment mechanism such as apple pay"
+    description: "Optional data to initialize the cart with on creation."
+  CartSubmissionRequest:
+    type: "object"
+    properties:
+      referral_id:
+        type: "string"
+        description: "Associate the order with a user or affiliate in your system"
+      app_order_id:
+        type: "string"
+        description: "Map the order in Violet to an order record within your system."
+      app_transaction_id:
+        type: "string"
+        description: "Transaction ID representing a transaction in the channels system."
+      app_transaction_gateway:
+        type: "string"
+        description: "Gateway used to submit the order."
+      order_customer:
+        description: "Customer details associated to this order"
+        $ref: "#/definitions/OrderCustomer"
+    description: "Properties for cart submission."
+  DiscountRequest:
+    type: "object"
+    properties:
+      code:
+        type: "string"
+        description: "Discount code being applied"
+      merchant_id:
+        type: "integer"
+        format: "int32"
+        description: "ID of the Merchant the discount belongs to"
+    description: "Discount request"
   Order:
     type: "object"
     required:
@@ -1675,10 +1813,6 @@ definitions:
       orderId:
         type: "integer"
         format: "int64"
-      guest:
-        type: "boolean"
-      intentBasedCheckout:
-        type: "boolean"
       orderStatus:
         type: "string"
         enum:
@@ -1689,6 +1823,10 @@ definitions:
         - "PARTIALLY_REFUNDED"
         - "REFUNDED"
         - "REQUIRES_ACTION"
+      intentBasedCheckout:
+        type: "boolean"
+      guest:
+        type: "boolean"
     description: "Order"
   OrderAddress:
     type: "object"
@@ -2099,10 +2237,10 @@ definitions:
       name:
         type: "string"
         description: "Rate Name"
-      decimalRate:
+      dollarAmount:
         type: "number"
         format: "double"
-      dollarAmount:
+      decimalRate:
         type: "number"
         format: "double"
     description: "Rates belonging to Order SKUs"
@@ -2157,17 +2295,17 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      last:
+        type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
       first:
         type: "boolean"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      last:
-        type: "boolean"
-      pageable:
-        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -2189,17 +2327,17 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      last:
+        type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
       first:
         type: "boolean"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      last:
-        type: "boolean"
-      pageable:
-        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -2221,17 +2359,17 @@ definitions:
       totalElements:
         type: "integer"
         format: "int64"
+      numberOfElements:
+        type: "integer"
+        format: "int32"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      last:
+        type: "boolean"
       sort:
         $ref: "#/definitions/Sort"
       first:
         type: "boolean"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      last:
-        type: "boolean"
-      pageable:
-        $ref: "#/definitions/Pageable"
       size:
         type: "integer"
         format: "int32"
@@ -2247,21 +2385,56 @@ definitions:
   Pageable:
     type: "object"
     properties:
-      sort:
-        $ref: "#/definitions/Sort"
-      paged:
+      unpaged:
         type: "boolean"
       pageNumber:
         type: "integer"
         format: "int32"
-      unpaged:
-        type: "boolean"
       pageSize:
         type: "integer"
         format: "int32"
+      paged:
+        type: "boolean"
+      sort:
+        $ref: "#/definitions/Sort"
       offset:
         type: "integer"
         format: "int64"
+  PaymentMethodRequest:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+        description: "Generated payment token."
+      intent_based_capture:
+        type: "boolean"
+        description: "Trigger payment intent based capture"
+      card_number:
+        type: "string"
+        description: "Number on the credit or debit card."
+      card_cvc:
+        type: "integer"
+        format: "int32"
+        description: "CVC code on the credit or debit card."
+      card_exp_month:
+        type: "integer"
+        format: "int32"
+        description: "Expiration month of the credit or debit card."
+      card_exp_year:
+        type: "integer"
+        format: "int32"
+        description: "Expiration year of the credit or debit card."
+      card_postal_code:
+        type: "string"
+        description: "Postal Code of the credit or debit card."
+      complete_checkout:
+        type: "boolean"
+        description: "Submit cart immediately after applying the payment method."
+      app_order_id:
+        type: "string"
+        description: "Map the order in Violet to an order record within your system."
+    description: "The payment method request for a cart. If the token is provided\
+      \ no card data is required."
   Refund:
     type: "object"
     required:
@@ -2406,9 +2579,9 @@ definitions:
   Sort:
     type: "object"
     properties:
-      sorted:
-        type: "boolean"
       unsorted:
+        type: "boolean"
+      sorted:
         type: "boolean"
       empty:
         type: "boolean"
