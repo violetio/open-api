@@ -330,13 +330,13 @@ definitions:
   Error:
     type: "object"
     properties:
+      message:
+        type: "string"
       error:
         type: "string"
       code:
         type: "integer"
         format: "int32"
-      message:
-        type: "string"
       id:
         type: "object"
       ids:
