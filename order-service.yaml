@@ -1,48 +1,955 @@
 ---
 swagger: "2.0"
 info:
-  description: "Order Service API"
   version: "v1"
   title: "Order-Service"
   contact:
     name: "Violet.io"
-    url: "https://violet.io"
 host: "sandbox-api.violet.io"
 basePath: "/v1"
 tags:
-- name: "1.0"
+- name: "Orders"
+  description: ""
 - name: "Checkout - Cart"
-  description: ""
-- name: "Checkout - Completion"
-  description: ""
-- name: "Checkout - Customer"
-  description: ""
-- name: "Checkout - Discounts"
   description: ""
 - name: "Checkout - Items"
   description: ""
-- name: "Checkout - Payment"
+- name: "Checkout - Discounts"
+  description: ""
+- name: "Checkout - Customer"
   description: ""
 - name: "Checkout - Shipping"
   description: ""
-- name: "Orders"
+- name: "Checkout - Payment"
+  description: ""
+- name: "Checkout - Completion"
   description: ""
 - name: "Refunds"
   description: ""
+- name: "1.0"
 schemes:
 - "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
 paths:
+  /checkout/cart/{cart_id}:
+    get:
+      tags:
+      - "Checkout - Cart"
+      summary: "Get Cart by ID"
+      description: ""
+      operationId: "getCart_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+    delete:
+      tags:
+      - "Checkout - Cart"
+      summary: "Delete Cart"
+      description: ""
+      operationId: "deleteCart_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        default:
+          description: "successful operation"
+  /checkout/cart/{cart_id}/payment:
+    post:
+      tags:
+      - "Checkout - Payment"
+      summary: "Apply Payment Method"
+      description: ""
+      operationId: "applyPaymentMethod_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/PaymentMethodRequest"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/payment/update:
+    post:
+      tags:
+      - "Checkout - Payment"
+      summary: "Update Payment Transaction"
+      description: ""
+      operationId: "updatePaymentTransaction_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/customer:
+    post:
+      tags:
+      - "Checkout - Customer"
+      summary: "Apply Guest Customer to Cart"
+      description: ""
+      operationId: "applyGuestCustomerToCart_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "async"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderCustomer"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/shipping_address:
+    post:
+      tags:
+      - "Checkout - Customer"
+      summary: "Set Shipping Address"
+      description: ""
+      operationId: "applyShippingAddress_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderAddress"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+    put:
+      tags:
+      - "Checkout - Customer"
+      summary: "Update Shipping Address"
+      description: ""
+      operationId: "updateShippingAddress_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderAddress"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/billing_address:
+    post:
+      tags:
+      - "Checkout - Customer"
+      summary: "Set Billing Address"
+      description: ""
+      operationId: "applyBillingAddress_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderAddress"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+    put:
+      tags:
+      - "Checkout - Customer"
+      summary: "Update Billing Address"
+      description: ""
+      operationId: "updateBillingAddress_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderAddress"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/submit:
+    post:
+      tags:
+      - "Checkout - Completion"
+      summary: "Submit Cart"
+      description: ""
+      operationId: "submitCheckout_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/CartSubmissionRequest"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /orders/{order_id}/refunds:
+    get:
+      tags:
+      - "Refunds"
+      summary: "Get Order Refunds"
+      description: ""
+      operationId: "getOrderRefunds_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "order_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Refund"
+  /orders/{order_id}/bags/{bag_id}/refunds:
+    get:
+      tags:
+      - "Refunds"
+      summary: "Get Bag Refunds"
+      description: ""
+      operationId: "getBagRefunds_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "order_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "bag_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Refund"
+  /orders/{order_id}/refunds/{refund_id}:
+    get:
+      tags:
+      - "Refunds"
+      summary: "Get Order Refund by ID"
+      description: ""
+      operationId: "getOrderRefundById_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "order_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "refund_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Refund"
+  /checkout/cart/{cart_id}/shipping:
+    post:
+      tags:
+      - "Checkout - Shipping"
+      summary: "Set Shipping Methods"
+      description: ""
+      operationId: "applyShippingMethods_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/BagShippingMethod"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/shipping/{shipping_method_id}:
+    delete:
+      tags:
+      - "Checkout - Shipping"
+      summary: "Remove Shipping Method"
+      description: ""
+      operationId: "removeShippingMethod_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "shipping_method_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/discounts/{discount_id}:
+    delete:
+      tags:
+      - "Checkout - Discounts"
+      summary: "Remove Discount from Cart"
+      description: ""
+      operationId: "removeDiscountFromCart_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "discount_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/discounts:
+    post:
+      tags:
+      - "Checkout - Discounts"
+      summary: "Add Discount to Cart"
+      description: ""
+      operationId: "addDiscountToCart_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/DiscountRequest"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /checkout/cart/{cart_id}/skus/{order_sku_id}:
+    put:
+      tags:
+      - "Checkout - Items"
+      summary: "Update SKU in Cart"
+      description: ""
+      operationId: "updateSkuInCart_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "order_sku_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "async"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: true
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/OrderSku"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+    delete:
+      tags:
+      - "Checkout - Items"
+      summary: "Remove SKU from Cart"
+      description: ""
+      operationId: "removeSkuFromCart_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "cart_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "order_sku_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "price_cart"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "async"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /orders/{order_id}:
+    get:
+      tags:
+      - "Orders"
+      summary: "Get Order by ID"
+      description: ""
+      operationId: "getOrderById_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "order_id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Order"
+  /orders/search:
+    post:
+      tags:
+      - "Orders"
+      summary: "Search Orders"
+      description: ""
+      operationId: "searchOrders_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/SearchRequest"
+      - name: "extended"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PageOrder"
+  /orders/bags/search:
+    post:
+      tags:
+      - "Orders"
+      summary: "Search Bags"
+      description: ""
+      operationId: "searchBags_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/SearchRequest"
+      - name: "extended"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PageBag"
+  /orders:
+    get:
+      tags:
+      - "Orders"
+      summary: "Get Orders"
+      description: ""
+      operationId: "getAllOrders_1"
+      parameters:
+      - name: "X-Violet-Token"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Secret"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "X-Violet-App-Id"
+        in: "header"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/PageOrder"
   /checkout/cart:
     post:
       tags:
       - "Checkout - Cart"
       summary: "Create Cart"
       description: ""
-      operationId: "createCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      operationId: "createCart_1"
       parameters:
       - name: "X-Violet-Token"
         in: "header"
@@ -104,7 +1011,7 @@ paths:
         schema:
           $ref: "#/definitions/CartInitializationRequest"
       responses:
-        200:
+        "200":
           description: "successful operation"
           schema:
             $ref: "#/definitions/Order"
@@ -114,11 +1021,7 @@ paths:
       - "Checkout - Cart"
       summary: "Get Cart by Token"
       description: ""
-      operationId: "getCartByToken"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      operationId: "getCartByToken_1"
       parameters:
       - name: "X-Violet-Token"
         in: "header"
@@ -138,634 +1041,7 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}:
-    get:
-      tags:
-      - "Checkout - Cart"
-      summary: "Get Cart by ID"
-      description: ""
-      operationId: "getCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-    delete:
-      tags:
-      - "Checkout - Cart"
-      summary: "Delete Cart"
-      description: ""
-      operationId: "deleteCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        default:
-          description: "successful operation"
-  /checkout/cart/{cart_id}/billing_address:
-    post:
-      tags:
-      - "Checkout - Customer"
-      summary: "Set Billing Address"
-      description: ""
-      operationId: "applyBillingAddress"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/OrderAddress"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-    put:
-      tags:
-      - "Checkout - Customer"
-      summary: "Update Billing Address"
-      description: ""
-      operationId: "updateBillingAddress"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/OrderAddress"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/customer:
-    post:
-      tags:
-      - "Checkout - Customer"
-      summary: "Apply Guest Customer to Cart"
-      description: ""
-      operationId: "applyGuestCustomerToCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "async"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/OrderCustomer"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/discounts:
-    post:
-      tags:
-      - "Checkout - Discounts"
-      summary: "Add Discount to Cart"
-      description: ""
-      operationId: "addDiscountToCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/DiscountRequest"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/discounts/{discount_id}:
-    delete:
-      tags:
-      - "Checkout - Discounts"
-      summary: "Remove Discount from Cart"
-      description: ""
-      operationId: "removeDiscountFromCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "discount_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/payment:
-    post:
-      tags:
-      - "Checkout - Payment"
-      summary: "Apply Payment Method"
-      description: ""
-      operationId: "applyPaymentMethod"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/PaymentMethodRequest"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/payment/update:
-    post:
-      tags:
-      - "Checkout - Payment"
-      summary: "Update Payment Transaction"
-      description: ""
-      operationId: "updatePaymentTransaction"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/price:
-    get:
-      tags:
-      - "Checkout - Completion"
-      summary: "Price Cart"
-      description: ""
-      operationId: "priceCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/shipping:
-    post:
-      tags:
-      - "Checkout - Shipping"
-      summary: "Set Shipping Methods"
-      description: ""
-      operationId: "applyShippingMethods"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/BagShippingMethod"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/shipping/available:
-    get:
-      tags:
-      - "Checkout - Shipping"
-      summary: "Get Available Shipping Methods"
-      description: ""
-      operationId: "getAvailableShippingMethods"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/OrderShippingMethodWrapper"
-  /checkout/cart/{cart_id}/shipping/{shipping_method_id}:
-    delete:
-      tags:
-      - "Checkout - Shipping"
-      summary: "Remove Shipping Method"
-      description: ""
-      operationId: "removeShippingMethod"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "shipping_method_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/shipping_address:
-    post:
-      tags:
-      - "Checkout - Customer"
-      summary: "Set Shipping Address"
-      description: ""
-      operationId: "applyShippingAddress"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/OrderAddress"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-    put:
-      tags:
-      - "Checkout - Customer"
-      summary: "Update Shipping Address"
-      description: ""
-      operationId: "updateShippingAddress"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/OrderAddress"
-      responses:
-        200:
+        "200":
           description: "successful operation"
           schema:
             $ref: "#/definitions/Order"
@@ -775,11 +1051,7 @@ paths:
       - "Checkout - Items"
       summary: "Add SKU to Cart"
       description: ""
-      operationId: "addSkuToCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      operationId: "addSkuToCart_1"
       parameters:
       - name: "X-Violet-Token"
         in: "header"
@@ -815,125 +1087,17 @@ paths:
         schema:
           $ref: "#/definitions/OrderSku"
       responses:
-        200:
+        "200":
           description: "successful operation"
           schema:
             $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/skus/{order_sku_id}:
-    put:
-      tags:
-      - "Checkout - Items"
-      summary: "Update SKU in Cart"
-      description: ""
-      operationId: "updateSkuInCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "order_sku_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - name: "async"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: true
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/OrderSku"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-    delete:
-      tags:
-      - "Checkout - Items"
-      summary: "Remove SKU from Cart"
-      description: ""
-      operationId: "removeSkuFromCart"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "cart_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "order_sku_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "price_cart"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      - name: "async"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-  /checkout/cart/{cart_id}/submit:
-    post:
+  /checkout/cart/{cart_id}/price:
+    get:
       tags:
       - "Checkout - Completion"
-      summary: "Submit Cart"
+      summary: "Price Cart"
       description: ""
-      operationId: "submitCheckout"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      operationId: "priceCart_1"
       parameters:
       - name: "X-Violet-Token"
         in: "header"
@@ -953,27 +1117,18 @@ paths:
         required: true
         type: "integer"
         format: "int64"
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/CartSubmissionRequest"
       responses:
-        200:
+        "200":
           description: "successful operation"
           schema:
             $ref: "#/definitions/Order"
-  /orders:
+  /checkout/cart/{cart_id}/shipping/available:
     get:
       tags:
-      - "Orders"
-      summary: "Get Orders"
+      - "Checkout - Shipping"
+      summary: "Get Available Shipping Methods"
       description: ""
-      operationId: "getAllOrders"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      operationId: "getAvailableShippingMethods_1"
       parameters:
       - name: "X-Violet-Token"
         in: "header"
@@ -988,267 +1143,18 @@ paths:
         required: false
         type: "integer"
         format: "int32"
-      - name: "page"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 1
-        format: "int32"
-      - name: "size"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 20
-        format: "int32"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/PageOrder"
-  /orders/bags/search:
-    post:
-      tags:
-      - "Orders"
-      summary: "Search Bags"
-      description: ""
-      operationId: "searchBags"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "page"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 1
-        format: "int32"
-      - name: "size"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 20
-        format: "int32"
-      - name: "extended"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/PageBag"
-  /orders/search:
-    post:
-      tags:
-      - "Orders"
-      summary: "Search Orders"
-      description: ""
-      operationId: "searchOrders"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "page"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 1
-        format: "int32"
-      - name: "size"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 20
-        format: "int32"
-      - name: "extended"
-        in: "query"
-        required: false
-        type: "boolean"
-        default: false
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/PageOrder"
-  /orders/{order_id}:
-    get:
-      tags:
-      - "Orders"
-      summary: "Get Order by ID"
-      description: ""
-      operationId: "getOrderById"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "order_id"
+      - name: "cart_id"
         in: "path"
         required: true
         type: "integer"
         format: "int64"
       responses:
-        200:
+        "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Order"
-  /orders/{order_id}/bags/{bag_id}/refunds:
-    get:
-      tags:
-      - "Refunds"
-      summary: "Get Bag Refunds"
-      description: ""
-      operationId: "getBagRefunds"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "order_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "bag_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Refund"
-  /orders/{order_id}/refunds:
-    get:
-      tags:
-      - "Refunds"
-      summary: "Get Order Refunds"
-      description: ""
-      operationId: "getOrderRefunds"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "order_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Refund"
-  /orders/{order_id}/refunds/{refund_id}:
-    get:
-      tags:
-      - "Refunds"
-      summary: "Get Order Refund by ID"
-      description: ""
-      operationId: "getOrderRefundById"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "order_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "refund_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Refund"
+            type: "array"
+            items:
+              $ref: "#/definitions/OrderShippingMethodWrapper"
 definitions:
   Bag:
     type: "object"
@@ -1451,6 +1357,9 @@ definitions:
       app_name:
         type: "string"
         description: "Name of app that originated the order."
+      bagId:
+        type: "integer"
+        format: "int64"
       bagStatus:
         type: "string"
         enum:
@@ -1463,9 +1372,6 @@ definitions:
         - "REJECTED"
         - "CANCELED"
         - "BACKORDERED"
-      bagId:
-        type: "integer"
-        format: "int64"
       merchant_name:
         type: "string"
         description: "Name of Merchant"
@@ -1616,82 +1522,6 @@ definitions:
         type: "integer"
         format: "int32"
         description: "Quantity of the this item fulfilled by this fulfillment."
-  BagShippingMethod:
-    type: "object"
-    properties:
-      bag_id:
-        type: "integer"
-        format: "int64"
-        description: "The ID of the bag the Shipping Method belongs to"
-      shipping_method_id:
-        type: "integer"
-        format: "int32"
-        description: "Price of the Shipping Method"
-      shipping_method_label:
-        type: "string"
-        description: "Label of the Shipping Method"
-    description: "Shipping Method applied to a Bag"
-  CartInitializationRequest:
-    type: "object"
-    properties:
-      base_currency:
-        type: "string"
-        description: "Base currency of cart"
-      skus:
-        type: "array"
-        description: "Optional collection of SKUs"
-        items:
-          $ref: "#/definitions/OrderSku"
-      referral_id:
-        type: "string"
-        description: "Associate the order with a user or affiliate in your system"
-      app_order_id:
-        type: "string"
-        description: "Map the order in Violet to an order record within your system"
-      customer:
-        description: "Customer data for initializing the cart"
-        $ref: "#/definitions/OrderCustomer"
-      discounts:
-        type: "array"
-        description: "Optional collection of Discounts"
-        uniqueItems: true
-        items:
-          $ref: "#/definitions/DiscountRequest"
-      wallet_based_checkout:
-        type: "boolean"
-        description: "Boolean denoting whether or not this order will be placed through\
-          \ a wallet based payment mechanism such as apple pay"
-    description: "Optional data to initialize the cart with on creation."
-  CartSubmissionRequest:
-    type: "object"
-    properties:
-      referral_id:
-        type: "string"
-        description: "Associate the order with a user or affiliate in your system"
-      app_order_id:
-        type: "string"
-        description: "Map the order in Violet to an order record within your system."
-      app_transaction_id:
-        type: "string"
-        description: "Transaction ID representing a transaction in the channels system."
-      app_transaction_gateway:
-        type: "string"
-        description: "Gateway used to submit the order."
-      order_customer:
-        description: "Customer details associated to this order"
-        $ref: "#/definitions/OrderCustomer"
-    description: "Properties for cart submission."
-  DiscountRequest:
-    type: "object"
-    properties:
-      code:
-        type: "string"
-        description: "Discount code being applied"
-      merchant_id:
-        type: "integer"
-        format: "int32"
-        description: "ID of the Merchant the discount belongs to"
-    description: "Discount request"
   Order:
     type: "object"
     required:
@@ -1810,9 +1640,8 @@ definitions:
       payment_intent_client_secret:
         type: "string"
         description: "Payment intent client secret"
-      orderId:
-        type: "integer"
-        format: "int64"
+      guest:
+        type: "boolean"
       orderStatus:
         type: "string"
         enum:
@@ -1825,8 +1654,9 @@ definitions:
         - "REQUIRES_ACTION"
       intentBasedCheckout:
         type: "boolean"
-      guest:
-        type: "boolean"
+      orderId:
+        type: "integer"
+        format: "int64"
     description: "Order"
   OrderAddress:
     type: "object"
@@ -2096,17 +1926,6 @@ definitions:
         type: "string"
         description: "Carrier Tracking Number"
     description: "Shipping Methods belonging to an Order"
-  OrderShippingMethodWrapper:
-    type: "object"
-    properties:
-      bag_id:
-        type: "integer"
-        format: "int64"
-      shipping_methods:
-        type: "array"
-        items:
-          $ref: "#/definitions/OrderShippingMethod"
-    description: "Order Shipping Method Wrapper"
   OrderSku:
     type: "object"
     required:
@@ -2194,11 +2013,11 @@ definitions:
         type: "integer"
         format: "int32"
         description: "The quantity of this item that has been fulfilled"
-      orderSkuRates:
+      order_sku_rates:
         type: "array"
         items:
           $ref: "#/definitions/OrderSkuRate"
-      transientExternalProductId:
+      transient_external_product_id:
         type: "string"
       line_price:
         type: "integer"
@@ -2237,10 +2056,10 @@ definitions:
       name:
         type: "string"
         description: "Rate Name"
-      dollarAmount:
+      decimal_rate:
         type: "number"
         format: "double"
-      decimalRate:
+      dollar_amount:
         type: "number"
         format: "double"
     description: "Rates belonging to Order SKUs"
@@ -2286,120 +2105,84 @@ definitions:
         minLength: 0
         maxLength: 255
     description: "Taxes belonging to an Order Bag"
-  Page:
+  Transaction:
     type: "object"
+    required:
+    - "app_id"
+    - "bag_id"
+    - "merchant_id"
+    - "payment_method_id"
     properties:
-      totalPages:
-        type: "integer"
-        format: "int32"
-      totalElements:
+      id:
         type: "integer"
         format: "int64"
-      numberOfElements:
+        readOnly: true
+      merchant_id:
         type: "integer"
         format: "int32"
-      pageable:
-        $ref: "#/definitions/Pageable"
-      last:
-        type: "boolean"
-      sort:
-        $ref: "#/definitions/Sort"
-      first:
-        type: "boolean"
-      size:
+        description: "ID of the Merchant receiving the transaction"
+      app_id:
         type: "integer"
         format: "int32"
-      content:
-        type: "array"
-        items:
-          type: "object"
-      number:
-        type: "integer"
-        format: "int32"
-      empty:
-        type: "boolean"
-  PageBag:
-    type: "object"
-    properties:
-      totalPages:
-        type: "integer"
-        format: "int32"
-      totalElements:
+        description: "ID of the App that created the Order"
+      order_id:
         type: "integer"
         format: "int64"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      pageable:
-        $ref: "#/definitions/Pageable"
-      last:
-        type: "boolean"
-      sort:
-        $ref: "#/definitions/Sort"
-      first:
-        type: "boolean"
-      size:
-        type: "integer"
-        format: "int32"
-      content:
-        type: "array"
-        items:
-          $ref: "#/definitions/Bag"
-      number:
-        type: "integer"
-        format: "int32"
-      empty:
-        type: "boolean"
-  PageOrder:
-    type: "object"
-    properties:
-      totalPages:
-        type: "integer"
-        format: "int32"
-      totalElements:
+        description: "ID of the Order the Transaction applies to"
+      bag_id:
         type: "integer"
         format: "int64"
-      numberOfElements:
-        type: "integer"
-        format: "int32"
-      pageable:
-        $ref: "#/definitions/Pageable"
-      last:
-        type: "boolean"
-      sort:
-        $ref: "#/definitions/Sort"
-      first:
-        type: "boolean"
-      size:
-        type: "integer"
-        format: "int32"
-      content:
-        type: "array"
-        items:
-          $ref: "#/definitions/Order"
-      number:
-        type: "integer"
-        format: "int32"
-      empty:
-        type: "boolean"
-  Pageable:
-    type: "object"
-    properties:
-      unpaged:
-        type: "boolean"
-      pageNumber:
-        type: "integer"
-        format: "int32"
-      pageSize:
-        type: "integer"
-        format: "int32"
-      paged:
-        type: "boolean"
-      sort:
-        $ref: "#/definitions/Sort"
-      offset:
+        description: "ID of the Bag the Transaction applies to"
+      payment_method_id:
         type: "integer"
         format: "int64"
+        description: "ID of the referenced Payment Method"
+      gateway_transaction_id:
+        type: "string"
+        description: "ID of the Transaction in the Payment Gateway"
+      gateway:
+        type: "string"
+        description: "Gateway processing the Transaction"
+      amount:
+        type: "integer"
+        format: "int32"
+        description: "Total amount being transacted"
+      currency:
+        type: "string"
+        description: "Currency the Transaction takes place in"
+      type:
+        type: "string"
+        description: "Transaction Type"
+        enum:
+        - "AUTHORIZATION"
+        - "CAPTURE"
+        - "VOID"
+        - "REFUND"
+      error_code:
+        type: "string"
+        description: "Error Code from gateway if error occurred"
+      status:
+        type: "string"
+        description: "Transaction Status"
+        enum:
+        - "PROCESSING"
+        - "COMPLETED"
+        - "REFUNDED"
+        - "REQUIRES_ACTION"
+      test:
+        type: "boolean"
+        description: "Is this a test Transaction"
+      date_created:
+        type: "string"
+        format: "date-time"
+        description: "Date of transaction creation"
+      date_last_modified:
+        type: "string"
+        format: "date-time"
+        description: "Date of last transaction update"
+      order_payment_method:
+        $ref: "#/definitions/OrderPaymentMethod"
+    description: "Order Transaction"
   PaymentMethodRequest:
     type: "object"
     properties:
@@ -2435,6 +2218,25 @@ definitions:
         description: "Map the order in Violet to an order record within your system."
     description: "The payment method request for a cart. If the token is provided\
       \ no card data is required."
+  CartSubmissionRequest:
+    type: "object"
+    properties:
+      referral_id:
+        type: "string"
+        description: "Associate the order with a user or affiliate in your system"
+      app_order_id:
+        type: "string"
+        description: "Map the order in Violet to an order record within your system."
+      app_transaction_id:
+        type: "string"
+        description: "Transaction ID representing a transaction in the channels system."
+      app_transaction_gateway:
+        type: "string"
+        description: "Gateway used to submit the order."
+      order_customer:
+        description: "Customer details associated to this order"
+        $ref: "#/definitions/OrderCustomer"
+    description: "Properties for cart submission."
   Refund:
     type: "object"
     required:
@@ -2576,90 +2378,219 @@ definitions:
         format: "int64"
         description: "Id of the Order Sku associated with Refund Order Sku"
     description: "Refunded Order Sku"
-  Sort:
+  BagShippingMethod:
     type: "object"
     properties:
-      unsorted:
-        type: "boolean"
-      sorted:
-        type: "boolean"
-      empty:
-        type: "boolean"
-  Transaction:
-    type: "object"
-    required:
-    - "app_id"
-    - "bag_id"
-    - "merchant_id"
-    - "payment_method_id"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-        readOnly: true
-      merchant_id:
-        type: "integer"
-        format: "int32"
-        description: "ID of the Merchant receiving the transaction"
-      app_id:
-        type: "integer"
-        format: "int32"
-        description: "ID of the App that created the Order"
-      order_id:
-        type: "integer"
-        format: "int64"
-        description: "ID of the Order the Transaction applies to"
       bag_id:
         type: "integer"
         format: "int64"
-        description: "ID of the Bag the Transaction applies to"
-      payment_method_id:
-        type: "integer"
-        format: "int64"
-        description: "ID of the referenced Payment Method"
-      gateway_transaction_id:
-        type: "string"
-        description: "ID of the Transaction in the Payment Gateway"
-      gateway:
-        type: "string"
-        description: "Gateway processing the Transaction"
-      amount:
+        description: "The ID of the bag the Shipping Method belongs to"
+      shipping_method_id:
         type: "integer"
         format: "int32"
-        description: "Total amount being transacted"
-      currency:
+        description: "Price of the Shipping Method"
+      shipping_method_label:
         type: "string"
-        description: "Currency the Transaction takes place in"
-      type:
+        description: "Label of the Shipping Method"
+    description: "Shipping Method applied to a Bag"
+  DiscountRequest:
+    type: "object"
+    properties:
+      code:
         type: "string"
-        description: "Transaction Type"
-        enum:
-        - "AUTHORIZATION"
-        - "CAPTURE"
-        - "VOID"
-        - "REFUND"
-      error_code:
-        type: "string"
-        description: "Error Code from gateway if error occurred"
-      status:
-        type: "string"
-        description: "Transaction Status"
-        enum:
-        - "PROCESSING"
-        - "COMPLETED"
-        - "REFUNDED"
-        - "REQUIRES_ACTION"
-      test:
+        description: "Discount code being applied"
+      merchant_id:
+        type: "integer"
+        format: "int32"
+        description: "ID of the Merchant the discount belongs to"
+    description: "Discount request"
+  Page:
+    type: "object"
+    properties:
+      total_pages:
+        type: "integer"
+        format: "int32"
+      total_elements:
+        type: "integer"
+        format: "int64"
+      last:
         type: "boolean"
-        description: "Is this a test Transaction"
-      date_created:
+      first:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      number_of_elements:
+        type: "integer"
+        format: "int32"
+      sort:
+        $ref: "#/definitions/Sort"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          type: "object"
+      number:
+        type: "integer"
+        format: "int32"
+      empty:
+        type: "boolean"
+  PageOrder:
+    type: "object"
+    properties:
+      total_pages:
+        type: "integer"
+        format: "int32"
+      total_elements:
+        type: "integer"
+        format: "int64"
+      last:
+        type: "boolean"
+      first:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      number_of_elements:
+        type: "integer"
+        format: "int32"
+      sort:
+        $ref: "#/definitions/Sort"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          $ref: "#/definitions/Order"
+      number:
+        type: "integer"
+        format: "int32"
+      empty:
+        type: "boolean"
+  Pageable:
+    type: "object"
+    properties:
+      paged:
+        type: "boolean"
+      unpaged:
+        type: "boolean"
+      page_number:
+        type: "integer"
+        format: "int32"
+      page_size:
+        type: "integer"
+        format: "int32"
+      sort:
+        $ref: "#/definitions/Sort"
+      offset:
+        type: "integer"
+        format: "int64"
+  Sort:
+    type: "object"
+    properties:
+      sorted:
+        type: "boolean"
+      unsorted:
+        type: "boolean"
+      empty:
+        type: "boolean"
+  SearchRequest:
+    type: "object"
+    properties:
+      user_id:
+        type: "integer"
+        format: "int64"
+        description: "User ID"
+      order_id:
+        type: "integer"
+        format: "int64"
+        description: "Order ID"
+      bag_id:
+        type: "integer"
+        format: "int64"
+        description: "Bag ID"
+      referral_id:
         type: "string"
-        format: "date-time"
-        description: "Date of transaction creation"
-      date_last_modified:
+        description: "Referral ID"
+      app_order_id:
         type: "string"
-        format: "date-time"
-        description: "Date of last transaction update"
-      orderPaymentMethod:
-        $ref: "#/definitions/OrderPaymentMethod"
-    description: "Order Transaction"
+        description: "Order ID in the App's System"
+      external_order_id:
+        type: "string"
+        description: "Order ID in the External Commerce Platform"
+    description: "Order Search Request"
+  PageBag:
+    type: "object"
+    properties:
+      total_pages:
+        type: "integer"
+        format: "int32"
+      total_elements:
+        type: "integer"
+        format: "int64"
+      last:
+        type: "boolean"
+      first:
+        type: "boolean"
+      pageable:
+        $ref: "#/definitions/Pageable"
+      number_of_elements:
+        type: "integer"
+        format: "int32"
+      sort:
+        $ref: "#/definitions/Sort"
+      size:
+        type: "integer"
+        format: "int32"
+      content:
+        type: "array"
+        items:
+          $ref: "#/definitions/Bag"
+      number:
+        type: "integer"
+        format: "int32"
+      empty:
+        type: "boolean"
+  CartInitializationRequest:
+    type: "object"
+    properties:
+      base_currency:
+        type: "string"
+        description: "Base currency of cart"
+      skus:
+        type: "array"
+        description: "Optional collection of SKUs"
+        items:
+          $ref: "#/definitions/OrderSku"
+      referral_id:
+        type: "string"
+        description: "Associate the order with a user or affiliate in your system"
+      app_order_id:
+        type: "string"
+        description: "Map the order in Violet to an order record within your system"
+      customer:
+        description: "Customer data for initializing the cart"
+        $ref: "#/definitions/OrderCustomer"
+      discounts:
+        type: "array"
+        description: "Optional collection of Discounts"
+        uniqueItems: true
+        items:
+          $ref: "#/definitions/DiscountRequest"
+      wallet_based_checkout:
+        type: "boolean"
+        description: "Boolean denoting whether or not this order will be placed through\
+          \ a wallet based payment mechanism such as apple pay"
+    description: "Optional data to initialize the cart with on creation."
+  OrderShippingMethodWrapper:
+    type: "object"
+    properties:
+      bag_id:
+        type: "integer"
+        format: "int64"
+      shipping_methods:
+        type: "array"
+        items:
+          $ref: "#/definitions/OrderShippingMethod"
+    description: "Order Shipping Method Wrapper"
