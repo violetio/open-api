@@ -1014,6 +1014,10 @@ definitions:
       visual:
         type: "boolean"
         description: "Is the variant visual"
+      display_order:
+        type: "integer"
+        format: "int32"
+        description: "The order the variants are displayed in."
       values:
         type: "array"
         description: "Variant Values"
@@ -1036,6 +1040,10 @@ definitions:
       name:
         type: "string"
         description: "Variant Value Name"
+      display_order:
+        type: "integer"
+        format: "int32"
+        description: "The order the variant values are displayed in."
       sku_ids:
         type: "array"
         description: "ID's of SKU's containing this Variant Value"
