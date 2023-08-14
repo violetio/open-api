@@ -1,0 +1,540 @@
+openapi: 3.0.1
+info:
+  title: Merchant-Service
+  description: Merchant Service API
+  contact:
+    name: Violet.io
+    url: https://violet.io
+  version: v1
+servers:
+- url: https://sandbox-api.violet.io/v1
+tags:
+- name: Merchants
+  description: Merchant related entities
+- name: Merchants - Explore
+  description: Merchant explore operations
+- name: Merchants - Merchant
+  description: Operations directly relating to merchant entities themselves
+paths:
+  /merchants:
+    get:
+      tags:
+      - Merchants - Merchant
+      summary: Get Merchants
+      operationId: getAllMerchants
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageMerchant'
+  /merchants/explore:
+    post:
+      tags:
+      - Merchants - Explore
+      summary: Get Merchant Summaries
+      operationId: getMerchantSummaries
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantExploreRequest'
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageMerchantSummary'
+      x-codegen-request-body-name: body
+  /merchants/search:
+    post:
+      tags:
+      - Merchants - Merchant
+      summary: Search Merchants
+      operationId: searchMerchants
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantSearchRequest'
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageMerchant'
+      x-codegen-request-body-name: body
+  /merchants/{merchant_id}:
+    get:
+      tags:
+      - Merchants - Merchant
+      summary: Get Merchant
+      operationId: getMerchantById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+components:
+  schemas:
+    Merchant:
+      required:
+      - email
+      - merchant_name
+      - platform
+      - user_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        merchant_name:
+          type: string
+          description: The name of the merchants business
+        email:
+          type: string
+          description: The Merchants unique email address
+        user_id:
+          type: integer
+          description: The Id of the User who owns this Merchant Account
+          format: int64
+        platform:
+          type: string
+          description: The eCommerce platform this merchant uses
+          enum:
+          - shopify
+          - magento
+          - magento_one
+          - woocommerce
+          - bigcommerce
+          - lightspeed
+          - ecwid
+          - yaas
+          - spreecommerce
+          - demandware
+          - volusion
+          - prestashop
+          - threedcart
+        store_url:
+          type: string
+          description: The URL of the Store
+        custom_store_url:
+          type: string
+          description: The custom URL of the Store
+        verified:
+          type: boolean
+          description: If a user has verified their email address
+        status:
+          type: string
+          description: The status of the merchant
+          enum:
+          - inactive
+          - active
+          - disabled
+          - new
+        default_currency:
+          type: string
+          description: The default currency used by merchant
+        default_country_code:
+          type: string
+          description: The default country of origin of merchant
+        default_state_code:
+          type: string
+          description: The default state / province of origin of merchant
+        default_language_code:
+          type: string
+          description: The default language used by merchant
+        commission_rate:
+          type: number
+          description: The default commission rate of the merchant
+          format: double
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+        external_id:
+          type: string
+          description: ID of the Merchant on Ecommerce Platform
+        distribution_type:
+          type: string
+          description: ID of the Merchant on Ecommerce Platform
+          enum:
+          - PUBLIC
+          - PRIVATE
+        default_weight_unit:
+          type: string
+          description: Default Unit of Weight in the Merchants Store
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+        default_size_unit:
+          type: string
+          description: Default Unit of Size in the Merchants Store
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+        referral_source:
+          type: string
+          description: Source of the merchant referral
+          enum:
+          - VIOLET
+          - PLATFORM_MARKETPLACE
+          - AFFILIATE_PROGRAM
+          - OTHER
+        logo:
+          type: string
+          description: URL of the merchants logo
+        category:
+          type: string
+          description: Merchant Category
+          enum:
+          - OTHER
+          - APPAREL_AND_ACCESSORIES
+          - ANIMALS_AND_PET_SUPPLIES
+          - ARTS_AND_ENTERTAINMENT
+          - BABY_AND_TODDLER
+          - BUSINESS_AND_INDUSTRIAL
+          - CAMERAS_AND_OPTICS
+          - ELECTRONICS
+          - FOOD_BEVERAGE_TOBACCO
+          - FURNITURE
+          - HARDWARE
+          - HEALTH_AND_BEAUTY
+          - HOME_AND_GARDEN
+          - LUGGAGE_AND_BAGS
+          - MATURE
+          - MEDIA
+          - OFFICE_SUPPLIES
+          - RELIGIOUS_AND_CEREMONIAL
+          - SOFTWARE
+          - SPORTING_GOODS
+          - TOYS_AND_GAMES
+          - VEHICLES_PARTS
+        featured:
+          type: boolean
+          description: Featured Merchant
+        connection_status:
+          type: string
+          description: If a developers application has access to this merchant.
+          enum:
+          - NOT_CONNECTED
+          - CONNECTED
+          - REQUESTED
+          - DECLINED
+        annual_revenue:
+          type: string
+          description: Annual Revenue
+          enum:
+          - L_E_100K
+          - G_100K_L_E_1M
+          - G_1M_L_E_100M
+          - G_100M
+        shipping_configured:
+          type: boolean
+          description: The shipping status of the merchant
+        taxes_configured:
+          type: boolean
+          description: The tax status of the merchant
+        default:
+          type: boolean
+        billing_configured:
+          type: boolean
+          description: The billing status of the merchant
+      description: Retailer selling goods
+    MerchantExploreRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of Merchant
+        sort_by:
+          type: string
+          description: Property to sort by in camelCase
+        sort_direction:
+          type: string
+          description: Direction to sort by
+      description: Merchant Explore Request
+    MerchantSearchRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the Merchant
+          format: int32
+        name:
+          type: string
+          description: The name of the Merchant
+        commission_rate_min:
+          type: number
+          description: The minimum commission rate of the Merchant
+          format: double
+        commission_rate_max:
+          type: number
+          description: The maximum commission rate of the Merchant
+          format: double
+        status:
+          type: string
+          description: The connection status of the Merchant
+          enum:
+          - ANY
+          - CONNECTED
+          - PRIVATE
+          - PUBLIC
+        sort_by:
+          type: string
+          description: Property to sort by in camelCase
+        sort_direction:
+          type: string
+          description: Direction to sort by
+    MerchantSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+          description: The name of the merchants business
+        store_url:
+          type: string
+          description: The URL of the Store
+      description: Merchant Summary
+    PageMerchant:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        first:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Merchant'
+        number:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageMerchantSummary:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        first:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantSummary'
+        number:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    Pageable:
+      type: object
+      properties:
+        unpaged:
+          type: boolean
+        pageSize:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        offset:
+          type: integer
+          format: int64
+    Sort:
+      type: object
+      properties:
+        unsorted:
+          type: boolean
+        sorted:
+          type: boolean
+        empty:
+          type: boolean
