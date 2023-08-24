@@ -1679,9 +1679,9 @@ definitions:
       email:
         type: "string"
         description: "Email Address"
-      firstName:
+      first_name:
         type: "string"
-      lastName:
+      last_name:
         type: "string"
       address_1:
         type: "string"
