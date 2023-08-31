@@ -114,7 +114,7 @@ paths:
         \ is changing rapidly (e.g. during onboarding) and you don't need the entire\
         \ report or can't wait for the entire report to be regenerated. The normal\
         \ GET endpoint is strongly encouraged for normal dashboard scenarios."
-      operationId: "getConnectionHealthByMerchantId"
+      operationId: "getCustomConnectionHealthByMerchantId"
       consumes:
       - "application/json"
       produces:
@@ -400,6 +400,43 @@ definitions:
         type: "array"
         items:
           type: "object"
+  InvalidProduct:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      external_id:
+        type: "string"
+        description: "ID of product on external platform"
+      name:
+        type: "string"
+        description: "Name of product on external platform"
+      thumbnail_url:
+        type: "string"
+        description: "URL to product thumbnail"
+      merchant_id:
+        type: "integer"
+        format: "int32"
+        description: "ID of merchant with broken product"
+      issues:
+        type: "string"
+        description: "Comma separated list of product invalidation reasons"
+      status:
+        type: "string"
+        description: "Status of the invalidation"
+        enum:
+        - "UNRESOLVED"
+        - "RESOLVED"
+      date_created:
+        type: "string"
+        format: "date-time"
+        description: "Date created"
+      date_last_modified:
+        type: "string"
+        format: "date-time"
+        description: "Date of last update"
+    description: "Any products that could not be synced"
   InvalidProducts:
     type: "object"
     properties:
@@ -427,17 +464,19 @@ definitions:
         description: "The number of invalid products the merchant has"
       invalid_product:
         description: "The first invalid product of the merchant"
-        $ref: "#/definitions/InvalidProducts"
+        $ref: "#/definitions/InvalidProduct"
     description: "The results object for invalid products"
   MerchantStatus:
     type: "object"
     properties:
       isConnected:
         type: "boolean"
+      hasActivePlan:
+        type: "boolean"
       hasShippingMethods:
         type: "boolean"
-      connected:
-        type: "boolean"
+      storeScopes:
+        $ref: "#/definitions/StoreScopes"
   Migration:
     type: "object"
     properties:
@@ -715,6 +754,21 @@ definitions:
         type: "boolean"
         description: "Have the webhooks been created"
     description: "Shopify Product Sync Tracking & Status"
+  StoreScopes:
+    type: "object"
+    properties:
+      hasValidScopes:
+        type: "boolean"
+      requiredScopes:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      missingScopes:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
   SyncStatus:
     type: "object"
     properties:
