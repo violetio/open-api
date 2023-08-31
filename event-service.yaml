@@ -91,6 +91,11 @@ paths:
         required: false
         type: "integer"
         format: "int32"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/Webhook"
       responses:
         200:
           description: "successful operation"
@@ -322,6 +327,11 @@ paths:
         required: true
         type: "integer"
         format: "int32"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/Webhook"
       responses:
         200:
           description: "successful operation"
@@ -588,6 +598,11 @@ paths:
         required: true
         type: "integer"
         format: "int32"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/WebhookHeader"
       responses:
         200:
           description: "successful operation"
@@ -677,6 +692,11 @@ paths:
         required: true
         type: "integer"
         format: "int32"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/WebhookHeader"
       responses:
         200:
           description: "successful operation"
@@ -794,6 +814,9 @@ definitions:
         type: "integer"
         format: "int64"
         description: "ID of entity this event occurred for"
+      entity_external_id:
+        type: "string"
+        description: "External ID of entity this event occurred for"
       status_code:
         type: "integer"
         format: "int32"
@@ -820,6 +843,12 @@ definitions:
         - "PRODUCT_SYNC_COMPLETED"
         - "PRODUCT_SYNC_FAILED"
         - "MERCHANT_NEEDS_ATTENTION"
+        - "RELAY_OFFER_CREATED"
+        - "RELAY_OFFER_UPDATED"
+        - "RELAY_OFFER_REMOVED"
+        - "RELAY_ORDER_UPDATED"
+        - "MERCHANT_ENABLED"
+        - "MERCHANT_DISABLED"
       attempts:
         type: "integer"
         format: "int32"

@@ -143,6 +143,11 @@ paths:
         required: false
         type: "integer"
         format: "int32"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ConnectionHealthRequest"
       responses:
         200:
           description: "successful operation"
@@ -246,6 +251,21 @@ definitions:
         type: "string"
         description: "The name of the merchant this connection health report pertains\
           \ to"
+      merchant_status:
+        type: "string"
+        description: "The status/state of the merchant this connection health report\
+          \ pertains to"
+        enum:
+        - "INACTIVE"
+        - "ACTIVE"
+        - "DISABLED"
+        - "NEW"
+        - "DISABLED_INACTIVE"
+        - "FOR_DELETION"
+        - "APPLICATION_IN_PROGRESS"
+        - "APPLICATION_SUBMITTED"
+        - "APPLICATION_DENIED"
+        - "APPLICATION_ACCEPTED"
       platform:
         type: "string"
         description: "The eCommerce platform this merchant uses"
@@ -327,6 +347,43 @@ definitions:
         $ref: "#/definitions/ChannelConnections"
     description: "The container for all status objects comprising merchant connection\
       \ health"
+  ConnectionHealthRequest:
+    type: "object"
+    properties:
+      include_connection:
+        type: "boolean"
+        description: "Set true to receive connection"
+      include_scope_validation:
+        type: "boolean"
+        description: "Set true to receive scope_validation"
+      include_sync_status:
+        type: "boolean"
+        description: "Set true to receive sync_status"
+      include_invalid_products:
+        type: "boolean"
+        description: "Set true to receive invalid_products"
+      include_offers_published:
+        type: "boolean"
+        description: "Set true to receive offers_published"
+      include_payout_account:
+        type: "boolean"
+        description: "Set true to receive payout_account"
+      include_migration_account:
+        type: "boolean"
+        description: "Set true to receive migration_account"
+      include_commission_rate:
+        type: "boolean"
+        description: "Set true to receive commission_rate"
+      include_terms_of_service:
+        type: "boolean"
+        description: "Set true to receive terms_of_service. Available only for merchants\
+          \ requesting their own health"
+      include_channel_connections:
+        type: "boolean"
+        description: "Set true to receive channel_connections. Available only for\
+          \ merchants requesting their own health"
+    description: "A request object to allow to you to customize your connection health\
+      \ report"
   Error:
     type: "object"
     properties:
