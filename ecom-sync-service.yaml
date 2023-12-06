@@ -1,192 +1,2538 @@
----
-swagger: "2.0"
+openapi: 3.0.1
 info:
-  description: "Econ Sync Service API"
-  version: "v1"
-  title: "Econ-Sync-Service"
+  title: Ecom-Sync-Service
+  description: Ecom-Sync Service API
   contact:
-    name: "Violet.io"
-    url: "https://violet.io"
-host: "sandbox-api.violet.io"
-basePath: "/v1"
+    name: Violet.io
+    url: https://violet.io
+  version: v1
+servers:
+- url: https://sandbox-api.violet.io/v1
 tags:
-- name: "1.0"
-schemes:
-- "https"
+- name: EcomSync
+- name: External Checkout
+- name: External Events
+- name: External Events - 3dCart
+- name: External Events - BigCommerce
+- name: External Events - ECWID
+- name: External Events - Lightspeed
+- name: External Events - Magento
+- name: External Events - Magento (Shared)
+- name: External Events - PrestaShop
+- name: External Events - Shopify
+- name: External Events - TDC
+- name: External Events - Volusion
+- name: External Events - WIX
+- name: External Events - WooCommerce
+- name: Internal
+- name: Invalid Products
+- name: Shop Profile
+- name: Relay
+- name: Schedule
 paths:
-  /sync/proxy/{subResources}:
+  /sync/merchants/{merchant_id}/invalid_products:
     get:
       tags:
-      - "1.0"
-      operationId: "sendRequestToSPMGET"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Invalid Products
+      summary: Get InvalidProduct Records By Merchant Id
+      operationId: getMerchantInvalidProducts
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 6
       responses:
         default:
-          description: "successful operation"
-    head:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageInvalidProduct'
+  /relay/merchants/{merchant_id}/customers/{order_id}:
+    get:
       tags:
-      - "1.0"
-      operationId: "sendRequestToSPMHEAD"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Relay
+      summary: Get a single customer directly from the merchant's ecom platform
+      operationId: getCustomer
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: include
+        in: query
+        schema:
+          type: string
       responses:
         default:
-          description: "successful operation"
-    post:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelayCustomer'
+  /relay/merchants/{merchant_id}/customers:
+    get:
       tags:
-      - "1.0"
-      operationId: "sendRequestToSPMPOST"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Relay
+      summary: Get multiple customers directly from the merchant's ecom platform
+      operationId: getCustomers
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: next_page_cursor
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        schema:
+          type: string
       responses:
         default:
-          description: "successful operation"
-    put:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageRelayCustomer'
+  /relay/merchants/{merchant_id}/offers/{product_id}:
+    get:
       tags:
-      - "1.0"
-      operationId: "sendRequestToSPMPUT"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Relay
+      summary: "Get a product directly from the merchant's ecom platform. An offer\
+        \ is a single merchant's offering of a product, most ecom platforms refer\
+        \ to these as products."
+      operationId: getOffer
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: include
+        in: query
+        schema:
+          type: string
       responses:
         default:
-          description: "successful operation"
-    delete:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+  /relay/merchants/{merchant_id}/offers:
+    get:
       tags:
-      - "1.0"
-      operationId: "sendRequestToSPMDELETE"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Relay
+      summary: "Get multiple products directly from the merchant's ecom platform.\
+        \ An offer is a single merchant's offering of a product, most ecom platforms\
+        \ refer to these as products."
+      operationId: getOffers
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: next_page_cursor
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        schema:
+          type: string
       responses:
         default:
-          description: "successful operation"
-    options:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageOffer'
+  /relay/merchants/{merchant_id}/orders/{order_id}:
+    get:
       tags:
-      - "1.0"
-      operationId: "sendRequestToSPMOPTIONS"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Relay
+      summary: Get a single order directly from the merchant's ecom platform
+      operationId: getOrder
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: include
+        in: query
+        schema:
+          type: string
       responses:
         default:
-          description: "successful operation"
-    patch:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /relay/merchants/{merchant_id}/orders:
+    get:
       tags:
-      - "1.0"
-      operationId: "sendRequestToSPMPATCH"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Relay
+      summary: Get multiple orders directly from the merchant's ecom platform
+      operationId: getOrders
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: next_page_cursor
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        schema:
+          type: string
       responses:
         default:
-          description: "successful operation"
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageOrder'
+components:
+  schemas:
+    InvalidProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        external_id:
+          type: string
+          description: ID of product on external platform
+        name:
+          type: string
+          description: Name of product on external platform
+        thumbnail_url:
+          type: string
+          description: URL to product thumbnail
+        merchant_id:
+          type: integer
+          description: ID of merchant with broken product
+          format: int32
+        issues:
+          type: string
+          description: Comma separated list of product invalidation reasons
+        status:
+          type: string
+          description: Status of the invalidation
+          enum:
+          - UNRESOLVED
+          - RESOLVED
+        date_created:
+          type: string
+          description: Date created
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+      description: Any products that could not be synced
+    VioletPageInvalidProduct:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/InvalidProduct'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    VioletPageable:
+      type: object
+      properties:
+        page_number:
+          type: integer
+          description: The current page number (one based)
+          format: int32
+        page_size:
+          type: integer
+          description: The number of elements per page
+          format: int32
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+        offset:
+          type: integer
+          description: The offset
+          format: int64
+        paged:
+          type: boolean
+          description: Boolean indicating if the result is paged
+        unpaged:
+          type: boolean
+          description: Boolean indicating if the result is unpaged
+      description: Violet wrapper for springframework pageable
+    VioletSort:
+      type: object
+      properties:
+        unsorted:
+          type: boolean
+          description: Boolean indicating if the result set is unsorted
+        sorted:
+          type: boolean
+          description: Boolean indicating if the result set is sorted
+        empty:
+          type: boolean
+          description: Boolean indicating if the result set is empty
+      description: Violet Wrapper for springframework sort
+    RelayCustomer:
+      type: object
+      properties:
+        external_id:
+          type: string
+          description: ID of the customer in the external commerce platform
+        first_name:
+          type: string
+          description: First name of customer
+        last_name:
+          type: string
+          description: Last name of customer
+        company_name:
+          type: string
+          description: Company name if customer is a company
+        email:
+          type: string
+          description: Email address of customer
+        email_verified:
+          type: boolean
+          description: Has the customers email address been verified
+        phone:
+          type: string
+          description: Phone number of customer
+        accepts_marketing:
+          type: boolean
+          description: Does the customer accept marketing communication. When value
+            is false there must be no marketing communications sent this customer.
+        addresses:
+          type: array
+          description: Addresses used by the customer
+          items:
+            $ref: '#/components/schemas/RelayCustomerAddress'
+        total_spent:
+          type: integer
+          description: The total amount the customer has spent at the merchant's store
+          format: int32
+        order_count:
+          type: integer
+          description: The total number of orders the customer has placed at the merchant's
+            store
+          format: int32
+        store_credit_amount:
+          type: integer
+          description: Amount of store credit the customer has at the merchant's store
+          format: int32
+        default_currency:
+          type: string
+          description: The default currency the customer shops in
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
+        notes:
+          type: string
+          description: Notes about the customer provided by the merchant
+        tags:
+          type: array
+          description: Tags about the customer provided by the merchant
+          items:
+            type: string
+            description: Tags about the customer provided by the merchant
+        status:
+          type: string
+          description: Status of the customer in the merchants store. Value will be
+            NONE_PROVIDED if the external commerce platform doesn't include the concept
+            of customer status
+          enum:
+          - DISABLED
+          - ENABLED
+          - INVITED
+          - DECLINED
+          - NONE_PROVIDED
+        date_created:
+          type: string
+          description: The date the customer was last updated. ISO 8601 formatted
+          format: date-time
+      description: The actual content of the response; A list of the result objects
+    RelayCustomerAddress:
+      required:
+      - address_1
+      - city
+      - country
+      - postal_code
+      - state
+      - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name on Address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State Abbreviation
+        country:
+          type: string
+          description: Country ISO2 Code
+        postal_code:
+          type: string
+          description: Postal/Zip Code
+        phone:
+          type: string
+          description: Phone Number
+        type:
+          type: string
+          description: Address Type
+          enum:
+          - SHIPPING
+          - BILLING
+        external_id:
+          type: string
+          description: ID of the address in the external platform.
+        address_1:
+          type: string
+          description: First line of the Address
+        address_2:
+          type: string
+          description: Second line of the Address
+      description: Addresses used by the customer
+    VioletPageRelayCustomer:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/RelayCustomer'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    Album:
+      required:
+      - parent_id
+      - type
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        parent_id:
+          type: integer
+          description: ID of the parent entity
+          format: int64
+        type:
+          type: string
+          description: Parent Type
+          enum:
+          - OFFER
+          - SKU
+        name:
+          type: string
+          description: Name of Album
+        media:
+          uniqueItems: true
+          type: array
+          description: Album media
+          items:
+            $ref: '#/components/schemas/Media'
+        primary_media:
+          $ref: '#/components/schemas/Media'
+      description: Product Image Container
+    Media:
+      required:
+      - album_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        album_id:
+          type: integer
+          description: Album ID
+          format: int64
+        external_id:
+          type: string
+          description: External ID
+        cloud_id:
+          type: string
+          description: ID of hosted cloud entity
+        url:
+          type: string
+          description: Media URL
+        source_url:
+          type: string
+          description: Media Source URL
+        type:
+          type: string
+          description: Media Type
+          enum:
+          - IMAGE
+          - VIDEO
+        display_order:
+          type: integer
+          description: Display Order
+          format: int32
+        primary:
+          type: boolean
+          description: Primary Media
+      description: Product and SKU Media
+    Meta:
+      required:
+      - key
+      - offer_id
+      - value
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        offer_id:
+          type: integer
+          description: Offer Id
+          format: int64
+        key:
+          type: string
+          description: Key
+        value:
+          type: string
+          description: Value
+      description: Additional Product MetaData
+    Offer:
+      required:
+      - available
+      - merchant_id
+      - min_price
+      - name
+      - product_id
+      - source
+      - visible
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        product_id:
+          type: string
+          description: The parent/container product ID
+        external_id:
+          type: string
+          description: External ID
+        external_url:
+          type: string
+          description: External URL
+        name:
+          type: string
+          description: Name of Product in Offer
+        description:
+          type: string
+          description: Product Description
+        source:
+          type: string
+          description: Source Platform
+          enum:
+          - OTHER
+          - SHOPIFY
+          - MAGENTO
+          - MAGENTO_ONE
+          - WOOCOMMERCE
+          - BIGCOMMERCE
+          - LIGHTSPEED
+          - ECWID
+          - YAAS
+          - SPREECOMMERCE
+          - DEMANDWARE
+          - VOLUSION
+          - PRESTASHOP
+          - THREEDCART
+          - SYLIUS
+          - WIX
+          - SWELL
+          - MIVA
+          - WEBSPHERE
+          - ORACLECC
+          - SAPCC
+          - SQUARESPACE
+          - SHOPWARE
+          - COMMERCETOOLS
+          - MEDUSA
+          - ABICART
+          - SPRYKER
+          - MYSTORE
+          - CENTRA
+          - XCART
+          - VTEX
+          - KIBO
+          - SALEOR
+          - VENDO
+          - CHORD
+          - DIGITALRIVER
+          - SQUARE
+          - AMAZON
+          - CUSTOM
+        seller:
+          type: string
+          description: Name of Merchant Selling Product
+        vendor:
+          type: string
+          description: Name of Original Vendor
+        merchant_id:
+          type: integer
+          description: Merchant ID
+          format: int32
+        available:
+          type: boolean
+          description: Is Product Available
+        visible:
+          type: boolean
+          description: Is Product Visible
+        min_price:
+          type: integer
+          description: Minimum Price the Product sells for
+          format: int32
+        max_price:
+          type: integer
+          description: Maximum Price the Product sells for
+          format: int32
+        currency:
+          type: string
+          description: Base Currency of Offer. Intended for reference only. The currency
+            property of the SKU is the currency source of truth.
+        source_category_name:
+          type: string
+          description: Original Category on Source Platform
+        meta:
+          uniqueItems: true
+          type: array
+          description: Additional Meta Data of the Offer
+          items:
+            $ref: '#/components/schemas/Meta'
+        variants:
+          uniqueItems: true
+          type: array
+          description: Product Variations
+          items:
+            $ref: '#/components/schemas/Variant'
+        skus:
+          uniqueItems: true
+          type: array
+          description: Product SKUs
+          items:
+            $ref: '#/components/schemas/Sku'
+        albums:
+          uniqueItems: true
+          type: array
+          description: Product Albums
+          items:
+            $ref: '#/components/schemas/Album'
+        three_d_enables:
+          type: boolean
+          description: Is the product 3D Enabled
+        three_d_resource:
+          type: string
+          description: 3D Resource Object
+        type:
+          type: string
+          description: Product Type
+          enum:
+          - PHYSICAL
+          - DIGITAL
+          - VIRTUAL
+        status:
+          type: string
+          description: Status
+          enum:
+          - UNAVAILABLE
+          - AVAILABLE
+          - DISABLED_UNAVAILABLE
+          - DISABLED_AVAILABLE
+          - FOR_DELETION
+          - ARCHIVED
+        publishing_status:
+          type: string
+          description: Publishing Status
+          enum:
+          - NOT_PUBLISHED
+          - PUBLISHED
+        date_created:
+          type: string
+          description: Date of offer creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last offer update
+          format: date-time
+        date_last_consolidated:
+          type: string
+          description: Date of last consolidation. This date is jittered for performance
+            reasons and can be in the future
+          format: date-time
+        tag_string:
+          type: string
+          writeOnly: true
+        commission_rate:
+          type: number
+          description: Amount given by merchant
+          format: double
+        weight_unit:
+          type: string
+          description: Weight Unit
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+        size_unit:
+          type: string
+          description: Size Unit
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+        currency_symbol:
+          type: string
+          description: Symbol representing the desired currency
+        presented_currency:
+          type: string
+          description: The presented currency of this SKU
+        default_image_url:
+          type: string
+          description: The default image for this Offer. Only present on responses
+            from the Search API. In other cases this value will be on the album's
+            primary media object.
+        subscription_status:
+          type: string
+          description: Subscription status
+          enum:
+          - NOT_SUBSCRIBED
+          - SUBSCRIBED
+        tags:
+          type: array
+          items:
+            type: string
+      description: Product Offer
+    Sku:
+      required:
+      - currency
+      - merchant_id
+      - offer_id
+      - sale_price
+      - type
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        offer_id:
+          type: integer
+          description: ID of the Offer
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the Merchant
+          format: int32
+        external_id:
+          type: string
+          description: ID of the SKU on the External Ecom Platform
+        name:
+          type: string
+          description: Sku Name
+        asin:
+          type: string
+          description: Amazon Standard Identification Number
+        gtin:
+          type: string
+          description: Global Trade Item Number
+        upc:
+          type: string
+          description: Universal Product Code
+        ean:
+          type: string
+          description: European Article Number
+        isbn:
+          type: string
+          description: International Standard Book Number
+        in_stock:
+          type: boolean
+          description: Is the Product in Stock
+        quantity_available:
+          type: integer
+          description: Quantity Available
+          format: int32
+        inventory_tracked:
+          type: boolean
+          description: Is the SKUs inventory tracked
+        sale_price:
+          type: integer
+          description: Sale Price of the SKU. This is the actual sale cost of the
+            product is purchased.
+          format: int32
+        retail_price:
+          type: integer
+          description: Retail Price of the SKU. This is the recommended or common
+            price of the SKU.
+          format: int32
+        currency:
+          type: string
+          description: The base currency of this SKU
+        presented_currency:
+          type: string
+          description: The presented currency of this SKU
+        taxable:
+          type: boolean
+          description: Is the product taxable
+        tax_type:
+          type: string
+          description: Type of Tax on this SKU
+          enum:
+          - DEFAULT
+          - APPAREL
+          - SERVICE
+        albums:
+          uniqueItems: true
+          type: array
+          description: Sku Albums
+          items:
+            $ref: '#/components/schemas/Album'
+        variant_values:
+          uniqueItems: true
+          type: array
+          description: Variant Values that apply to this SKU
+          items:
+            $ref: '#/components/schemas/SkuVariantValue'
+        type:
+          type: string
+          enum:
+          - PHYSICAL
+          - DIGITAL
+          - VIRTUAL
+        status:
+          type: string
+          description: SKU Status
+          enum:
+          - UNAVAILABLE
+          - AVAILABLE
+          - DISABLED_UNAVAILABLE
+          - DISABLED_AVAILABLE
+          - FOR_DELETION
+          - ARCHIVED
+        date_created:
+          type: string
+          description: Date of SKU creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last SKU update
+          format: date-time
+        sku_dimensions:
+          $ref: '#/components/schemas/SkuDimensions'
+        display_order:
+          type: integer
+          description: Order to display SKU
+          format: int32
+      description: Stock Keeping Unit
+    SkuDimensions:
+      type: object
+      properties:
+        sku_id:
+          type: integer
+          description: ID of SKU Dimensions Belong To
+          format: int64
+        weight:
+          type: number
+          description: Weight of SKU
+          format: double
+        height:
+          type: number
+          description: Height of SKU
+          format: double
+        width:
+          type: number
+          description: Width of SKU
+          format: double
+        length:
+          type: number
+          description: Length of SKU
+          format: double
+        type:
+          type: string
+          description: Dimensions Type
+          enum:
+          - SKU
+          - SHIPPING
+      description: Individual Sku Dimensions
+    SkuVariantValue:
+      required:
+      - value
+      - variant
+      type: object
+      properties:
+        variant:
+          type: string
+          description: Variant Name
+        value:
+          type: string
+          description: Variant Value
+      description: Individual Variation Value for a Sku
+    Variant:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        product_variant_id:
+          type: string
+          description: ID of the Product Variant
+        external_id:
+          type: string
+          description: ID of the Variant on the External Ecommerce Platform
+        name:
+          type: string
+          description: Variant Name
+        visual:
+          type: boolean
+          description: Is the variant visual
+        values:
+          uniqueItems: true
+          type: array
+          description: Variant Values
+          items:
+            $ref: '#/components/schemas/VariantValue'
+        display_order:
+          type: integer
+          description: The order the variants are displayed in.
+          format: int32
+      description: Variation Data
+    VariantValue:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        product_variant_value_id:
+          type: string
+          description: ID of the Product Variation Value
+        external_id:
+          type: string
+          description: ID of the Variant in the External Ecommerce Platform
+        name:
+          type: string
+          description: Variant Value Name
+        sku_ids:
+          uniqueItems: true
+          type: array
+          description: ID's of SKU's containing this Variant Value
+          items:
+            type: integer
+            description: ID's of SKU's containing this Variant Value
+            format: int64
+        display_order:
+          type: integer
+          description: The order the variant values are displayed in.
+          format: int32
+      description: Individual Variation Value
+    VioletPageOffer:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Offer'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    Bag:
+      required:
+      - app_id
+      - merchant_id
+      - order_id
+      - shipping_method
+      - taxes
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        order_id:
+          type: integer
+          description: ID of the Order the Bag belongs to
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the Merchant the Bag references
+          format: int32
+        app_id:
+          type: integer
+          description: ID of the App creating this Bag
+          format: int32
+        external_id:
+          type: string
+          description: ID of the Order on the External Ecommerce Platform
+        status:
+          type: string
+          description: Status
+          enum:
+          - IN_PROGRESS
+          - SUBMITTED
+          - ACCEPTED
+          - COMPLETED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REJECTED
+          - CANCELED
+          - BACKORDERED
+        fulfillment_status:
+          type: string
+          description: Fulfillment Status
+          enum:
+          - PROCESSING
+          - SHIPPED
+          - PARTIALLY_SHIPPED
+          - DELIVERED
+          - COULD_NOT_DELIVER
+          - RETURNED
+        financial_status:
+          type: string
+          description: Financial Status
+          enum:
+          - UNPAID
+          - AUTHORIZED
+          - PENDING
+          - PAID
+          - PARTIALLY_PAID
+          - REFUNDED
+          - PARTIALLY_REFUNDED
+          - VOIDED
+        skus:
+          type: array
+          description: SKUs added to the bag
+          items:
+            $ref: '#/components/schemas/OrderSku'
+        shipping_method:
+          $ref: '#/components/schemas/OrderShippingMethod'
+        taxes:
+          type: array
+          description: Taxes applied to the bag
+          items:
+            $ref: '#/components/schemas/OrderTax'
+        sub_total:
+          type: integer
+          description: "The price of the Bag in the base currency before discounts,\
+            \ shipping, duties, taxes, and tips. In Cents"
+          format: int32
+        shipping_total:
+          type: integer
+          description: The sum of all shipping methods applied to the Bag in the base
+            currency. In Cents
+          format: int32
+        tax_total:
+          type: integer
+          description: The sum of all the taxes applied to the Bag in the base currency.
+            In Cents
+          format: int32
+        discount_total:
+          type: integer
+          description: The total discounts applied to the price of the Bag in the
+            base currency. In Cents
+          format: int32
+        total:
+          type: integer
+          description: "The sum of all item prices, discounts, shipping, and taxes\
+            \ applied to the Bag in the base currency. In Cents"
+          format: int32
+        taxes_included:
+          type: boolean
+          description: Are taxes included in the cart total.
+        transactions:
+          type: array
+          description: Transactions of the bag
+          items:
+            $ref: '#/components/schemas/Transaction'
+        external_checkout:
+          type: boolean
+          description: If bag is tracked externally
+        commission_rate:
+          type: number
+          description: The developer commission rate
+          format: double
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+        date_last_consolidated:
+          type: string
+          description: Date of last consolidation
+          format: date-time
+        remorse_period_ends:
+          type: string
+          description: Date when the bag can no longer be refunded
+          format: date-time
+        currency:
+          type: string
+          description: Base currency of cart
+        external_currency:
+          type: string
+          description: Currency of cart on external ecommerce platform
+        currency_exchange_rate:
+          type: number
+          description: "Exchange rate of currency and external currency, if different,\
+            \ at the time the bag was last priced."
+        channel:
+          type: string
+          description: The channel that originated this order.
+          enum:
+          - APP
+          - MARKETPLACE
+          - FACEBOOK
+          - INSTAGRAM
+          - WALMART
+          - GOOGLE
+          - TIKTOK
+          - SNAPCHAT
+          - PINTEREST
+        app_order_id:
+          type: string
+          description: App Order ID. Automatically obtained through the app_order_id
+            applied to the order.
+        platform:
+          type: string
+          description: The commerce platform used by this merchant.
+          enum:
+          - OTHER
+          - SHOPIFY
+          - MAGENTO
+          - MAGENTO_ONE
+          - WOOCOMMERCE
+          - BIGCOMMERCE
+          - LIGHTSPEED
+          - ECWID
+          - YAAS
+          - SPREECOMMERCE
+          - DEMANDWARE
+          - VOLUSION
+          - PRESTASHOP
+          - THREEDCART
+          - SYLIUS
+          - WIX
+          - SWELL
+          - MIVA
+          - WEBSPHERE
+          - ORACLECC
+          - SAPCC
+          - SQUARESPACE
+          - SHOPWARE
+          - COMMERCETOOLS
+          - MEDUSA
+          - ABICART
+          - SPRYKER
+          - MYSTORE
+          - CENTRA
+          - XCART
+          - VTEX
+          - KIBO
+          - SALEOR
+          - VENDO
+          - CHORD
+          - DIGITALRIVER
+          - SQUARE
+          - AMAZON
+          - CUSTOM
+        fulfillments:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/BagFulfillment'
+        discounts:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/BagDiscount'
+        wallet_based_checkout:
+          type: boolean
+          description: Is this bag going to be placed through wallet-based checkout
+        app_name:
+          type: string
+          description: Name of app that originated the order. Use the "extended" query
+            param when looking up orders to include this value.
+        bag_status:
+          type: string
+          enum:
+          - IN_PROGRESS
+          - SUBMITTED
+          - ACCEPTED
+          - COMPLETED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REJECTED
+          - CANCELED
+          - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
+        merchant_name:
+          type: string
+          description: Name of Merchant
+      description: Per Merchant Bag in Order
+    BagDiscount:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        bag_id:
+          type: integer
+          description: ID of the Bag this discount belong to
+          format: int64
+        status:
+          type: string
+          description: Status of discount
+          enum:
+          - PENDING
+          - APPLIED
+          - INVALID
+          - NOT_SUPPORTED
+          - ERROR
+          - EXPIRED
+        type:
+          type: string
+          description: Type of discount
+          enum:
+          - CODE
+        value_type:
+          type: string
+          description: Value type of discount
+          enum:
+          - AMOUNT
+          - PERCENTAGE
+        target_type:
+          type: string
+          description: Target type of the discount
+          enum:
+          - ORDER
+          - SKU
+          - SHIPPING
+        code:
+          type: string
+          description: Code of discount
+        external_id:
+          type: string
+          description: External ID of discount
+        amount:
+          type: integer
+          description: Amount of discount
+          format: int32
+        percentage:
+          type: number
+          description: Percentage of discount
+          format: double
+        amount_total:
+          type: integer
+          description: Total amount of discount applied to bag
+          format: int32
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last bag discount update
+          format: date-time
+      description: Bag Discount
+    BagFulfillment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        bag_id:
+          type: integer
+          description: ID of the bag the fulfillment belongs to.
+          format: int64
+        external_id:
+          type: string
+          description: ID of the fulfillment on the external commerce platform.
+        carrier:
+          type: string
+          description: Carrier responsible for the fulfillment. Will be OTHER if raw
+            carrier is not recognized.
+          enum:
+          - OTHER
+          - UPS
+          - USPS
+          - FEDEX
+          - DHL
+          - ONTRAC
+          - ROYAL_MAIL
+          - SENDLE
+          - POSTNORD
+        raw_carrier:
+          type: string
+          description: Raw name of carrier from the external commerce platform.
+        status:
+          type: string
+          description: ID of the Bag the fulfillment belongs to.
+          enum:
+          - PENDING
+          - PROCESSING
+          - SUCCESS
+          - CANCELED
+          - ERROR
+          - FAILURE
+          - NONE_PROVIDED
+        carrier_status:
+          type: string
+          description: ID of the Bag the fulfillment belongs to.
+          enum:
+          - PENDING
+          - LABEL_PURCHASED
+          - LABEL_PRINTED
+          - CONFIRMED
+          - READY_FOR_PICKUP
+          - IN_TRANSIT
+          - OUT_FOR_DELIVERY
+          - ATTEMPTED_DELIVERY
+          - DELIVERED
+          - FAILURE
+          - NONE_PROVIDED
+        tracking_number:
+          type: string
+          description: Tracking number provider by the carrier.
+        tracking_url:
+          type: string
+          description: Tracking URL provider by the carrier.
+        skus:
+          uniqueItems: true
+          type: array
+          description: SKUs fulfilled by this fulfillment.
+          items:
+            $ref: '#/components/schemas/BagFulfillmentSku'
+      description: A Bag Fulfillment
+    BagFulfillmentSku:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        fulfillment_id:
+          type: integer
+          description: ID of the fulfillment that contains this item.
+          format: int64
+        order_sku_id:
+          type: integer
+          description: ID of the SKU in the Bag.
+          format: int64
+        quantity_fulfilled:
+          type: integer
+          description: Quantity of the this item fulfilled by this fulfillment.
+          format: int32
+      description: A bag fulfillment sku
+    Order:
+      required:
+      - status
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        token:
+          type: string
+          readOnly: true
+        errors:
+          type: array
+          description: "Errors on the Order. During checkout, if there was an error\
+            \ or issue on one of the order's bags, there will be an error added to\
+            \ this list describing the issue. The checkout API will return 200 with\
+            \ the order object in the response even if there was an issue with a bag\
+            \ so you must always check the response for errors in this list to know\
+            \ if there was an issue on the order."
+          items:
+            $ref: '#/components/schemas/OrderError'
+        user_id:
+          type: integer
+          description: ID of the User placing the order
+          format: int64
+        app_id:
+          type: integer
+          description: ID of the App creating the order
+          format: int32
+        developer_id:
+          type: integer
+          description: ID of the Developer who placed
+          format: int32
+        customer:
+          $ref: '#/components/schemas/OrderCustomer'
+        bags:
+          type: array
+          description: Bags in the Order
+          items:
+            $ref: '#/components/schemas/Bag'
+        shipping_address:
+          $ref: '#/components/schemas/OrderAddress'
+        billing_address:
+          $ref: '#/components/schemas/OrderAddress'
+        payment_method:
+          $ref: '#/components/schemas/OrderPaymentMethod'
+        sub_total:
+          type: integer
+          description: "The price of the Order in the base currency before discounts,\
+            \ shipping, duties, taxes, and tips. In Cents."
+          format: int32
+        shipping_total:
+          type: integer
+          description: The sum of all shipping methods applied to the Order in the
+            base currency. In Cents.
+          format: int32
+        tax_total:
+          type: integer
+          description: The sum of all the taxes applied to the Order in the base currency.
+            In Cents.
+          format: int32
+        discount_total:
+          type: integer
+          description: The total discounts applied to the price of the Order in the
+            base currency. In Cents.
+          format: int32
+        total:
+          type: integer
+          description: "The sum of all item prices, discounts, shipping, and taxes\
+            \ applied to the Order in the base currency. In Cents."
+          format: int32
+        app_customer_id:
+          type: string
+          description: App Customer ID. This should be used to map the order to the
+            ID of the customer in your application.
+        app_order_id:
+          type: string
+          description: "App Order ID. This should be set to a unique identifier in\
+            \ your system. While not enforced unique in Violet's system, it is strongly\
+            \ recommended that unique values are used for each cart to help correlate\
+            \ identifiers between Violet's system and yours."
+        status:
+          type: string
+          description: Status of the Order
+          enum:
+          - IN_PROGRESS
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REQUIRES_ACTION
+        is_guest:
+          type: boolean
+          description: Order is Guest
+        date_created:
+          type: string
+          description: Date of order creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last order update
+          format: date-time
+        priced:
+          type: boolean
+          description: Is the cart priced
+        wallet_based_checkout:
+          type: boolean
+          description: Is this cart going to be placed through wallet-based checkout
+        currency:
+          type: string
+          description: Base currency of cart
+        referral_id:
+          type: string
+          description: Optional value used to represent an identifier in your system.
+            This value is not required to represent a referral. It can represent the
+            ID of anything in your system and can be used to filter order lookup results.
+            Max length of 128 characters.
+        currency_symbol:
+          type: string
+          description: Symbol representing the desired currency
+        app_name:
+          type: string
+          description: Name of app that originated the order. Use the "extended" query
+            param when looking up orders to include this value.
+        stripe_key:
+          type: string
+          description: Stripe publishable key. Use for tokenizing payment methods.
+        payment_intent_client_secret:
+          type: string
+          description: Payment intent client secret. Use for payment intent based
+            payment capture and external captures
+        order_id:
+          type: integer
+          format: int64
+        guest:
+          type: boolean
+        order_status:
+          type: string
+          enum:
+          - IN_PROGRESS
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REQUIRES_ACTION
+        intent_based_checkout:
+          type: boolean
+          description: Boolean indicating if the cart/order will be payed using a
+            payment intent.
+      description: Order
+    OrderAddress:
+      required:
+      - address_1
+      - city
+      - country
+      - postal_code
+      - state
+      - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name on Address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State Abbreviation
+        country:
+          type: string
+          description: Country ISO2 Code
+        postal_code:
+          type: string
+          description: Postal/Zip Code
+        phone:
+          type: string
+          description: Phone Number
+        type:
+          type: string
+          description: Address Type
+          enum:
+          - SHIPPING
+          - BILLING
+        email:
+          type: string
+          description: Email Address
+        address_1:
+          type: string
+          description: First line of the Address
+        address_2:
+          type: string
+          description: Second line of the Address
+        first_name:
+          type: string
+        last_name:
+          type: string
+      description: The shipping or billing address of a user placing an order
+    OrderCustomer:
+      required:
+      - first_name
+      - last_name
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: ID of the User the Order Customer references
+          format: int64
+        first_name:
+          type: string
+          description: First Name
+        last_name:
+          type: string
+          description: Last Name
+        email:
+          type: string
+          description: Email Address of Customer
+        external_id:
+          type: string
+          description: ID of the Customer on the External Platform
+        shipping_address:
+          $ref: '#/components/schemas/OrderAddress'
+        billing_address:
+          $ref: '#/components/schemas/OrderAddress'
+        same_address:
+          type: boolean
+          description: Use Same Address for Both
+        name:
+          type: string
+      description: The Customer Placing the Order
+    OrderError:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        order_id:
+          type: integer
+          description: Order ID
+          format: int64
+        bag_id:
+          type: integer
+          description: Bag ID
+          format: int64
+        entity_id:
+          type: string
+          description: Entity ID
+        type:
+          type: string
+          description: Error Type
+          enum:
+          - EXTERNAL_CREATE_CART
+          - EXTERNAL_ADD_ITEM
+          - EXTERNAL_UPDATE_ITEM
+          - EXTERNAL_REMOVE_ITEM
+          - EXTERNAL_ADD_CUSTOMER
+          - EXTERNAL_ADD_ADDRESSES
+          - EXTERNAL_ADD_SHIPPING_ADDRESS
+          - EXTERNAL_ADD_BILLING_ADDRESS
+          - EXTERNAL_GET_SHIPPING_METHODS
+          - EXTERNAL_SET_SHIPPING_METHOD
+          - EXTERNAL_SET_PAYMENT_METHOD
+          - EXTERNAL_PRICE_CART
+          - EXTERNAL_SUBMIT_CART
+          - INTERNAL_ADD_ITEM
+          - EXTERNAL_DELETE_CART
+          - EXTERNAL_CANCEL_ORDER
+          - EXTERNAL_WRITE_ORDER
+          - EXTERNAL_MARK_ORDER_AS_PAID
+          - EXTERNAL_ADD_DISCOUNT_CODE
+          - EXTERNAL_REMOVE_DISCOUNT_CODE
+          - EXTERNAL_DELETE_ORDER
+        message:
+          type: string
+          description: Error Message
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+        platform:
+          type: string
+          enum:
+          - OTHER
+          - SHOPIFY
+          - MAGENTO
+          - MAGENTO_ONE
+          - WOOCOMMERCE
+          - BIGCOMMERCE
+          - LIGHTSPEED
+          - ECWID
+          - YAAS
+          - SPREECOMMERCE
+          - DEMANDWARE
+          - VOLUSION
+          - PRESTASHOP
+          - THREEDCART
+          - SYLIUS
+          - WIX
+          - SWELL
+          - MIVA
+          - WEBSPHERE
+          - ORACLECC
+          - SAPCC
+          - SQUARESPACE
+          - SHOPWARE
+          - COMMERCETOOLS
+          - MEDUSA
+          - ABICART
+          - SPRYKER
+          - MYSTORE
+          - CENTRA
+          - XCART
+          - VTEX
+          - KIBO
+          - SALEOR
+          - VENDO
+          - CHORD
+          - DIGITALRIVER
+          - SQUARE
+          - AMAZON
+          - CUSTOM
+      description: Order Error
+    OrderPaymentMethod:
+      required:
+      - payment_method_id
+      type: object
+      properties:
+        brand:
+          type: string
+          description: Brand of Card
+        last_four:
+          type: string
+          description: Last Four Numbers on Card
+        exp_month:
+          type: integer
+          description: Card Expiration Month
+          format: int32
+        exp_year:
+          type: integer
+          description: Card Expiration Year
+          format: int32
+        cardholder_name:
+          type: string
+          description: Name as it appears on Card
+        payment_method_id:
+          type: integer
+          description: ID of the referenced Payment Method
+          format: int64
+        default:
+          type: boolean
+          description: Is Default Method
+      description: Payment Method belonging to an Order
+    OrderShippingMethod:
+      required:
+      - bag_id
+      - merchant_id
+      - price
+      - shipping_method_id
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of Shipping Method
+          enum:
+          - CALCULATED
+          - FLAT_RATE_PRICE
+          - FLAT_RATE_WEIGHT
+        Carrier:
+          type: string
+          enum:
+          - OTHER
+          - UPS
+          - USPS
+          - FEDEX
+          - DHL
+          - ONTRAC
+          - ROYAL_MAIL
+          - SENDLE
+          - POSTNORD
+        label:
+          type: string
+          description: Shipping Method Label
+        price:
+          type: integer
+          description: Total cost of the Shipping Method. In Cents
+          format: int32
+        min_subtotal:
+          type: integer
+          description: Minimum Subtotal. In Cents. Only applies to Flat Rate by Price
+          format: int32
+        max_subtotal:
+          type: integer
+          description: Maximum Subtotal. In Cents. Only applies to Flat Rate by Price
+          format: int32
+        min_weight:
+          type: number
+          description: Minimum Weight. In Cents. Only applies to Flat Rate by Weight
+          format: double
+        max_weight:
+          type: number
+          description: Maximum Weight. In Cents. Only applies to Flat Rate by Weight
+          format: double
+        external_id:
+          type: string
+          description: ID(s) on external ecommerce platform
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        shipping_method_id:
+          type: string
+          description: ID of the referenced Shipping Method
+        bag_id:
+          type: integer
+          description: ID of the Bag the Shipping Method applies to
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the merchant the bag belongs to
+          format: int32
+        tracking_number:
+          type: string
+          description: Carrier Tracking Number
+      description: Shipping Methods belonging to an Order
+    OrderSku:
+      required:
+      - sku_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the Merchant the SKU belongs to
+          format: int32
+        app_id:
+          type: integer
+          description: ID of the App creating the Order
+          format: int32
+        product_id:
+          type: string
+          description: ID of the Product
+        sku_id:
+          type: integer
+          description: ID of the referenced SKU
+          format: int64
+        external_id:
+          type: string
+          description: ID of the SKU on the External Ecommerce Platform
+        name:
+          type: string
+          description: Name of the SKU
+        brand:
+          type: string
+          description: Brand Name
+        thumbnail:
+          type: string
+          description: URL of the thumbnail image. Useful for order overview displays
+        quantity:
+          type: integer
+          description: Quantity of the SKU being purchased. Quantities over 1000 will
+            default to 1000
+          format: int32
+        price:
+          type: integer
+          description: Price of the individual SKU. In Cents
+          format: int32
+        weight:
+          type: number
+          description: Weight of SKU
+          format: double
+        height:
+          type: number
+          description: Height of SKU
+          format: double
+        width:
+          type: number
+          description: Width of SKU
+          format: double
+        length:
+          type: number
+          description: Length of SKU
+          format: double
+        available:
+          type: boolean
+          description: Is the product still available for purchase. If a SKU becomes
+            unavailable it likely means that the product became out of stock after
+            it was added to the cart. Unavailable SKUs cannot be purchased.
+        status:
+          type: string
+          description: Sku Status
+          enum:
+          - IN_PROGRESS
+          - PROCESSING
+          - SHIPPED
+          - PARTIALLY_SHIPPED
+          - DELIVERED
+          - COULD_NOT_DELIVER
+          - RETURNED
+          - CANCELED
+          - REFUNDED
+          - ERROR
+          - PARTIALLY_RETURNED
+          - PARTIALLY_REFUNDED
+        product_type:
+          type: string
+          description: Product Type
+          enum:
+          - PHYSICAL
+          - DIGITAL
+          - VIRTUAL
+        quantity_fulfilled:
+          type: integer
+          description: The quantity of this item that has been fulfilled
+          format: int32
+        order_sku_rates:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderSkuRate'
+        transient_external_product_id:
+          type: string
+        line_price:
+          type: integer
+          description: Price of the SKU multiplied by the Quantity. In Cents
+          format: int32
+      description: SKUs belonging to an Order
+    OrderSkuRate:
+      required:
+      - amount
+      - name
+      - order_sku_id
+      - type
+      type: object
+      properties:
+        order_sku_id:
+          type: integer
+          description: ID of the Order SKU the Rate belongs to
+          format: int64
+        amount:
+          type: integer
+          description: Total Tax amount on Bag. In Cents
+          format: int32
+        rate:
+          type: number
+          description: Rate
+          format: double
+        type:
+          type: string
+          description: Rate Type
+          enum:
+          - TAX
+          - SHIPPING
+          - FEE
+          - DUTY
+        name:
+          type: string
+          description: Rate Name
+        decimal_rate:
+          type: number
+          format: double
+        dollar_amount:
+          type: number
+          format: double
+      description: Rates belonging to Order SKUs
+    OrderTax:
+      required:
+      - amount
+      - merchant_id
+      - order_id
+      - rate
+      - state
+      type: object
+      properties:
+        order_id:
+          type: integer
+          description: ID of the Order the Tax belongs to
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the Merchant the Bag belongs to
+          format: int32
+        skus:
+          type: array
+          description: SKUs covered by the Tax
+          items:
+            type: string
+            description: SKUs covered by the Tax
+        state:
+          type: string
+          description: State abbreviation
+        postal_code:
+          type: string
+          description: Postal/Zip Code
+        rate:
+          type: number
+          description: Tax Rate
+          format: double
+        amount:
+          type: integer
+          description: Total Tax amount on Bag. In Cents
+          format: int32
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: Description of the Tax
+      description: Taxes belonging to an Order Bag
+    Transaction:
+      required:
+      - app_id
+      - bag_id
+      - merchant_id
+      - payment_method_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        merchant_id:
+          type: integer
+          description: ID of the Merchant receiving the transaction
+          format: int32
+        app_id:
+          type: integer
+          description: ID of the App that created the Order
+          format: int32
+        order_id:
+          type: integer
+          description: ID of the Order the Transaction applies to
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the Bag the Transaction applies to
+          format: int64
+        payment_method_id:
+          type: integer
+          description: ID of the referenced Payment Method
+          format: int64
+        gateway_transaction_id:
+          type: string
+          description: ID of the Transaction in the Payment Gateway
+        gateway:
+          type: string
+          description: Gateway processing the Transaction
+        amount:
+          type: integer
+          description: Total amount being transacted
+          format: int32
+        currency:
+          type: string
+          description: Currency the Transaction takes place in
+        type:
+          type: string
+          description: Transaction Type
+          enum:
+          - AUTHORIZATION
+          - CAPTURE
+          - SALE
+          - VOID
+          - REFUND
+        error_code:
+          type: string
+          description: Error Code from gateway if error occurred
+        status:
+          type: string
+          description: Transaction Status
+          enum:
+          - PROCESSING
+          - COMPLETED
+          - REFUNDED
+          - REQUIRES_ACTION
+        test:
+          type: boolean
+          description: Is this a test Transaction
+        date_created:
+          type: string
+          description: Date of transaction creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last transaction update
+          format: date-time
+        order_payment_method:
+          $ref: '#/components/schemas/OrderPaymentMethod'
+      description: Order Transaction
+    VioletPageOrder:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Order'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
