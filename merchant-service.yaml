@@ -9,12 +9,39 @@ info:
 servers:
 - url: https://sandbox-api.violet.io/v1
 tags:
+- name: Merchants - Address
+  description: Operations relating to Merchant Addresses
+- name: Merchants - Attribute
+  description: Operations relating to Merchant Attributes
 - name: Merchants
   description: Merchant related entities
-- name: Merchants - Explore
-  description: Merchant explore operations
+- name: Merchants - Configuration
+  description: Operations relating to Merchant Configuration
+- name: Merchants - Contributor
+  description: Operations relating to Merchant Contributors
+- name: Merchants - Credential
+  description: Operations relating to Merchant Credentials
+- name: Merchants - External
+  description: Convenience methods for external merchant management (i.e. createing
+    merchants through Violet Connect or ecommerce apps)
 - name: Merchants - Merchant
   description: Operations directly relating to merchant entities themselves
+- name: Merchants - Explore Configuration
+  description: Merchant explore configurations
+- name: Merchants - Explore
+  description: Merchant explore operations
+- name: Merchants - ReferenceId
+  description: Operations relating to Merchant ReferenceIds
+- name: Merchants - Setup
+  description: Operations relating to Merchant Setups
+- name: Merchants - Submission
+  description: Operations relating to Merchant Submissions
+- name: Merchants - Sync
+  description: Sync operations
+- name: Merchants - User Merchants
+  description: Operations relating to a User's Merchants
+- name: Merchants - Util
+  description: Various utility operations
 paths:
   /merchants:
     get:
@@ -49,18 +76,18 @@ paths:
           format: int32
           default: 20
       responses:
-        200:
-          description: successful operation
+        default:
+          description: default response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageMerchant'
-  /merchants/explore:
-    post:
+                $ref: '#/components/schemas/VioletPageMerchant'
+  /merchants/{merchant_id}:
+    get:
       tags:
-      - Merchants - Explore
-      summary: Get Merchant Summaries
-      operationId: getMerchantSummaries
+      - Merchants - Merchant
+      summary: Get Merchant
+      operationId: getMerchantById
       parameters:
       - name: X-Violet-Token
         in: header
@@ -75,32 +102,24 @@ paths:
         schema:
           type: integer
           format: int32
-      - name: page
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
         in: query
         schema:
           type: integer
           format: int32
-          default: 1
-      - name: size
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 20
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MerchantExploreRequest'
-        required: false
       responses:
-        200:
-          description: successful operation
+        default:
+          description: default response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageMerchantSummary'
-      x-codegen-request-body-name: body
+                $ref: '#/components/schemas/Merchant'
   /merchants/search:
     post:
       tags:
@@ -138,21 +157,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MerchantSearchRequest'
-        required: false
       responses:
-        200:
-          description: successful operation
+        default:
+          description: default response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageMerchant'
-      x-codegen-request-body-name: body
-  /merchants/{merchant_id}:
-    get:
+                $ref: '#/components/schemas/VioletPageMerchant'
+  /merchants/explore:
+    post:
       tags:
-      - Merchants - Merchant
-      summary: Get Merchant
-      operationId: getMerchantById
+      - Merchants - Explore
+      summary: Get Merchant Summaries
+      operationId: getMerchantSummaries
       parameters:
       - name: X-Violet-Token
         in: header
@@ -167,24 +184,30 @@ paths:
         schema:
           type: integer
           format: int32
-      - name: merchant_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      - name: app_id
+      - name: page
         in: query
         schema:
           type: integer
           format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantExploreRequest'
       responses:
-        200:
-          description: successful operation
+        default:
+          description: default response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Merchant'
+                $ref: '#/components/schemas/VioletPageMerchantSummary'
 components:
   schemas:
     Merchant:
@@ -212,19 +235,48 @@ components:
           type: string
           description: The eCommerce platform this merchant uses
           enum:
-          - shopify
-          - magento
-          - magento_one
-          - woocommerce
-          - bigcommerce
-          - lightspeed
-          - ecwid
-          - yaas
-          - spreecommerce
-          - demandware
-          - volusion
-          - prestashop
-          - threedcart
+          - OTHER
+          - SHOPIFY
+          - MAGENTO
+          - MAGENTO_ONE
+          - WOOCOMMERCE
+          - BIGCOMMERCE
+          - LIGHTSPEED
+          - ECWID
+          - YAAS
+          - SPREECOMMERCE
+          - DEMANDWARE
+          - VOLUSION
+          - PRESTASHOP
+          - THREEDCART
+          - SYLIUS
+          - WIX
+          - SWELL
+          - MIVA
+          - WEBSPHERE
+          - ORACLECC
+          - SAPCC
+          - SQUARESPACE
+          - SHOPWARE
+          - COMMERCETOOLS
+          - MEDUSA
+          - ABICART
+          - SPRYKER
+          - MYSTORE
+          - CENTRA
+          - XCART
+          - VTEX
+          - KIBO
+          - SALEOR
+          - VENDO
+          - CHORD
+          - DIGITALRIVER
+          - SQUARE
+          - AMAZON
+          - CUSTOM
+        platform_plan:
+          type: string
+          description: The eCommerce platform plan of the store
         store_url:
           type: string
           description: The URL of the Store
@@ -233,15 +285,23 @@ components:
           description: The custom URL of the Store
         verified:
           type: boolean
-          description: If a user has verified their email address
+          description: If a user has verified their email address. Deprecated (not
+            used will always be false)
+          deprecated: true
         status:
           type: string
           description: The status of the merchant
           enum:
-          - inactive
-          - active
-          - disabled
-          - new
+          - INACTIVE
+          - ACTIVE
+          - DISABLED
+          - NEW
+          - DISABLED_INACTIVE
+          - FOR_DELETION
+          - APPLICATION_IN_PROGRESS
+          - APPLICATION_SUBMITTED
+          - APPLICATION_DENIED
+          - APPLICATION_ACCEPTED
         default_currency:
           type: string
           description: The default currency used by merchant
@@ -360,48 +420,121 @@ components:
           - VEHICLES_PARTS
         featured:
           type: boolean
-          description: Featured Merchant
+          description: Featured Merchant. Deprecated (not used)
+          deprecated: true
         connection_status:
           type: string
-          description: If a developers application has access to this merchant.
+          description: If a developers application has access to this merchant. Deprecated
+            (not reliable) use connection health endpoint instead.
+          deprecated: true
           enum:
           - NOT_CONNECTED
           - CONNECTED
           - REQUESTED
           - DECLINED
-        annual_revenue:
-          type: string
-          description: Annual Revenue
-          enum:
-          - L_E_100K
-          - G_100K_L_E_1M
-          - G_1M_L_E_100M
-          - G_100M
         shipping_configured:
           type: boolean
-          description: The shipping status of the merchant
+          description: The shipping status of the merchant. Deprecated (not reliable)
+          deprecated: true
         taxes_configured:
           type: boolean
-          description: The tax status of the merchant
+          description: The tax status of the merchant. Deprecated (not reliable)
+          deprecated: true
         default:
           type: boolean
+          description: Is this a Users default merchant
         billing_configured:
           type: boolean
-          description: The billing status of the merchant
+          description: The billing status of the merchant. Deprecated (not reliable)
+            use connection health endpoint instead.
+          deprecated: true
       description: Retailer selling goods
-    MerchantExploreRequest:
+    VioletPageMerchant:
       type: object
       properties:
-        name:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Merchant'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
           type: string
-          description: Name of Merchant
-        sort_by:
-          type: string
-          description: Property to sort by in camelCase
-        sort_direction:
-          type: string
-          description: Direction to sort by
-      description: Merchant Explore Request
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    VioletPageable:
+      type: object
+      properties:
+        page_number:
+          type: integer
+          description: The current page number (one based)
+          format: int32
+        page_size:
+          type: integer
+          description: The number of elements per page
+          format: int32
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+        offset:
+          type: integer
+          description: The offset
+          format: int64
+        paged:
+          type: boolean
+          description: Boolean indicating if the result is paged
+        unpaged:
+          type: boolean
+          description: Boolean indicating if the result is unpaged
+      description: Violet wrapper for springframework pageable
+    VioletSort:
+      type: object
+      properties:
+        unsorted:
+          type: boolean
+          description: Boolean indicating if the result set is unsorted
+        sorted:
+          type: boolean
+          description: Boolean indicating if the result set is sorted
+        empty:
+          type: boolean
+          description: Boolean indicating if the result set is empty
+      description: Violet Wrapper for springframework sort
     MerchantSearchRequest:
       type: object
       properties:
@@ -447,94 +580,65 @@ components:
           type: string
           description: The URL of the Store
       description: Merchant Summary
-    PageMerchant:
+    VioletPageMerchantSummary:
       type: object
       properties:
-        total_pages:
-          type: integer
-          format: int32
-        total_elements:
-          type: integer
-          format: int64
-        pageable:
-          $ref: '#/components/schemas/Pageable'
-        number_of_elements:
-          type: integer
-          format: int32
-        last:
-          type: boolean
-        first:
-          type: boolean
-        sort:
-          $ref: '#/components/schemas/Sort'
-        size:
-          type: integer
-          format: int32
         content:
           type: array
-          items:
-            $ref: '#/components/schemas/Merchant'
-        number:
-          type: integer
-          format: int32
-        empty:
-          type: boolean
-    PageMerchantSummary:
-      type: object
-      properties:
-        total_pages:
-          type: integer
-          format: int32
-        total_elements:
-          type: integer
-          format: int64
-        pageable:
-          $ref: '#/components/schemas/Pageable'
-        number_of_elements:
-          type: integer
-          format: int32
-        last:
-          type: boolean
-        first:
-          type: boolean
-        sort:
-          $ref: '#/components/schemas/Sort'
-        size:
-          type: integer
-          format: int32
-        content:
-          type: array
+          description: The actual content of the response; A list of the result objects
           items:
             $ref: '#/components/schemas/MerchantSummary'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
         number:
           type: integer
+          description: The page number selected at request time
           format: int32
         empty:
           type: boolean
-    Pageable:
-      type: object
-      properties:
-        unpaged:
-          type: boolean
-        page_size:
-          type: integer
-          format: int32
-        page_number:
-          type: integer
-          format: int32
-        paged:
-          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
         sort:
-          $ref: '#/components/schemas/Sort'
-        offset:
-          type: integer
-          format: int64
-    Sort:
+          $ref: '#/components/schemas/VioletSort'
+    MerchantExploreRequest:
       type: object
       properties:
-        unsorted:
-          type: boolean
-        sorted:
-          type: boolean
-        empty:
-          type: boolean
+        name:
+          type: string
+          description: Name of Merchant
+        sort_by:
+          type: string
+          description: Property to sort by in camelCase
+        sort_direction:
+          type: string
+          description: Direction to sort by
+      description: Merchant Explore Request
