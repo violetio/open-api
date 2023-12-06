@@ -1,922 +1,1108 @@
----
-swagger: "2.0"
+openapi: 3.0.1
 info:
-  description: "Event Service API"
-  version: "v1"
-  title: "Event-Service"
+  title: Event-Service
+  description: Event Service API
   contact:
-    name: "Violet.io"
-    url: "https://violet.io"
-host: "sandbox-api.violet.io"
-basePath: "/v1"
+    name: Violet.io
+    url: https://violet.io
+  version: v1
+servers:
+- url: https://sandbox-api.violet.io/v1
 tags:
-- name: "1.0"
-- name: "Events - Webhook Events"
-  description: ""
-- name: "Events - Webhook Headers"
-  description: ""
-- name: "Events - Webhooks"
-  description: ""
-schemes:
-- "https"
+- name: Event
+- name: Events - Webhook Events
+- name: Events - Webhook Headers
+- name: Events - Webhooks
 paths:
-  /events/webhooks:
-    get:
-      tags:
-      - "Events - Webhooks"
-      summary: "Get Webhooks"
-      description: "Gets webhooks."
-      operationId: "getWebhooks"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "event"
-        in: "query"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Webhook"
-    post:
-      tags:
-      - "Events - Webhooks"
-      summary: "Create Webhook"
-      description: "Creates a new webhook for the desired event. The remote endpoint\
-        \ must be HTTPS."
-      operationId: "createWebhook"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/Webhook"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Webhook"
-    delete:
-      tags:
-      - "Events - Webhooks"
-      summary: "Delete Channel Webhooks"
-      description: "Deletes All Channel Webhooks. Events will immediately stop posting\
-        \ to this endpoint upon deletion."
-      operationId: "deleteWebhooks"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      responses:
-        default:
-          description: "successful operation"
-  /events/webhooks/all/events:
-    get:
-      tags:
-      - "Events - Webhook Events"
-      summary: "Get All Webhook Events"
-      description: "Retrieves WebhookEvents from all Webhooks."
-      operationId: "getAllWebhookEvents"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "since"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int64"
-      - name: "page"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 1
-        format: "int32"
-      - name: "size"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 20
-        format: "int32"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/WebhookEvent"
-  /events/webhooks/event/types:
-    get:
-      tags:
-      - "Events - Webhook Events"
-      summary: "Get Webhook Event Types"
-      description: "Retrieves a list of all supported Webhook event types."
-      operationId: "getWebhookEventTypes"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "string"
-  /events/webhooks/status/{status}:
-    put:
-      tags:
-      - "Events - Webhooks"
-      summary: "Update Webhooks Status"
-      description: "Updates All Webhooks Status."
-      operationId: "updateWebhooksStatus"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "status"
-        in: "path"
-        required: true
-        type: "string"
-      responses:
-        default:
-          description: "successful operation"
-  /events/webhooks/{webhook_id}:
-    get:
-      tags:
-      - "Events - Webhooks"
-      summary: "Get Webhook"
-      description: "Gets webhook by ID."
-      operationId: "getWebhookById"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Webhook"
-    put:
-      tags:
-      - "Events - Webhooks"
-      summary: "Update Webhook"
-      description: "Updates Webhook."
-      operationId: "updateWebhook"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/Webhook"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Webhook"
-    delete:
-      tags:
-      - "Events - Webhooks"
-      summary: "Delete Webhook"
-      description: "Deletes Webhook. Events will immediately stop posting to this\
-        \ endpoint upon deletion."
-      operationId: "deleteWebhook"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      responses:
-        default:
-          description: "successful operation"
-  /events/webhooks/{webhook_id}/events:
-    get:
-      tags:
-      - "Events - Webhook Events"
-      summary: "Get Webhook Events"
-      description: "Retrieves WebhookEvents from a single Webhook."
-      operationId: "getWebhookEvents"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      - name: "since"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int64"
-      - name: "page"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 1
-        format: "int32"
-      - name: "size"
-        in: "query"
-        required: false
-        type: "integer"
-        default: 20
-        format: "int32"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/WebhookEvent"
-  /events/webhooks/{webhook_id}/events/{event_id}:
-    get:
-      tags:
-      - "Events - Webhook Events"
-      summary: "Get Webhook Event"
-      description: "Retrieves a single WebhookEvent by ID."
-      operationId: "getWebhookEventById"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      - name: "event_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/WebhookEvent"
   /events/webhooks/{webhook_id}/events/{event_id}/body:
     get:
       tags:
-      - "Events - Webhook Events"
-      summary: "Get Webhook Event Body"
-      description: "Retrieves the body of a Webhook Event."
-      operationId: "getWebhookEventBodyByEventId"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Events - Webhook Events
+      summary: Get Webhook Event Body. Retrieves the body of a Webhook Event.
+      operationId: getWebhookEventBodyByEventId
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
         required: true
-        type: "integer"
-        format: "int32"
-      - name: "event_id"
-        in: "path"
+        schema:
+          type: integer
+          format: int32
+      - name: event_id
+        in: path
         required: true
-        type: "integer"
-        format: "int32"
+        schema:
+          type: integer
+          format: int32
       responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/WebhookEventBody"
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEventBody'
+  /events/webhooks/{webhook_id}/events/{event_id}/headers:
+    get:
+      tags:
+      - Events - Webhook Events
+      summary: Get Webhook Event Headers. Retrieves the headers of a Webhook Event.
+      operationId: getWebhookEventHeadersByEventId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEventHeaders'
+  /events/webhooks/all/events:
+    get:
+      tags:
+      - Events - Webhook Events
+      summary: Get All Webhook Events. Retrieves WebhookEvents from all Webhooks.
+      operationId: getAllWebhookEvents
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: since
+        in: query
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageWebhookEvent'
+  /events/webhooks/{webhook_id}/events/{event_id}:
+    get:
+      tags:
+      - Events - Webhook Events
+      summary: Get Webhook Event. Retrieves a single WebhookEvent by ID.
+      operationId: getWebhookEventById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEvent'
+  /events/webhooks/event/types:
+    get:
+      tags:
+      - Events - Webhook Events
+      summary: Get Webhook Event Types. Retrieves a list of all supported Webhook
+        event types.
+      operationId: getWebhookEventTypes
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /events/webhooks/{webhook_id}/events:
+    get:
+      tags:
+      - Events - Webhook Events
+      summary: Get Webhook Events. Retrieves WebhookEvents from a single Webhook.
+      operationId: getWebhookEvents
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: since
+        in: query
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageWebhookEvent'
+  /events/webhooks/all/events/search:
+    post:
+      tags:
+      - Events - Webhook Events
+      summary: Search All Webhook Events. Search WebhookEvents from all Webhooks.
+      operationId: searchAllWebhookEvents
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookEventSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageWebhookEvent'
   /events/webhooks/{webhook_id}/headers:
     get:
       tags:
-      - "Events - Webhook Headers"
-      summary: "Get Webhook Headers"
-      description: "Retrieves a list of WebhookHeaders by WebhookId."
-      operationId: "getWebhookHeaders"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Events - Webhook Headers
+      summary: Get Webhook Headers. Retrieves a list of WebhookHeaders by WebhookId.
+      operationId: getWebhookHeaders
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
         required: true
-        type: "integer"
-        format: "int32"
+        schema:
+          type: integer
+          format: int32
       responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/WebhookHeader"
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebhookHeader'
     post:
       tags:
-      - "Events - Webhook Headers"
-      summary: "Create Webhook Header"
-      description: "Creates a new Webhook Header."
-      operationId: "createWebhookHeader"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Events - Webhook Headers
+      summary: Create Webhook Header. Creates a new Webhook Header.
+      operationId: createWebhookHeader
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      - in: "body"
-        name: "body"
-        required: false
+      - name: X-Violet-Token
+        in: header
         schema:
-          $ref: "#/definitions/WebhookHeader"
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookHeader'
       responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/WebhookHeader"
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookHeader'
   /events/webhooks/{webhook_id}/headers/{header_id}:
     get:
       tags:
-      - "Events - Webhook Headers"
-      summary: "Get Webhook Header"
-      description: "Retrieves a Webhook Header by ID."
-      operationId: "getWebhookHeaderById"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Events - Webhook Headers
+      summary: Get Webhook Header. Retrieves a Webhook Header by ID.
+      operationId: getWebhookHeaderById
       parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      - name: "header_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/WebhookHeader"
-    put:
-      tags:
-      - "Events - Webhook Headers"
-      summary: "Update Webhook Header"
-      description: "Updates Webhook Header."
-      operationId: "updateWebhookHeader"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      - name: "header_id"
-        in: "path"
-        required: true
-        type: "integer"
-        format: "int32"
-      - in: "body"
-        name: "body"
-        required: false
+      - name: X-Violet-Token
+        in: header
         schema:
-          $ref: "#/definitions/WebhookHeader"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/WebhookHeader"
-    delete:
-      tags:
-      - "Events - Webhook Headers"
-      summary: "Delete Webhook Header"
-      description: "Deletes Webhook Header."
-      operationId: "deleteWebhookHeader"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "X-Violet-Token"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Secret"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "X-Violet-App-Id"
-        in: "header"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "app_id"
-        in: "query"
-        required: false
-        type: "integer"
-        format: "int32"
-      - name: "webhook_id"
-        in: "path"
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
         required: true
-        type: "integer"
-        format: "int32"
-      - name: "header_id"
-        in: "path"
+        schema:
+          type: integer
+          format: int32
+      - name: header_id
+        in: path
         required: true
-        type: "integer"
-        format: "int32"
+        schema:
+          type: integer
+          format: int32
       responses:
         default:
-          description: "successful operation"
-definitions:
-  Webhook:
-    type: "object"
-    required:
-    - "event"
-    - "remote_endpoint"
-    properties:
-      id:
-        type: "integer"
-        format: "int32"
-        readOnly: true
-      app_id:
-        type: "integer"
-        format: "int32"
-        readOnly: true
-      event:
-        type: "string"
-        description: "The event being triggered"
-        enum:
-        - "ORDER_UPDATED"
-        - "ORDER_SHIPPED"
-        - "ORDER_COMPLETED"
-        - "ORDER_CANCELLED"
-        - "ORDER_REFUNDED"
-        - "ORDER_RETURNED"
-        - "OFFER_CREATED"
-        - "OFFER_UPDATED"
-        - "OFFER_REMOVED"
-      remote_endpoint:
-        type: "string"
-        description: "Remote endpoint the webhook posts against."
-      status:
-        type: "string"
-        description: "Status of the webhook"
-        enum:
-        - "INACTIVE"
-        - "ACTIVE"
-        - "DISABLED"
-      date_created:
-        type: "string"
-        format: "date-time"
-        description: "Date of creation"
-        readOnly: true
-      date_last_modified:
-        type: "string"
-        format: "date-time"
-        description: "Date of last update"
-        readOnly: true
-    description: "External Hook Event"
-  WebhookEvent:
-    type: "object"
-    required:
-    - "status"
-    properties:
-      id:
-        type: "integer"
-        format: "int32"
-        readOnly: true
-      app_id:
-        type: "integer"
-        format: "int32"
-        description: "App ID"
-      webhook_id:
-        type: "integer"
-        format: "int32"
-        description: "ID of the webhook the event occurred on"
-      entity_id:
-        type: "integer"
-        format: "int64"
-        description: "ID of entity this event occurred for"
-      entity_external_id:
-        type: "string"
-        description: "External ID of entity this event occurred for"
-      status_code:
-        type: "integer"
-        format: "int32"
-        description: "HTTP Status Code"
-      response:
-        type: "string"
-        description: "Response from the remote url"
-      event_type:
-        type: "string"
-        description: "Type of webhook event"
-        enum:
-        - "ORDER_UPDATED"
-        - "ORDER_SHIPPED"
-        - "ORDER_COMPLETED"
-        - "ORDER_CANCELED"
-        - "ORDER_REFUNDED"
-        - "ORDER_RETURNED"
-        - "MERCHANT_CONNECTED"
-        - "MERCHANT_DISCONNECTED"
-        - "OFFER_CREATED"
-        - "OFFER_UPDATED"
-        - "OFFER_REMOVED"
-        - "PRODUCT_SYNC_STARTED"
-        - "PRODUCT_SYNC_COMPLETED"
-        - "PRODUCT_SYNC_FAILED"
-        - "MERCHANT_NEEDS_ATTENTION"
-        - "RELAY_OFFER_CREATED"
-        - "RELAY_OFFER_UPDATED"
-        - "RELAY_OFFER_REMOVED"
-        - "RELAY_ORDER_UPDATED"
-        - "MERCHANT_ENABLED"
-        - "MERCHANT_DISABLED"
-      attempts:
-        type: "integer"
-        format: "int32"
-        description: "Deliver attempts of the webhook the event"
-      status:
-        type: "string"
-        description: "Status of webhook event"
-        enum:
-        - "CREATED"
-        - "IN_PROGRESS"
-        - "SUCCEEDED"
-        - "FAILED"
-      date_created:
-        type: "string"
-        format: "date-time"
-        description: "Date of creation"
-        readOnly: true
-      date_last_modified:
-        type: "string"
-        format: "date-time"
-        description: "Date of last update"
-        readOnly: true
-    description: "Webhook Event"
-  WebhookEventBody:
-    type: "object"
-    properties:
-      body:
-        type: "object"
-        additionalProperties:
-          type: "object"
-      length:
-        type: "integer"
-        format: "int32"
-      date_created:
-        type: "string"
-        format: "date-time"
-        description: "Date of creation"
-        readOnly: true
-    description: "Webhook Event Body"
-  WebhookHeader:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int32"
-        readOnly: true
-      app_id:
-        type: "integer"
-        format: "int32"
-        description: "App ID"
-      webhook_id:
-        type: "integer"
-        format: "int32"
-        description: "ID of the webhook the header belongs to"
-      key:
-        type: "string"
-        description: "Header Key"
-      value:
-        type: "string"
-        description: "Header Value"
-      date_created:
-        type: "string"
-        format: "date-time"
-        description: "Date of creation"
-        readOnly: true
-      date_last_modified:
-        type: "string"
-        format: "date-time"
-        description: "Date of last update"
-        readOnly: true
-    description: "Webhook Header"
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookHeader'
+    put:
+      tags:
+      - Events - Webhook Headers
+      summary: Update Webhook Header. Updates Webhook Header.
+      operationId: updateWebhookHeader
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: header_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookHeader'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookHeader'
+    delete:
+      tags:
+      - Events - Webhook Headers
+      summary: Delete Webhook Header. Deletes Webhook Header.
+      operationId: deleteWebhookHeader
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: header_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /events/webhooks:
+    get:
+      tags:
+      - Events - Webhooks
+      summary: Get Webhooks. Gets webhooks.
+      operationId: getWebhooks
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: event
+        in: query
+        schema:
+          type: string
+      - name: extended
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Webhook'
+    post:
+      tags:
+      - Events - Webhooks
+      summary: Create Webhook. Creates a new webhook for the desired event. The remote
+        endpoint must be HTTPS.
+      operationId: createWebhook
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Webhook'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+    delete:
+      tags:
+      - Events - Webhooks
+      summary: Delete Channel Webhooks. Deletes All Channel Webhooks. Events will
+        immediately stop posting to this endpoint upon deletion.
+      operationId: deleteWebhooks
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /events/webhooks/{webhook_id}:
+    get:
+      tags:
+      - Events - Webhooks
+      summary: Get Webhook. Gets webhook by ID.
+      operationId: getWebhookById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: extended
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+    put:
+      tags:
+      - Events - Webhooks
+      summary: Update Webhook. Updates Webhook.
+      operationId: updateWebhook
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Webhook'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+    delete:
+      tags:
+      - Events - Webhooks
+      summary: Delete Webhook. Deletes Webhook. Events will immediately stop posting
+        to this endpoint upon deletion.
+      operationId: deleteWebhook
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /events/webhooks/status/{status}:
+    put:
+      tags:
+      - Events - Webhooks
+      summary: Update Webhooks Status. Updates All Webhooks Status.
+      operationId: updateWebhooksStatus
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: status
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+components:
+  schemas:
+    WebhookEventBody:
+      type: object
+      properties:
+        body:
+          type: object
+          additionalProperties:
+            type: object
+        length:
+          type: integer
+          format: int32
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+          readOnly: true
+      description: Webhook Event Body
+    WebhookEventHeaders:
+      type: object
+      properties:
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+          readOnly: true
+      description: Webhook Event Headers
+    VioletPageWebhookEvent:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/WebhookEvent'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    VioletPageable:
+      type: object
+      properties:
+        page_number:
+          type: integer
+          description: The current page number (one based)
+          format: int32
+        page_size:
+          type: integer
+          description: The number of elements per page
+          format: int32
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+        offset:
+          type: integer
+          description: The offset
+          format: int64
+        paged:
+          type: boolean
+          description: Boolean indicating if the result is paged
+        unpaged:
+          type: boolean
+          description: Boolean indicating if the result is unpaged
+      description: Violet wrapper for springframework pageable
+    VioletSort:
+      type: object
+      properties:
+        unsorted:
+          type: boolean
+          description: Boolean indicating if the result set is unsorted
+        sorted:
+          type: boolean
+          description: Boolean indicating if the result set is sorted
+        empty:
+          type: boolean
+          description: Boolean indicating if the result set is empty
+      description: Violet Wrapper for springframework sort
+    WebhookEvent:
+      required:
+      - status
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        app_id:
+          type: integer
+          description: App ID
+          format: int32
+        webhook_id:
+          type: integer
+          description: ID of the webhook the event occurred on
+          format: int32
+        entity_id:
+          type: integer
+          description: ID of entity this event occurred for
+          format: int64
+        entity_external_id:
+          type: string
+          description: External ID of entity this event occurred for
+        status_code:
+          type: integer
+          description: HTTP Status Code
+          format: int32
+        response:
+          type: string
+          description: Response from the remote url
+        event_type:
+          type: string
+          description: Type of webhook event
+          enum:
+          - ORDER_UPDATED
+          - ORDER_SHIPPED
+          - ORDER_COMPLETED
+          - ORDER_CANCELED
+          - ORDER_REFUNDED
+          - ORDER_RETURNED
+          - MERCHANT_CONNECTED
+          - MERCHANT_DISCONNECTED
+          - OFFER_CREATED
+          - OFFER_UPDATED
+          - OFFER_REMOVED
+          - PRODUCT_SYNC_STARTED
+          - PRODUCT_SYNC_COMPLETED
+          - PRODUCT_SYNC_FAILED
+          - MERCHANT_NEEDS_ATTENTION
+          - RELAY_OFFER_CREATED
+          - RELAY_OFFER_UPDATED
+          - RELAY_OFFER_REMOVED
+          - RELAY_ORDER_UPDATED
+          - MERCHANT_ENABLED
+          - MERCHANT_DISABLED
+          - MERCHANT_COMPLETE
+        remote_endpoint:
+          type: string
+          description: Remote endpoint the webhook event was sent.
+        attempts:
+          type: integer
+          description: Deliver attempts of the webhook the event
+          format: int32
+        status:
+          type: string
+          description: Status of webhook event
+          enum:
+          - IN_PROGRESS
+          - SUCCEEDED
+          - FAILED
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+          readOnly: true
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+          readOnly: true
+      description: Webhook Event
+    WebhookEventSearchRequest:
+      type: object
+      properties:
+        ids:
+          uniqueItems: true
+          type: array
+          description: Webhook Event Ids
+          items:
+            type: integer
+            description: Webhook Event Ids
+            format: int32
+        webhook_ids:
+          uniqueItems: true
+          type: array
+          description: Webhook Ids
+          items:
+            type: integer
+            description: Webhook Ids
+            format: int32
+        webhook_remote_endpoints:
+          uniqueItems: true
+          type: array
+          description: Webhook Remote Endpoints
+          items:
+            type: string
+            description: Webhook Remote Endpoints
+        status_codes:
+          uniqueItems: true
+          type: array
+          description: Http Status Codes
+          items:
+            type: integer
+            description: Http Status Codes
+            format: int32
+        statuses:
+          uniqueItems: true
+          type: array
+          description: Statuses
+          items:
+            type: string
+            description: Statuses
+            enum:
+            - IN_PROGRESS
+            - SUCCEEDED
+            - FAILED
+        event_types:
+          uniqueItems: true
+          type: array
+          description: Event Types
+          items:
+            type: string
+            description: Event Types
+            enum:
+            - ORDER_UPDATED
+            - ORDER_SHIPPED
+            - ORDER_COMPLETED
+            - ORDER_CANCELED
+            - ORDER_REFUNDED
+            - ORDER_RETURNED
+            - MERCHANT_CONNECTED
+            - MERCHANT_DISCONNECTED
+            - OFFER_CREATED
+            - OFFER_UPDATED
+            - OFFER_REMOVED
+            - PRODUCT_SYNC_STARTED
+            - PRODUCT_SYNC_COMPLETED
+            - PRODUCT_SYNC_FAILED
+            - MERCHANT_NEEDS_ATTENTION
+            - RELAY_OFFER_CREATED
+            - RELAY_OFFER_UPDATED
+            - RELAY_OFFER_REMOVED
+            - RELAY_ORDER_UPDATED
+            - MERCHANT_ENABLED
+            - MERCHANT_DISABLED
+            - MERCHANT_COMPLETE
+        before_date:
+          type: string
+          description: Before Date
+          format: date-time
+        after_date:
+          type: string
+          description: After Date
+          format: date-time
+      description: Webhook Event Search Request
+    WebhookHeader:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        app_id:
+          type: integer
+          description: App ID
+          format: int32
+        webhook_id:
+          type: integer
+          description: ID of the webhook the header belongs to
+          format: int32
+        key:
+          type: string
+          description: Header Key
+        value:
+          type: string
+          description: Header Value
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+          readOnly: true
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+          readOnly: true
+      description: Webhook Header
+    Webhook:
+      required:
+      - event
+      - remote_endpoint
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        app_id:
+          type: integer
+          format: int32
+          readOnly: true
+        event:
+          type: string
+          description: The event being triggered
+          enum:
+          - ORDER_UPDATED
+          - ORDER_SHIPPED
+          - ORDER_COMPLETED
+          - ORDER_CANCELED
+          - ORDER_REFUNDED
+          - ORDER_RETURNED
+          - MERCHANT_CONNECTED
+          - MERCHANT_DISCONNECTED
+          - OFFER_CREATED
+          - OFFER_UPDATED
+          - OFFER_REMOVED
+          - PRODUCT_SYNC_STARTED
+          - PRODUCT_SYNC_COMPLETED
+          - PRODUCT_SYNC_FAILED
+          - MERCHANT_NEEDS_ATTENTION
+          - RELAY_OFFER_CREATED
+          - RELAY_OFFER_UPDATED
+          - RELAY_OFFER_REMOVED
+          - RELAY_ORDER_UPDATED
+          - MERCHANT_ENABLED
+          - MERCHANT_DISABLED
+          - MERCHANT_COMPLETE
+        remote_endpoint:
+          type: string
+          description: Remote endpoint the webhook posts against.
+        status:
+          type: string
+          description: Status of the webhook
+          enum:
+          - INACTIVE
+          - ACTIVE
+          - DISABLED
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+          readOnly: true
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+          readOnly: true
+        events_count:
+          type: integer
+          description: 7 day event count
+          format: int64
+          readOnly: true
+        failure_rate:
+          type: number
+          description: 7 day failure rate
+          format: double
+          readOnly: true
+      description: External Hook Event
