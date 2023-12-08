@@ -1126,6 +1126,9 @@ components:
           enum:
           - NOT_SUBSCRIBED
           - SUBSCRIBED
+        external_data:
+          type: object
+          description: The raw external product data from the external commerce platform.
         tags:
           type: array
           items:
