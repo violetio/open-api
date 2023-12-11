@@ -289,6 +289,10 @@ components:
           type: string
           description: The name of the merchant this connection health report pertains
             to
+        merchant_email:
+          type: string
+          description: The obfuscated email address of the merchant this connection
+            health report pertains to
         merchant_status:
           type: string
           description: The status/state of the merchant this connection health report
