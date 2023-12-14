@@ -1749,9 +1749,6 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -1768,6 +1765,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Order
     OrderAddress:
       required:
@@ -2132,6 +2132,16 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+        CustomProperties:
+          type: array
+          description: Used to provide the merchant with custom values for the product.
+            This functionality is currently limited to Shopify merchants.
+          nullable: true
+          example:
+          - name: engraving
+            value: Happy Birthday!
+          items:
+            $ref: '#/components/schemas/OrderSkuCustomProperty'
         quantity_fulfilled:
           type: integer
           description: The quantity of this item that has been fulfilled
@@ -2147,6 +2157,26 @@ components:
           description: Price of the SKU multiplied by the Quantity. In Cents
           format: int32
       description: SKUs belonging to an Order
+    OrderSkuCustomProperty:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+          description: Name of the custom property.
+        value:
+          minLength: 1
+          type: string
+          description: Value of the custom property.
+      description: Used to provide the merchant with custom values for the product.
+        This functionality is currently limited to Shopify merchants.
+      nullable: true
+      example:
+      - name: engraving
+        value: Happy Birthday!
     OrderSkuRate:
       required:
       - amount
