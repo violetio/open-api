@@ -255,6 +255,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageWebhookEvent'
+  /events/webhooks/{webhook_id}/events/entity/{entity_id}/resend:
+    post:
+      operationId: resendWebhookEventByEntity
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: entity_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEvent'
+  /events/webhooks/{webhook_id}/events/{event_id}/resend:
+    post:
+      operationId: resendWebhookEventById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEvent'
   /events/webhooks/all/events/search:
     post:
       tags:
@@ -994,6 +1066,14 @@ components:
             - MERCHANT_ENABLED
             - MERCHANT_DISABLED
             - MERCHANT_COMPLETE
+        entity_ids:
+          uniqueItems: true
+          type: array
+          description: Entity Ids
+          items:
+            type: integer
+            description: Entity Ids
+            format: int64
         before_date:
           type: string
           description: Before Date
