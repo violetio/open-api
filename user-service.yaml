@@ -50,8 +50,9 @@ paths:
     get:
       tags:
       - Access
-      summary: "Refresh Token. Auth tokens expire after 24 hours, you many use this\
-        \ endpoint to pass the refresh token in to mint a new auth token."
+      summary: Refresh Token
+      description: "Auth tokens expire after 24 hours, you many use this endpoint\
+        \ to pass the refresh token in to mint a new auth token."
       operationId: refreshToken
       parameters:
       - name: X-Violet-Token
