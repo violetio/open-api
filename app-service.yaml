@@ -1,0 +1,132 @@
+openapi: 3.0.1
+info:
+  title: App-Service
+  description: App Service API
+  contact:
+    name: Violet.io
+    url: https://violet.io
+  version: v1
+servers:
+- url: https://sandbox-api.violet.io/v1
+tags:
+- name: Apps
+- name: Apps - Merchant Install
+  description: Merchant/App Installs
+- name: Apps - Merchant Install - Configuration
+  description: Merchant/App Install Configuration Entities
+- name: Developers - Metadata
+  description: Developer metadata entities
+- name: Apps - Merchant Install - Commission Rate
+  description: Merchant/App Install commission rate entities
+paths:
+  /apps/{app_id}/merchants/uninstall:
+    post:
+      tags:
+      - Apps - Merchant Install
+      summary: App Request Merchant App Uninstall
+      description: Send a request to uninstall (disconnect) a Merchant from the given
+        App
+      operationId: requestMerchantAppUninstall
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UninstallAppRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantAppInstall'
+components:
+  schemas:
+    MerchantAppInstall:
+      required:
+      - app_id
+      - merchant_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        app_id:
+          type: integer
+          description: App ID
+          format: int32
+        merchant_id:
+          type: integer
+          description: Merchant ID
+          format: int32
+        scope:
+          type: string
+          description: Scope
+        status:
+          type: string
+          description: Status
+          enum:
+          - REQUESTED
+          - CONNECTED
+          - NOT_CONNECTED
+          - DECLINED
+        install_source:
+          type: string
+          description: Source of the App Install
+          enum:
+          - DIRECT
+          - CATEGORY
+          - APP_AGREEMENT
+        commission_rate:
+          type: number
+          description: Custom commission rate between the channel and supplier.
+          format: double
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+          readOnly: true
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+          readOnly: true
+      description: Record of Application Install by a Merchant
+    UninstallAppRequest:
+      required:
+      - merchant_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        app_id:
+          type: integer
+          description: ID of the App to uninstall from
+          format: int32
+        merchant_id:
+          type: integer
+          description: ID of Merchant being uninstalled
+          format: int32
+      description: A Request to uninstall/disconnect a merchant from an app
