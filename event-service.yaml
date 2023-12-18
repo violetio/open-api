@@ -18,7 +18,8 @@ paths:
     get:
       tags:
       - Events - Webhook Events
-      summary: Get Webhook Event Body. Retrieves the body of a Webhook Event.
+      summary: Get Webhook Event Body
+      description: Retrieves the body of a Webhook Event.
       operationId: getWebhookEventBodyByEventId
       parameters:
       - name: X-Violet-Token
@@ -57,7 +58,8 @@ paths:
     get:
       tags:
       - Events - Webhook Events
-      summary: Get Webhook Event Headers. Retrieves the headers of a Webhook Event.
+      summary: Get Webhook Event Headers
+      description: Retrieves the headers of a Webhook Event.
       operationId: getWebhookEventHeadersByEventId
       parameters:
       - name: X-Violet-Token
@@ -96,7 +98,8 @@ paths:
     get:
       tags:
       - Events - Webhook Events
-      summary: Get All Webhook Events. Retrieves WebhookEvents from all Webhooks.
+      summary: Get All Webhook Events
+      description: Retrieves WebhookEvents from all Webhooks.
       operationId: getAllWebhookEvents
       parameters:
       - name: X-Violet-Token
@@ -140,7 +143,8 @@ paths:
     get:
       tags:
       - Events - Webhook Events
-      summary: Get Webhook Event. Retrieves a single WebhookEvent by ID.
+      summary: Get Webhook Event
+      description: Retrieves a single WebhookEvent by ID.
       operationId: getWebhookEventById
       parameters:
       - name: X-Violet-Token
@@ -179,8 +183,8 @@ paths:
     get:
       tags:
       - Events - Webhook Events
-      summary: Get Webhook Event Types. Retrieves a list of all supported Webhook
-        event types.
+      summary: Get Webhook Event Types
+      description: Retrieves a list of all supported Webhook event types.
       operationId: getWebhookEventTypes
       parameters:
       - name: X-Violet-Token
@@ -209,7 +213,8 @@ paths:
     get:
       tags:
       - Events - Webhook Events
-      summary: Get Webhook Events. Retrieves WebhookEvents from a single Webhook.
+      summary: Get Webhook Events
+      description: Retrieves WebhookEvents from a single Webhook.
       operationId: getWebhookEvents
       parameters:
       - name: X-Violet-Token
@@ -257,6 +262,11 @@ paths:
                 $ref: '#/components/schemas/VioletPageWebhookEvent'
   /events/webhooks/{webhook_id}/events/entity/{entity_id}/resend:
     post:
+      tags:
+      - Events - Webhook Events
+      summary: Resend Latest Webhook Event by Entity ID
+      description: Creates a copy and resends latest single WebhookEvent by Entity
+        ID.
       operationId: resendWebhookEventByEntity
       parameters:
       - name: X-Violet-Token
@@ -293,6 +303,10 @@ paths:
                 $ref: '#/components/schemas/WebhookEvent'
   /events/webhooks/{webhook_id}/events/{event_id}/resend:
     post:
+      tags:
+      - Events - Webhook Events
+      summary: Resend Webhook Event by Event ID
+      description: Creates a copy and resends a single WebhookEvent by ID.
       operationId: resendWebhookEventById
       parameters:
       - name: X-Violet-Token
@@ -331,7 +345,8 @@ paths:
     post:
       tags:
       - Events - Webhook Events
-      summary: Search All Webhook Events. Search WebhookEvents from all Webhooks.
+      summary: Search All Webhook Events
+      description: Search WebhookEvents from all Webhooks.
       operationId: searchAllWebhookEvents
       parameters:
       - name: X-Violet-Token
@@ -375,7 +390,8 @@ paths:
     get:
       tags:
       - Events - Webhook Headers
-      summary: Get Webhook Headers. Retrieves a list of WebhookHeaders by WebhookId.
+      summary: Get Webhook Headers
+      description: Retrieves a list of WebhookHeaders by WebhookId.
       operationId: getWebhookHeaders
       parameters:
       - name: X-Violet-Token
@@ -409,7 +425,8 @@ paths:
     post:
       tags:
       - Events - Webhook Headers
-      summary: Create Webhook Header. Creates a new Webhook Header.
+      summary: Create Webhook Header
+      description: Creates a new Webhook Header.
       operationId: createWebhookHeader
       parameters:
       - name: X-Violet-Token
@@ -447,7 +464,8 @@ paths:
     get:
       tags:
       - Events - Webhook Headers
-      summary: Get Webhook Header. Retrieves a Webhook Header by ID.
+      summary: Get Webhook Header
+      description: Retrieves a Webhook Header by ID.
       operationId: getWebhookHeaderById
       parameters:
       - name: X-Violet-Token
@@ -485,7 +503,8 @@ paths:
     put:
       tags:
       - Events - Webhook Headers
-      summary: Update Webhook Header. Updates Webhook Header.
+      summary: Update Webhook Header
+      description: Updates Webhook Header.
       operationId: updateWebhookHeader
       parameters:
       - name: X-Violet-Token
@@ -528,7 +547,8 @@ paths:
     delete:
       tags:
       - Events - Webhook Headers
-      summary: Delete Webhook Header. Deletes Webhook Header.
+      summary: Delete Webhook Header
+      description: Deletes Webhook Header.
       operationId: deleteWebhookHeader
       parameters:
       - name: X-Violet-Token
@@ -565,7 +585,8 @@ paths:
     get:
       tags:
       - Events - Webhooks
-      summary: Get Webhooks. Gets webhooks.
+      summary: Get Webhooks
+      description: Gets webhooks.
       operationId: getWebhooks
       parameters:
       - name: X-Violet-Token
@@ -602,8 +623,9 @@ paths:
     post:
       tags:
       - Events - Webhooks
-      summary: Create Webhook. Creates a new webhook for the desired event. The remote
-        endpoint must be HTTPS.
+      summary: Create Webhook
+      description: Creates a new webhook for the desired event. The remote endpoint
+        must be HTTPS.
       operationId: createWebhook
       parameters:
       - name: X-Violet-Token
@@ -634,8 +656,9 @@ paths:
     delete:
       tags:
       - Events - Webhooks
-      summary: Delete Channel Webhooks. Deletes All Channel Webhooks. Events will
-        immediately stop posting to this endpoint upon deletion.
+      summary: Delete Channel Webhooks
+      description: Deletes All Channel Webhooks. Events will immediately stop posting
+        to this endpoint upon deletion.
       operationId: deleteWebhooks
       parameters:
       - name: X-Violet-Token
@@ -660,7 +683,8 @@ paths:
     get:
       tags:
       - Events - Webhooks
-      summary: Get Webhook. Gets webhook by ID.
+      summary: Get Webhook
+      description: Gets webhook by ID.
       operationId: getWebhookById
       parameters:
       - name: X-Violet-Token
@@ -697,7 +721,8 @@ paths:
     put:
       tags:
       - Events - Webhooks
-      summary: Update Webhook. Updates Webhook.
+      summary: Update Webhook
+      description: Updates Webhook.
       operationId: updateWebhook
       parameters:
       - name: X-Violet-Token
@@ -734,8 +759,9 @@ paths:
     delete:
       tags:
       - Events - Webhooks
-      summary: Delete Webhook. Deletes Webhook. Events will immediately stop posting
-        to this endpoint upon deletion.
+      summary: Delete Webhook
+      description: Deletes Webhook. Events will immediately stop posting to this endpoint
+        upon deletion.
       operationId: deleteWebhook
       parameters:
       - name: X-Violet-Token
@@ -766,7 +792,8 @@ paths:
     put:
       tags:
       - Events - Webhooks
-      summary: Update Webhooks Status. Updates All Webhooks Status.
+      summary: Update Webhooks Status
+      description: Updates All Webhooks Status.
       operationId: updateWebhooksStatus
       parameters:
       - name: X-Violet-Token
