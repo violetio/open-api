@@ -405,7 +405,8 @@ paths:
     post:
       tags:
       - Catalog - Offers
-      summary: Search Offers. Maximum size limit of 100 results.
+      summary: Search Offers
+      description: Maximum size limit of 100 results.
       operationId: searchOffers
       parameters:
       - name: X-Violet-Token
