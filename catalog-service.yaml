@@ -212,6 +212,10 @@ paths:
         in: query
         schema:
           type: string
+      - name: include
+        in: query
+        schema:
+          type: string
       responses:
         default:
           description: default response
@@ -312,6 +316,10 @@ paths:
         schema:
           type: number
           format: double
+      - name: include
+        in: query
+        schema:
+          type: string
       responses:
         default:
           description: default response
@@ -687,28 +695,44 @@ components:
           type: boolean
           description: Primary Media
       description: Product and SKU Media
-    Meta:
-      required:
-      - key
-      - offer_id
-      - value
+    MetaObject:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        offer_id:
-          type: integer
-          description: Offer Id
-          format: int64
+        version:
+          type: number
+          description: Schema version
+          format: double
+        type:
+          type: string
+          description: Type of the value
+          enum:
+          - STRING
+          - JSON
+          - INTEGER
+          - LONG
+          - DECIMAL
+          - BOOLEAN
+        external_type:
+          type: string
+          description: Type of the value in the external commerce platform
         key:
           type: string
-          description: Key
+          description: The key of meta value
         value:
+          type: object
+          description: The meta value. Values of type JSON will be stringified
+        external_id:
           type: string
-          description: Value
-      description: Additional Product MetaData
+          description: ID of the meta object in the external commerce platform
+        source:
+          type: string
+          description: "The source the meta object originated from, either EXTERNAL\
+            \ or INTERNAL, with EXTERNAL representing data from the external commerce\
+            \ platform"
+          enum:
+          - INTERNAL
+          - EXTERNAL
+      description: Meta Object
     Offer:
       required:
       - available
@@ -812,12 +836,12 @@ components:
         source_category_name:
           type: string
           description: Original Category on Source Platform
-        meta:
+        metadata:
           uniqueItems: true
           type: array
           description: Additional Meta Data of the Offer
           items:
-            $ref: '#/components/schemas/Meta'
+            $ref: '#/components/schemas/MetaObject'
         variants:
           uniqueItems: true
           type: array
@@ -948,6 +972,9 @@ components:
           enum:
           - NOT_SUBSCRIBED
           - SUBSCRIBED
+        external_data:
+          type: object
+          description: The raw external product data from the external commerce platform.
         tags:
           type: array
           items:
