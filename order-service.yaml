@@ -103,6 +103,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderSku'
+            example:
+              sku_id: 12345
+              quantity: 1
       responses:
         default:
           description: default response
@@ -146,6 +149,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderAddress'
+            example:
+              address_1: 42 Wallaby Way
+              city: Sydney
+              country: AU
+              postal_code: 4000
+              state: NSW
+              type: SHIPPING
+              phone: 1234567890
       responses:
         default:
           description: default response
@@ -188,6 +199,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderAddress'
+            example:
+              address_1: 42 Wallaby Way
+              city: Sydney
+              country: AU
+              postal_code: 4000
+              state: NSW
+              type: SHIPPING
+              phone: 1234567890
       responses:
         default:
           description: default response
@@ -231,6 +250,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderCustomer'
+            example:
+              email: p.sherman@findingnemo.com
+              first_name: P
+              last_name: Sherman
+              shipping_address:
+                address_1: 42 Wallaby Way
+                city: Sydney
+                country: AU
+                postal_code: 4000
+                state: NSW
+                type: SHIPPING
+                phone: 1234567890
+              same_address: true
       responses:
         default:
           description: default response
@@ -274,6 +306,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PaymentMethodRequest'
+            example:
+              card_number: '4242424242424242'
+              card_cvc: 111
+              card_exp_month: 12
+              card_exp_year: 29
+              card_postal_code: '11211'
       responses:
         default:
           description: default response
@@ -317,6 +355,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderAddress'
+            example:
+              address_1: 42 Wallaby Way
+              city: Sydney
+              country: AU
+              postal_code: 4000
+              state: NSW
+              type: SHIPPING
+              phone: 1234567890
       responses:
         default:
           description: default response
@@ -359,6 +405,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderAddress'
+            example:
+              address_1: 42 Wallaby Way
+              city: Sydney
+              country: AU
+              postal_code: 4000
+              state: NSW
+              type: SHIPPING
+              phone: 1234567890
       responses:
         default:
           description: default response
@@ -477,6 +531,24 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CartInitializationRequest'
+            example:
+              base_currency: USD
+              skus:
+              - sku_id: 12345
+                quantity: 1
+              customer:
+                email: p.sherman@findingnemo.com
+                first_name: P
+                last_name: Sherman
+                shipping_address:
+                  address_1: 42 Wallaby Way
+                  city: Sydney
+                  country: AU
+                  postal_code: 4000
+                  state: NSW
+                  type: SHIPPING
+                  phone: 1234567890
+                same_address: true
       responses:
         default:
           description: default response
@@ -1176,6 +1248,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CartSubmissionRequest'
+            example:
+              app_order_id: asdf-ghjk-qwer-tyui
       responses:
         default:
           description: default response
@@ -2391,12 +2465,15 @@ components:
           description: The ID of the bag the Shipping Method belongs to
           format: int64
         shipping_method_id:
-          type: integer
-          description: Price of the Shipping Method
-          format: int32
+          type: string
+          description: ID of the Shipping Method
         shipping_method_label:
           type: string
           description: Label of the Shipping Method
+        shipping_method_price:
+          type: integer
+          description: Price of the Shipping Method
+          format: int32
       description: Shipping Method applied to a Bag
     CartInitializationRequest:
       type: object
