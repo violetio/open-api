@@ -59,6 +59,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MerchantAppInstall'
+  /apps/merchants/{merchant_id}/configuration/new_offer_auto_subscribe/enabled:
+    get:
+      operationId: getEnabledNewOfferAutoSubscribeAppIdsByMerchantId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  type: integer
+                  format: int32
 components:
   schemas:
     MerchantAppInstall:
