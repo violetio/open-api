@@ -465,6 +465,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+  /carts/estimate:
+    post:
+      tags:
+      - Orders
+      summary: Estimate Cart - BETA
+      operationId: calculateCart
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateCartRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculateCartResponse'
   /checkout/cart:
     post:
       tags:
@@ -1886,9 +1918,9 @@ components:
         address_2:
           type: string
           description: Second line of the Address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
     OrderCustomer:
@@ -2475,6 +2507,580 @@ components:
           description: Price of the Shipping Method
           format: int32
       description: Shipping Method applied to a Bag
+    CalculateCartResponse:
+      type: object
+      properties:
+        estimated_carts:
+          type: array
+          description: The discount total of the cart in cents.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/CalculatedCartTotals'
+      description: Calculate Cart Response
+    CalculatedCartShippingMethod:
+      type: object
+      properties:
+        label:
+          type: string
+          description: The title of the shipping method.
+          readOnly: true
+        carrier:
+          type: string
+          description: The enumerate value of the carrier. Violet will attempt to
+            match the raw carrier name to an enum. If no match is found the value
+            will be OTHER.
+          readOnly: true
+          enum:
+          - OTHER
+          - UPS
+          - USPS
+          - FEDEX
+          - DHL
+          - ONTRAC
+          - ROYAL_MAIL
+          - SENDLE
+          - POSTNORD
+        raw_carrier:
+          type: string
+          description: The raw name of the carrier provided by the external commerce
+            platform.
+          readOnly: true
+        price:
+          type: integer
+          description: The price of the shipping method in cents.
+          format: int32
+          readOnly: true
+        shipping_method_id:
+          type: string
+          description: The ID of the shipping method in the external commerce platform.
+          readOnly: true
+      description: Calculated Cart Shipping Method
+      readOnly: true
+    CalculatedCartSku:
+      required:
+      - sku_id
+      type: object
+      properties:
+        quantity:
+          title: Quantity
+          minimum: 1
+          type: integer
+          description: Quantity of the Sku.
+          format: int32
+          default: 1
+        sku_id:
+          title: Sku ID
+          type: integer
+          description: ID of the Violet Sku.
+          format: int64
+        name:
+          type: string
+          description: Name of the SKU
+          readOnly: true
+        price:
+          type: integer
+          description: Price of the individual SKU. In Cents
+          format: int32
+          readOnly: true
+        merchant_id:
+          type: integer
+          description: ID of the merchant in Violet
+          format: int32
+          readOnly: true
+        external_id:
+          type: string
+          description: ID of the equivalent Sku in the external commerce platform
+          readOnly: true
+        available:
+          type: boolean
+          description: Is the Sku available in the external commerce platform and
+            included in the calculation.
+          readOnly: true
+        requires_shipping:
+          type: boolean
+          description: Does the Sku require shipping.
+          readOnly: true
+        product_type:
+          type: string
+          description: Product Type
+          readOnly: true
+          enum:
+          - PHYSICAL
+          - DIGITAL
+          - VIRTUAL
+        line_price:
+          type: integer
+          description: Price of the SKU multiplied by the Quantity. In Cents
+          format: int32
+      description: Calculated Cart Sku
+      readOnly: true
+    CalculatedCartTotals:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          description: ID of the merchant this cart is calculated for.
+          format: int32
+          readOnly: true
+        platform:
+          type: string
+          description: Platform of the merchant this cart is calculated for.
+          readOnly: true
+          enum:
+          - OTHER
+          - SHOPIFY
+          - MAGENTO
+          - MAGENTO_ONE
+          - WOOCOMMERCE
+          - BIGCOMMERCE
+          - LIGHTSPEED
+          - ECWID
+          - YAAS
+          - SPREECOMMERCE
+          - DEMANDWARE
+          - VOLUSION
+          - PRESTASHOP
+          - THREEDCART
+          - SYLIUS
+          - WIX
+          - SWELL
+          - MIVA
+          - WEBSPHERE
+          - ORACLECC
+          - SAPCC
+          - SQUARESPACE
+          - SHOPWARE
+          - COMMERCETOOLS
+          - MEDUSA
+          - ABICART
+          - SPRYKER
+          - MYSTORE
+          - CENTRA
+          - XCART
+          - VTEX
+          - KIBO
+          - SALEOR
+          - VENDO
+          - CHORD
+          - DIGITALRIVER
+          - SQUARE
+          - AMAZON
+          - CUSTOM
+        base_currency:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The base currency the cart should is calculated in.
+          readOnly: true
+          default: USD
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
+        sub_total:
+          minimum: 0
+          type: integer
+          description: The subtotal of the cart in cents.
+          format: int32
+          readOnly: true
+        shipping_total:
+          minimum: 0
+          type: integer
+          description: The tax total of the cart in cents.
+          format: int32
+          readOnly: true
+        discount_total:
+          minimum: 0
+          type: integer
+          description: The discount total of the cart in cents.
+          format: int32
+          readOnly: true
+        total:
+          minimum: 0
+          type: integer
+          description: "The grand total of the cart in cents. This is the sum of the\
+            \ subtotal, shipping total, and tax total, with the discount total subtracted."
+          format: int32
+          readOnly: true
+        skus:
+          type: array
+          description: A collection of skus calculated for the cart.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/CalculatedCartSku'
+        available_shipping_methods:
+          type: array
+          description: A collection of shipping methods calculated for the cart.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/CalculatedCartShippingMethod'
+        has_shipping_methods:
+          type: boolean
+          description: Does the calculated cart have available shipping methods.
+          readOnly: true
+        external_error_messages:
+          type: array
+          description: Error messages from the external commerce platform.
+          readOnly: true
+          items:
+            type: string
+            description: Error messages from the external commerce platform.
+            readOnly: true
+      description: Calculate Cart Response
+      readOnly: true
+    BaseAddress:
+      required:
+      - address_1
+      - city
+      - country
+      - postal_code
+      - state
+      type: object
+      properties:
+        city:
+          title: City or Subdivision
+          type: string
+          example: Seattle
+        state:
+          title: State/Province
+          type: string
+          description: The state/province of the address. Abbreviations are recommended
+            but not required. Violet will attempt to abbreviate these values when
+            abbreviations are required by the external commerce platform.
+          example: WA
+        postal_code:
+          title: Postal Code
+          maxLength: 10
+          minLength: 4
+          type: string
+          description: The postal/zip code of the address.
+        country:
+          title: Country
+          maxLength: 2
+          minLength: 2
+          type: string
+          description: The ISO2 country code.
+          example: US
+        address_1:
+          title: Address Line 1
+          type: string
+        address_2:
+          title: Address Line 2
+          type: string
+          nullable: true
+      description: The address the cart would be shipped to.
+    BaseSku:
+      required:
+      - sku_id
+      type: object
+      properties:
+        quantity:
+          title: Quantity
+          minimum: 1
+          type: integer
+          description: Quantity of the Sku.
+          format: int32
+          default: 1
+        sku_id:
+          title: Sku ID
+          type: integer
+          description: ID of the Violet Sku.
+          format: int64
+      description: A list of one or more Violet Sku's. Sku's from the same merchant
+        will be grouped and calculated together.
+    CalculateCartRequest:
+      required:
+      - shipping_address
+      - skus
+      type: object
+      properties:
+        base_currency:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The base currency the cart should be calculated in.
+          default: USD
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
+        skus:
+          type: array
+          description: A list of one or more Violet Sku's. Sku's from the same merchant
+            will be grouped and calculated together.
+          items:
+            $ref: '#/components/schemas/BaseSku'
+        shipping_address:
+          $ref: '#/components/schemas/BaseAddress'
+      description: Calculate Cart Request
     CartInitializationRequest:
       type: object
       properties:
