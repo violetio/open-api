@@ -94,6 +94,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebhookEventHeaders'
+  /events/webhooks/{webhook_id}/events/{event_id}/cancel:
+    post:
+      tags:
+      - Events - Webhook Events
+      summary: Cancel Webhook Event by Event ID
+      description: Cancels a single WebhookEvent by ID.
+      operationId: cancelWebhookEventById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
   /events/webhooks/all/events:
     get:
       tags:
@@ -1007,6 +1045,7 @@ components:
           - IN_PROGRESS
           - SUCCEEDED
           - FAILED
+          - CANCELLED
         date_created:
           type: string
           description: Date of creation
@@ -1063,6 +1102,7 @@ components:
             - IN_PROGRESS
             - SUCCEEDED
             - FAILED
+            - CANCELLED
         event_types:
           uniqueItems: true
           type: array
