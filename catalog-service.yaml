@@ -186,8 +186,8 @@ paths:
           format: int32
       - name: since
         in: query
-        description: A date represented in epoch milliseconds. Gets offers last modified
-          after the given date.
+        description: A date represented in epoch milliseconds (https://www.epochconverter.com/).
+          Gets offers last modified after the given date.
         schema:
           type: integer
           format: int64
@@ -249,24 +249,11 @@ paths:
         schema:
           type: integer
           format: int32
-      - name: include_all
-        in: query
-        description: "Boolean to indicate if all statuses should be counted, if false\
-          \ only Active offers will be counted"
-        schema:
-          type: boolean
-          default: false
-      - name: extended
-        in: query
-        description: "Boolean to indicate if extended result set should be included,\
-          \ extended results will include a separate count of published and un-published\
-          \ offers. Only published offers will be available to channels so this value\
-          \ should be used to determine the total number of offers a merchant has."
-        schema:
-          type: boolean
-          default: false
       - name: date_last_modified:min
         in: query
+        description: "Count only the offers that have been modified after the given\
+          \ date time, using the standard Violet datetime format (most objects have\
+          \ a date on them using this format)"
         schema:
           type: string
       responses:
