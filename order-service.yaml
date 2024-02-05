@@ -450,7 +450,7 @@ paths:
         in: query
         schema:
           type: boolean
-          default: false
+          default: true
       requestBody:
         content:
           application/json:
