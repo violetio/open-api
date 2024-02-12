@@ -14,6 +14,7 @@ tags:
 - name: Catalog - Offers
 - name: Catalog - Skus
 - name: Catalog - Categories
+- name: Catalog - Collections
 - name: Currencies
 - name: Catalog - Offer subscriptions
 paths:
@@ -214,6 +215,7 @@ paths:
           type: string
       - name: include
         in: query
+        description: "Comma-separated list of extra data to be included. E.g. metadata,collections."
         schema:
           type: string
       responses:
@@ -305,6 +307,7 @@ paths:
           format: double
       - name: include
         in: query
+        description: "Comma-separated list of extra data to be included. E.g. metadata,collections."
         schema:
           type: string
       responses:
@@ -461,6 +464,188 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+  /catalog/collections/{collection_id}:
+    get:
+      tags:
+      - Catalog - Collections
+      summary: Get Collection by ID
+      description: Retrieve the `Collection`s details for a given `collection_id`.
+      operationId: getCollectionById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: collection_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+  /catalog/collections/{collection_id}/offers:
+    get:
+      tags:
+      - Catalog - Collections
+      summary: Get Collection Offers
+      description: Retrieve a list of all `Offer`s inside a `Collection` for a given
+        `collection_id`.
+      operationId: getCollectionOffers
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: collection_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: exclude_hidden
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageOffer'
+  /catalog/collections:
+    get:
+      tags:
+      - Catalog - Collections
+      summary: Get All Collections
+      description: Retrieve a list of all `Collection`s that you have access to.
+      operationId: getCollections
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: exclude_hidden
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageCollection'
+  /catalog/collections/merchants/{merchant_id}:
+    get:
+      tags:
+      - Catalog - Collections
+      summary: Get All Merchant Collections
+      description: Retrieve a list of all `Collection`s for a given `merchant_id`.
+      operationId: getCollectionsByMerchantId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: exclude_hidden
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageCollection'
   /currencies/latest:
     get:
       tags:
@@ -643,6 +828,77 @@ components:
         primary_media:
           $ref: '#/components/schemas/Media'
       description: Product Image Container
+    Collection:
+      required:
+      - merchant_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        external_id:
+          type: string
+          description: External ID
+        merchant_id:
+          type: integer
+          description: Merchant ID
+          format: int32
+        name:
+          type: string
+          description: Name of this collection
+        handle:
+          type: string
+          description: Handle of this collection
+        description:
+          type: string
+          description: Description of this collection
+        status:
+          type: string
+          description: Status of this collection
+          enum:
+          - INACTIVE
+          - ACTIVE
+          - SYNC_IN_PROGRESS
+          - FOR_DELETION
+        type:
+          type: string
+          description: Type of this collection
+          enum:
+          - CUSTOM
+          - AUTOMATED
+        media:
+          $ref: '#/components/schemas/CollectionMedia'
+        date_created:
+          type: string
+          description: Date of creation of this collection on platform
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last update of this collection on platform
+          format: date-time
+      description: Offers Collection
+    CollectionMedia:
+      type: object
+      properties:
+        source_url:
+          type: string
+          description: Source URL
+        alt:
+          type: string
+          description: Alt
+        height:
+          type: integer
+          description: Height
+          format: int32
+        width:
+          type: integer
+          description: Width
+          format: int32
+        date_created:
+          type: string
+          description: Date of media creation on platform
+          format: date-time
+      description: Collection Media
     Media:
       required:
       - album_id
@@ -961,7 +1217,13 @@ components:
           - SUBSCRIBED
         external_data:
           type: object
-          description: The raw external product data from the external commerce platform.
+          description: The raw external product data from the external commerce platform
+        collections:
+          uniqueItems: true
+          type: array
+          description: Collections this offer belongs to
+          items:
+            $ref: '#/components/schemas/Collection'
         tags:
           type: array
           items:
@@ -1397,6 +1659,55 @@ components:
           type: string
           description: Direction to sort by
       description: Offer Search Request
+    VioletPageCollection:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Collection'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
     Latest:
       type: object
       properties:
