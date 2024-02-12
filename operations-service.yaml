@@ -13,6 +13,7 @@ tags:
   description: API calls for learning about a Channel's connection to a Merchant and
     the status/health of said connection
 - name: Operations
+- name: Reports
 paths:
   /operations/connection_health:
     get:
@@ -210,6 +211,101 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageConnectionHealth'
+  /reports/{report_run_id}/cancel:
+    put:
+      summary: Cancel Report Run
+      description: Cancel the specified report run
+      operationId: cancelReportRun
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: report_run_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report Run'
+  /reports/{report_run_id}:
+    get:
+      summary: Get Report Run By Id
+      description: "Get a specified report run, by ID"
+      operationId: getReportRunById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: report_run_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report Run'
+  /reports:
+    post:
+      summary: Run Report
+      description: Request a report run based on the provided parameters
+      operationId: runReport
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportRunRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report Run'
 components:
   schemas:
     ChannelCommissionRate:
@@ -394,7 +490,9 @@ components:
           type: array
           items:
             type: object
-      description: The error encountered while retrieving status
+      description: "A list of errors encountered during this report run. This is the\
+        \ top level Violet Error object, it can contain any Violet Error, if it is\
+        \ encountered during the report run."
     InvalidProduct:
       type: object
       properties:
@@ -574,6 +672,7 @@ components:
           enum:
           - EXPRESS
           - CUSTOM
+          - STANDARD
         payment_service:
           type: string
           description: Payment Service used for this payout account
@@ -996,3 +1095,119 @@ components:
           enum:
           - "asc, desc"
       description: "Request object for searching, sorting and filtering ConnectionHealth"
+    Report Run:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        errors:
+          type: array
+          description: "A list of errors encountered during this report run. This\
+            \ is the top level Violet Error object, it can contain any Violet Error,\
+            \ if it is encountered during the report run."
+          items:
+            $ref: '#/components/schemas/Error'
+        parameters:
+          $ref: '#/components/schemas/ReportRunParameters'
+        report_type:
+          type: string
+          description: This run's report type.
+          enum:
+          - DISTRIBUTION
+        status:
+          type: string
+          description: This run's status.
+          enum:
+          - PENDING
+          - COMPLETE
+          - FAILED
+          - CANCELED
+        async_notification_enabled:
+          type: boolean
+          description: "Indicates if this report run will deliver app wide, async,\
+            \ dashboard notifications when the run is finished. Default to false."
+        result:
+          $ref: '#/components/schemas/ReportRunResult'
+        date_created:
+          type: string
+          description: Date of creation. The date the request for this report run
+            came in.
+          format: date-time
+          readOnly: true
+        date_last_modified:
+          type: string
+          description: Date of last update.
+          format: date-time
+          readOnly: true
+      description: "Represents a specific run of a report including the parameters\
+        \ used to create it, the status, the result and any errors encountered."
+    ReportRunParameters:
+      required:
+      - interval_end
+      - interval_start
+      type: object
+      properties:
+        app_id:
+          type: integer
+          description: The AppId to generate this report for.
+          format: int32
+        user_id:
+          type: integer
+          description: The UserId of the user that initiated this report run.
+          format: int64
+        columns:
+          type: array
+          description: The list of columns included in the report. An empty list will
+            default to all columns appropriate for the report type.
+          items:
+            type: string
+            description: The list of columns included in the report. An empty list
+              will default to all columns appropriate for the report type.
+        interval_start:
+          type: string
+          description: "The starting date of the report, inclusive."
+          format: date-time
+        interval_end:
+          type: string
+          description: "The ending date of the report, inclusive."
+          format: date-time
+      description: The parameters used to define a report run.
+    ReportRunResult:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The UUID for the report file in S3.
+        url:
+          type: string
+          description: A pre-signed url for accessing the file. Pre-signed URLs are
+            valid for 5 minutes. Get the ReportRunResult again to generate a freshly
+            signed URL.
+        created_date:
+          type: string
+          description: The date this report was stored in S3.
+          format: date-time
+        size:
+          type: integer
+          description: The file size (in bytes) of the generated report file.
+          format: int64
+        type:
+          type: string
+          description: The type of report file.
+          enum:
+          - CSV
+      description: The result of a report including the pre-signed URL for downloading
+        the report file.
+    ReportRunRequest:
+      type: object
+      properties:
+        report_type:
+          type: string
+          description: The type of report being requested.
+          enum:
+          - DISTRIBUTION
+        parameters:
+          $ref: '#/components/schemas/ReportRunParameters'
+      description: The body object for use when requesting a report run.
