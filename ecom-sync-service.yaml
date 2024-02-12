@@ -75,6 +75,147 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageInvalidProduct'
+  /relay/merchants/{merchant_id}/collections/{collection_id}:
+    get:
+      tags:
+      - Relay
+      summary: Get a collection directly from the merchant's ecom platform.
+      operationId: getCollection
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: collection_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+  /relay/merchants/{merchant_id}/collections/{collection_id}/offers:
+    get:
+      tags:
+      - Relay
+      summary: Get collection offers directly from the merchant's ecom platform.
+      operationId: getCollectionOffers
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: collection_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: next_page_cursor
+        in: query
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageOffer'
+  /relay/merchants/{merchant_id}/collections:
+    get:
+      tags:
+      - Relay
+      summary: Get multiple collections directly from the merchant's ecom platform.
+      operationId: getCollections
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: next_page_cursor
+        in: query
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageCollection'
   /relay/merchants/{merchant_id}/customers/{order_id}:
     get:
       tags:
@@ -489,311 +630,77 @@ components:
           type: boolean
           description: Boolean indicating if the result set is empty
       description: Violet Wrapper for springframework sort
-    RelayCustomer:
+    Collection:
+      required:
+      - merchant_id
       type: object
       properties:
+        id:
+          type: integer
+          format: int64
         external_id:
           type: string
-          description: ID of the customer in the external commerce platform
-        first_name:
-          type: string
-          description: First name of customer
-        last_name:
-          type: string
-          description: Last name of customer
-        company_name:
-          type: string
-          description: Company name if customer is a company
-        email:
-          type: string
-          description: Email address of customer
-        email_verified:
-          type: boolean
-          description: Has the customers email address been verified
-        phone:
-          type: string
-          description: Phone number of customer
-        accepts_marketing:
-          type: boolean
-          description: Does the customer accept marketing communication. When value
-            is false there must be no marketing communications sent this customer.
-        addresses:
-          type: array
-          description: Addresses used by the customer
-          items:
-            $ref: '#/components/schemas/RelayCustomerAddress'
-        total_spent:
+          description: External ID
+        merchant_id:
           type: integer
-          description: The total amount the customer has spent at the merchant's store
+          description: Merchant ID
           format: int32
-        order_count:
-          type: integer
-          description: The total number of orders the customer has placed at the merchant's
-            store
-          format: int32
-        store_credit_amount:
-          type: integer
-          description: Amount of store credit the customer has at the merchant's store
-          format: int32
-        default_currency:
-          type: string
-          description: The default currency the customer shops in
-          enum:
-          - USD
-          - AED
-          - AFN
-          - ALL
-          - AMD
-          - ANG
-          - AOA
-          - ARS
-          - AUD
-          - AWG
-          - AZN
-          - BAM
-          - BBD
-          - BDT
-          - BGN
-          - BIF
-          - BMD
-          - BND
-          - BOB
-          - BRL
-          - BSD
-          - BWP
-          - BZD
-          - CAD
-          - CDF
-          - CHF
-          - CLP
-          - CNY
-          - COP
-          - CRC
-          - CVE
-          - CZK
-          - DJF
-          - DKK
-          - DOP
-          - DZD
-          - EGP
-          - ETB
-          - EUR
-          - FJD
-          - FKP
-          - GBP
-          - GEL
-          - GIP
-          - GMD
-          - GNF
-          - GTQ
-          - GYD
-          - HKD
-          - HNL
-          - HRK
-          - HTG
-          - HUF
-          - IDR
-          - ILS
-          - INR
-          - ISK
-          - JMD
-          - JPY
-          - KES
-          - KGS
-          - KHR
-          - KMF
-          - KRW
-          - KYD
-          - KZT
-          - LAK
-          - LBP
-          - LKR
-          - LRD
-          - LSL
-          - MAD
-          - MDL
-          - MGA
-          - MKD
-          - MMK
-          - MNT
-          - MOP
-          - MRO
-          - MUR
-          - MVR
-          - MWK
-          - MXN
-          - MYR
-          - MZN
-          - NAD
-          - NGN
-          - NIO
-          - NOK
-          - NPR
-          - NZD
-          - PAB
-          - PEN
-          - PGK
-          - PHP
-          - PKR
-          - PLN
-          - PYG
-          - QAR
-          - RON
-          - RSD
-          - RUB
-          - RWF
-          - SAR
-          - SBD
-          - SCR
-          - SEK
-          - SGD
-          - SHP
-          - SLL
-          - SOS
-          - SRD
-          - STD
-          - SVC
-          - SZL
-          - THB
-          - TJS
-          - TOP
-          - TRY
-          - TTD
-          - TWD
-          - TZS
-          - UAH
-          - UGX
-          - UYU
-          - UZS
-          - VND
-          - VUV
-          - WST
-          - XAF
-          - XCD
-          - XOF
-          - XPF
-          - YER
-          - ZAR
-          - ZMW
-          - BTN
-        notes:
-          type: string
-          description: Notes about the customer provided by the merchant
-        tags:
-          type: array
-          description: Tags about the customer provided by the merchant
-          items:
-            type: string
-            description: Tags about the customer provided by the merchant
-        status:
-          type: string
-          description: Status of the customer in the merchants store. Value will be
-            NONE_PROVIDED if the external commerce platform doesn't include the concept
-            of customer status
-          enum:
-          - DISABLED
-          - ENABLED
-          - INVITED
-          - DECLINED
-          - NONE_PROVIDED
-        date_created:
-          type: string
-          description: The date the customer was last updated. ISO 8601 formatted
-          format: date-time
-      description: The actual content of the response; A list of the result objects
-    RelayCustomerAddress:
-      required:
-      - address_1
-      - city
-      - country
-      - postal_code
-      - state
-      - type
-      type: object
-      properties:
         name:
           type: string
-          description: Name on Address
-        city:
+          description: Name of this collection
+        handle:
           type: string
-          description: City
-        state:
+          description: Handle of this collection
+        description:
           type: string
-          description: State Abbreviation
-        country:
+          description: Description of this collection
+        status:
           type: string
-          description: Country ISO2 Code
-        postal_code:
-          type: string
-          description: Postal/Zip Code
-        phone:
-          type: string
-          description: Phone Number
+          description: Status of this collection
+          enum:
+          - INACTIVE
+          - ACTIVE
+          - SYNC_IN_PROGRESS
+          - FOR_DELETION
         type:
           type: string
-          description: Address Type
+          description: Type of this collection
           enum:
-          - SHIPPING
-          - BILLING
-        external_id:
+          - CUSTOM
+          - AUTOMATED
+        media:
+          $ref: '#/components/schemas/CollectionMedia'
+        date_created:
           type: string
-          description: ID of the address in the external platform.
-        address_1:
+          description: Date of creation of this collection on platform
+          format: date-time
+        date_last_modified:
           type: string
-          description: First line of the Address
-        address_2:
-          type: string
-          description: Second line of the Address
-      description: Addresses used by the customer
-    VioletPageRelayCustomer:
+          description: Date of last update of this collection on platform
+          format: date-time
+      description: Offers Collection
+    CollectionMedia:
       type: object
       properties:
-        content:
-          type: array
-          description: The actual content of the response; A list of the result objects
-          items:
-            $ref: '#/components/schemas/RelayCustomer'
-        last:
-          type: boolean
-          description: Boolean indicating if this is the last page
-        total_pages:
-          type: integer
-          description: The total count of pages available
-          format: int32
-        total_elements:
-          type: integer
-          description: The total count of objects available
-          format: int32
-        first:
-          type: boolean
-          description: Boolean indicating if this is the first page of the response
-        number_of_elements:
-          type: integer
-          description: The total number of objects in this specific response
-          format: int32
-        size:
-          type: integer
-          description: The page size selected at request time
-          format: int32
-        number:
-          type: integer
-          description: The page number selected at request time
-          format: int32
-        empty:
-          type: boolean
-          description: Boolean indicating if the response content is empty
-        next_page_cursor:
+        source_url:
           type: string
-          description: Contains the cursor for the next page. This property will only
-            be used for situations where the API does not support the page number/page
-            size paradigm and it will mutually exclusive with the size/number fields
-            in the response. If this property is returned it must be passed when requesting
-            the next page from the API. Does not apply to endpoints that do not have
-            a next_page_cursor query param documented.
-        pageable:
-          $ref: '#/components/schemas/VioletPageable'
-        sort:
-          $ref: '#/components/schemas/VioletSort'
+          description: Source URL
+        alt:
+          type: string
+          description: Alt
+        height:
+          type: integer
+          description: Height
+          format: int32
+        width:
+          type: integer
+          description: Width
+          format: int32
+        date_created:
+          type: string
+          description: Date of media creation on platform
+          format: date-time
+      description: Collection Media
     Album:
       required:
       - parent_id
@@ -1144,7 +1051,13 @@ components:
           - SUBSCRIBED
         external_data:
           type: object
-          description: The raw external product data from the external commerce platform.
+          description: The raw external product data from the external commerce platform
+        collections:
+          uniqueItems: true
+          type: array
+          description: Collections this offer belongs to
+          items:
+            $ref: '#/components/schemas/Collection'
         tags:
           type: array
           items:
@@ -1381,6 +1294,360 @@ components:
           description: The actual content of the response; A list of the result objects
           items:
             $ref: '#/components/schemas/Offer'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    VioletPageCollection:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Collection'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    RelayCustomer:
+      type: object
+      properties:
+        external_id:
+          type: string
+          description: ID of the customer in the external commerce platform
+        first_name:
+          type: string
+          description: First name of customer
+        last_name:
+          type: string
+          description: Last name of customer
+        company_name:
+          type: string
+          description: Company name if customer is a company
+        email:
+          type: string
+          description: Email address of customer
+        email_verified:
+          type: boolean
+          description: Has the customers email address been verified
+        phone:
+          type: string
+          description: Phone number of customer
+        accepts_marketing:
+          type: boolean
+          description: Does the customer accept marketing communication. When value
+            is false there must be no marketing communications sent this customer.
+        addresses:
+          type: array
+          description: Addresses used by the customer
+          items:
+            $ref: '#/components/schemas/RelayCustomerAddress'
+        total_spent:
+          type: integer
+          description: The total amount the customer has spent at the merchant's store
+          format: int32
+        order_count:
+          type: integer
+          description: The total number of orders the customer has placed at the merchant's
+            store
+          format: int32
+        store_credit_amount:
+          type: integer
+          description: Amount of store credit the customer has at the merchant's store
+          format: int32
+        default_currency:
+          type: string
+          description: The default currency the customer shops in
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
+        notes:
+          type: string
+          description: Notes about the customer provided by the merchant
+        tags:
+          type: array
+          description: Tags about the customer provided by the merchant
+          items:
+            type: string
+            description: Tags about the customer provided by the merchant
+        status:
+          type: string
+          description: Status of the customer in the merchants store. Value will be
+            NONE_PROVIDED if the external commerce platform doesn't include the concept
+            of customer status
+          enum:
+          - DISABLED
+          - ENABLED
+          - INVITED
+          - DECLINED
+          - NONE_PROVIDED
+        date_created:
+          type: string
+          description: The date the customer was last updated. ISO 8601 formatted
+          format: date-time
+      description: The actual content of the response; A list of the result objects
+    RelayCustomerAddress:
+      required:
+      - address_1
+      - city
+      - country
+      - postal_code
+      - state
+      - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name on Address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State Abbreviation
+        country:
+          type: string
+          description: Country ISO2 Code
+        postal_code:
+          type: string
+          description: Postal/Zip Code
+        phone:
+          type: string
+          description: Phone Number
+        type:
+          type: string
+          description: Address Type
+          enum:
+          - SHIPPING
+          - BILLING
+        external_id:
+          type: string
+          description: ID of the address in the external platform.
+        address_1:
+          type: string
+          description: First line of the Address
+        address_2:
+          type: string
+          description: Second line of the Address
+      description: Addresses used by the customer
+    VioletPageRelayCustomer:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/RelayCustomer'
         last:
           type: boolean
           description: Boolean indicating if this is the last page
@@ -1948,6 +2215,9 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -1964,9 +2234,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Order
     OrderAddress:
       required:
