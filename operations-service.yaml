@@ -446,6 +446,7 @@ components:
           - DIGITALRIVER
           - SQUARE
           - AMAZON
+          - BIGCARTEL
           - CUSTOM
         store_url:
           type: string
@@ -1074,6 +1075,7 @@ components:
             - DIGITALRIVER
             - SQUARE
             - AMAZON
+            - BIGCARTEL
             - CUSTOM
         status:
           type: string
