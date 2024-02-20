@@ -1047,6 +1047,7 @@ components:
           - DIGITALRIVER
           - SQUARE
           - AMAZON
+          - BIGCARTEL
           - CUSTOM
         seller:
           type: string
