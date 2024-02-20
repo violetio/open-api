@@ -273,6 +273,7 @@ components:
           - DIGITALRIVER
           - SQUARE
           - AMAZON
+          - BIGCARTEL
           - CUSTOM
         platform_plan:
           type: string
