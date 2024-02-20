@@ -1529,6 +1529,7 @@ components:
           - DIGITALRIVER
           - SQUARE
           - AMAZON
+          - BIGCARTEL
           - CUSTOM
         fulfillments:
           uniqueItems: true
@@ -1855,9 +1856,6 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -1874,6 +1872,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Order
     OrderAddress:
       required:
@@ -2046,6 +2047,7 @@ components:
           - DIGITALRIVER
           - SQUARE
           - AMAZON
+          - BIGCARTEL
           - CUSTOM
       description: Order Error
     OrderPaymentMethod:
@@ -2112,6 +2114,10 @@ components:
           type: integer
           description: Total cost of the Shipping Method. In Cents
           format: int32
+        custom:
+          type: boolean
+          description: Is the shipping method custom. True when the price has been
+            overridden.
         min_subtotal:
           type: integer
           description: Minimum Subtotal. In Cents. Only applies to Flat Rate by Price
@@ -2238,6 +2244,9 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+        custom:
+          type: boolean
+          description: Is the Sku custom. True when the price has been overridden.
         CustomProperties:
           type: array
           description: Used to provide the merchant with custom values for the product.
@@ -2256,8 +2265,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OrderSkuRate'
-        transient_external_product_id:
-          type: string
         line_price:
           type: integer
           description: Price of the SKU multiplied by the Quantity. In Cents
@@ -2506,6 +2513,10 @@ components:
           type: integer
           description: Price of the Shipping Method
           format: int32
+        custom:
+          type: boolean
+          description: Is the shipping method custom. True when the price has been
+            overridden.
       description: Shipping Method applied to a Bag
     CalculateCartResponse:
       type: object
@@ -2665,6 +2676,7 @@ components:
           - DIGITALRIVER
           - SQUARE
           - AMAZON
+          - BIGCARTEL
           - CUSTOM
         base_currency:
           maxLength: 3
