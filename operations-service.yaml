@@ -446,7 +446,6 @@ components:
           - DIGITALRIVER
           - SQUARE
           - AMAZON
-          - BIGCARTEL
           - CUSTOM
         store_url:
           type: string
@@ -478,6 +477,8 @@ components:
     Error:
       type: object
       properties:
+        id:
+          type: object
         message:
           type: string
         error:
@@ -485,8 +486,6 @@ components:
         code:
           type: integer
           format: int32
-        id:
-          type: object
         ids:
           type: array
           items:
@@ -1075,7 +1074,6 @@ components:
             - DIGITALRIVER
             - SQUARE
             - AMAZON
-            - BIGCARTEL
             - CUSTOM
         status:
           type: string
