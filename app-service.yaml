@@ -59,6 +59,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MerchantAppInstall'
+  /apps/{app_id}/merchants/{merchant_id}/commission_rate:
+    put:
+      tags:
+      - Apps - Merchant Install - Configuration
+      summary: Set Merchant/Channel Commission Rate
+      description: "Updates the Commission Rate for a specified Merchant's relationship\
+        \ with a specified Channel. Commission Rate can be locked/unlocked by a Channel,\
+        \ preventing changes by the Merchant."
+      operationId: updateMerchantAppInstallCommissionRate
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantAppInstallCommissionRateRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
   /apps/merchants/{merchant_id}/configuration/new_offer_auto_subscribe/enabled:
     get:
       operationId: getEnabledNewOfferAutoSubscribeAppIdsByMerchantId
@@ -135,6 +180,10 @@ components:
           type: number
           description: Custom commission rate between the channel and supplier.
           format: double
+        commission_locked:
+          type: boolean
+          description: Indicates if the commission rate is locked or not. Commission
+            rates can only be locked or unlocked by a Channel.
         date_created:
           type: string
           description: Date of creation
@@ -164,3 +213,14 @@ components:
           description: ID of Merchant being uninstalled
           format: int32
       description: A Request to uninstall/disconnect a merchant from an app
+    MerchantAppInstallCommissionRateRequest:
+      type: object
+      properties:
+        commission_rate:
+          type: number
+          description: Custom commission rate between the channel and supplier.
+          format: double
+        commission_locked:
+          type: boolean
+          description: Indicates if the commission rate is locked or not. Commission
+            rates can only be locked or unlocked by a Channel.
