@@ -103,7 +103,9 @@ paths:
         default:
           description: default response
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantAppInstall'
   /apps/merchants/{merchant_id}/configuration/new_offer_auto_subscribe/enabled:
     get:
       operationId: getEnabledNewOfferAutoSubscribeAppIdsByMerchantId
