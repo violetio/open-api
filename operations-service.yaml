@@ -330,6 +330,10 @@ components:
           type: number
           description: The commission rate this merchant pays to the channel
           format: double
+        commission_locked:
+          type: boolean
+          description: Indicates if the commission rate is locked or not. Commission
+            rates can only be locked or unlocked by a Channel.
       description: The status object for the channel commission rate
     CommissionRate:
       type: object
@@ -446,6 +450,7 @@ components:
           - DIGITALRIVER
           - SQUARE
           - AMAZON
+          - BIGCARTEL
           - CUSTOM
         store_url:
           type: string
@@ -1074,6 +1079,7 @@ components:
             - DIGITALRIVER
             - SQUARE
             - AMAZON
+            - BIGCARTEL
             - CUSTOM
         status:
           type: string
@@ -1157,6 +1163,10 @@ components:
           type: integer
           description: The UserId of the user that initiated this report run.
           format: int64
+        merchant_id:
+          type: integer
+          description: The MerchantId to generate this report for.
+          format: int32
         columns:
           type: array
           description: The list of columns included in the report. An empty list will
