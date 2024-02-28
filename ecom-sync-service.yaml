@@ -505,6 +505,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOrder'
+  /relay/merchants/{merchant_id}/shipping-zones:
+    get:
+      tags:
+      - Relay
+      summary: Get shipping zones directly from the merchant's ecom platform.
+      operationId: getShippingZones
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
 components:
   schemas:
     InvalidProduct:
@@ -1909,6 +1940,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -1921,9 +1955,6 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of Merchant
