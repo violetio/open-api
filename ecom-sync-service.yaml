@@ -533,9 +533,10 @@ paths:
           format: int32
       responses:
         default:
-          description: default response
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelayShippingZonesWrapper'
 components:
   schemas:
     InvalidProduct:
@@ -841,6 +842,7 @@ components:
           - INTERNAL
           - EXTERNAL
       description: Meta Object
+      readOnly: true
     Offer:
       required:
       - available
@@ -1940,9 +1942,6 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -1955,6 +1954,9 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
         merchant_name:
           type: string
           description: Name of Merchant
@@ -2248,9 +2250,6 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -2267,6 +2266,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Order
     OrderAddress:
       required:
@@ -2891,3 +2893,234 @@ components:
           $ref: '#/components/schemas/VioletPageable'
         sort:
           $ref: '#/components/schemas/VioletSort'
+    RelayFreeShipping:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Is the shipping method enabled in the external commerce platform.
+          readOnly: true
+        min_price:
+          type: integer
+          description: The minimum price threshold to unlock free shipping in the
+            external commerce platform. May be null when there is no free shipping
+            available.
+          format: int32
+          readOnly: true
+        price_type:
+          type: string
+          description: "The type of the price, whether it applies to the subtotal\
+            \ or the total. May be null when there is no free shipping available."
+          readOnly: true
+          enum:
+          - SUBTOTAL
+          - TOTAL
+          - SUBTOTAL
+          - TOTAL
+        exclude_products_with_custom_shipping:
+          type: boolean
+          description: Are products with custom shipping overrides excluded from free
+            shipping. May be null when there is no free shipping available.
+          readOnly: true
+      description: A summary of the free shipping (if any) for a shipping zone.
+      readOnly: true
+    RelayShippingMethod:
+      type: object
+      properties:
+        external_id:
+          type: string
+          description: The ID of the shipping method in the external commerce platform.
+          readOnly: true
+        name:
+          type: string
+          description: The name of the shipping method in the external commerce platform.
+          readOnly: true
+        carrier_name:
+          type: string
+          description: The name of the carrier (if any) in the external commerce platform.
+            May be null or empty when not of type CARRIER.
+          readOnly: true
+        display_order:
+          type: integer
+          description: The display order of the shipping method in the external commerce
+            platform.
+          format: int32
+          readOnly: true
+        enabled:
+          type: boolean
+          description: Is the shipping method enabled in the external commerce platform.
+          readOnly: true
+        price:
+          type: integer
+          description: The price of the shipping method in the external commerce platform.
+            May be null for carrier rates.
+          format: int32
+          readOnly: true
+        type:
+          type: string
+          description: The type of shipping method in the external commerce platform
+          readOnly: true
+          enum:
+          - ORDER
+          - WEIGHT
+          - PRICE
+          - CARRIER
+          - ORDER
+          - WEIGHT
+          - PRICE
+          - CARRIER
+        min_price:
+          type: integer
+          description: The minimum price of a price constrained shipping method in
+            the external commerce platform. Will be null when not of type PRICE.
+          format: int32
+          readOnly: true
+        max_price:
+          type: integer
+          description: The maximum price of a price constrained shipping method in
+            the external commerce platform. Will be null when not of type PRICE.
+          format: int32
+          readOnly: true
+        price_type:
+          type: string
+          description: "The type of the price, whether it applies to the subtotal\
+            \ or the total. Will be null when not of type PRICE."
+          readOnly: true
+          enum:
+          - SUBTOTAL
+          - TOTAL
+          - SUBTOTAL
+          - TOTAL
+        min_weight:
+          type: number
+          description: The minimum weight of a weight constrained shipping method
+            in the external commerce platform. Will be null when not of type WEIGHT.
+          format: double
+          readOnly: true
+        max_weight:
+          type: number
+          description: The maximum weight of a weight constrained shipping method
+            in the external commerce platform. Will be null when not of type WEIGHT.
+          format: double
+          readOnly: true
+        weight_unit:
+          type: string
+          description: The weight unit of a weight constrained shipping method in
+            the external commerce platform. Will be null when not of type WEIGHT.
+          readOnly: true
+          enum:
+          - CARAT
+          - GRAM
+          - OUNCE
+          - POUND
+          - KILOGRAM
+          - TON
+          - TONNE
+        metadata:
+          uniqueItems: true
+          type: array
+          description: Additional data about the shipping method.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/MetaObject'
+      description: Shipping Method in an external commerce platform.
+      readOnly: true
+    RelayShippingZone:
+      type: object
+      properties:
+        external_id:
+          type: string
+          description: The ID of the shipping zone in the external commerce platform.
+          readOnly: true
+        name:
+          type: string
+          description: The name of the shipping zone in the external commerce platform.
+          readOnly: true
+        display_order:
+          type: integer
+          description: The display order of the shipping zone in the external commerce
+            platform.
+          format: int32
+          readOnly: true
+        enabled:
+          type: boolean
+          description: Is the shipping zone enabled in the external commerce platform.
+          readOnly: true
+        regions:
+          type: array
+          description: The regions included for this shipping zone.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/RelayShippingZoneRegion'
+        methods:
+          type: array
+          description: The methods included for this shipping zone.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/RelayShippingMethod'
+        free_shipping:
+          $ref: '#/components/schemas/RelayFreeShipping'
+        metadata:
+          uniqueItems: true
+          type: array
+          description: Additional data about the shipping zone.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/MetaObject'
+      description: Shipping Zone in an external commerce platform.
+    RelayShippingZoneRegion:
+      type: object
+      properties:
+        external_id:
+          type: string
+          description: The ID of the shipping zone region in the external commerce
+            platform.
+          readOnly: true
+        name:
+          type: string
+          description: The abbreviated code of the shipping zone region in the external
+            commerce platform.
+          readOnly: true
+        type:
+          type: string
+          description: The type of the shipping zone region in the external commerce
+            platform.
+          readOnly: true
+          enum:
+          - COUNTRY
+          - PROVINCE
+          - COUNTRY
+          - PROVINCE
+        enabled:
+          type: boolean
+          description: Is the shipping zone region enabled in the external commerce
+            platform.
+          readOnly: true
+        display_order:
+          type: integer
+          description: The display order of the shipping zone region in the external
+            commerce platform.
+          format: int32
+          readOnly: true
+        sub_regions:
+          type: array
+          description: Sub regions (if any) that belong to this parent shipping region.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/RelayShippingZoneRegion'
+        metadata:
+          uniqueItems: true
+          type: array
+          description: Additional data about the shipping zone region.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/MetaObject'
+      description: Shipping Zone Region in an external commerce platform.
+      readOnly: true
+    RelayShippingZonesWrapper:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelayShippingZone'
