@@ -509,7 +509,9 @@ paths:
     get:
       tags:
       - Relay
-      summary: Get shipping zones directly from the merchant's ecom platform.
+      summary: Relay - Get Shipping Zones
+      description: Get realtime shipping zone data directly from the merchant’s ecom
+        platform.
       operationId: getShippingZones
       parameters:
       - name: X-Violet-Token
@@ -533,10 +535,105 @@ paths:
           format: int32
       responses:
         default:
+          description: default response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RelayShippingZonesWrapper'
+              example:
+                content:
+                - external_id: "457216524578"
+                  name: Domestic
+                  display_order: 1
+                  enabled: true
+                  regions:
+                  - name: United States
+                    code: US
+                    type: COUNTRY
+                    enabled: true
+                    display_order: 1
+                    sub_regions:
+                    - name: Washington
+                      code: WA
+                      type: PROVINCE
+                      enabled: true
+                      display_order: 55
+                      metadata:
+                      - type: STRING
+                        key: tax_name
+                        value: State Tax
+                      - type: DECIMAL
+                        key: tax
+                        value: 0.065
+                      - type: DECIMAL
+                        key: tax_percentage
+                        value: 6.5
+                    metadata:
+                    - type: DECIMAL
+                      key: tax
+                      value: 0
+                    - type: STRING
+                      key: tax_name
+                      value: Federal Tax
+                  methods:
+                  - external_id: "641084293410"
+                    name: Free Ground Shipping Over $50
+                    price: 0
+                    type: PRICE
+                    min_price: 5000
+                    price_type: SUBTOTAL
+                  - external_id: "641084326178"
+                    name: Economy
+                    price: 490
+                    type: WEIGHT
+                    min_weight: 0
+                    max_weight: 5
+                    weight_unit: POUND
+                  - external_id: "641084358946"
+                    name: Economy
+                    price: 1990
+                    type: WEIGHT
+                    min_weight: 5
+                    max_weight: 70
+                    weight_unit: POUND
+                  - external_id: "641084457250"
+                    name: First Class Package
+                    carrier_name: USPS
+                    type: CARRIER
+                    metadata:
+                    - type: DECIMAL
+                      key: percent_modifier
+                      value: 0
+                    - type: DECIMAL
+                      key: flat_modifier
+                      value: 0
+                  - external_id: "641084457250"
+                    name: Priority Mail Express
+                    carrier_name: USPS
+                    type: CARRIER
+                    metadata:
+                    - type: DECIMAL
+                      key: percent_modifier
+                      value: 0
+                    - type: DECIMAL
+                      key: flat_modifier
+                      value: 0
+                  - external_id: "641084457250"
+                    name: Priority Mail
+                    carrier_name: USPS
+                    type: CARRIER
+                    metadata:
+                    - type: DECIMAL
+                      key: percent_modifier
+                      value: 0
+                    - type: DECIMAL
+                      key: flat_modifier
+                      value: 0
+                  free_shipping:
+                    enabled: true
+                    min_price: 5000
+                    price_type: SUBTOTAL
+                    exclude_products_with_custom_shipping: true
 components:
   schemas:
     InvalidProduct:
@@ -3089,8 +3186,12 @@ components:
           enum:
           - COUNTRY
           - PROVINCE
+          - POSTCODE
+          - CONTINENT
           - COUNTRY
           - PROVINCE
+          - POSTCODE
+          - CONTINENT
         enabled:
           type: boolean
           description: Is the shipping zone region enabled in the external commerce
