@@ -43,6 +43,159 @@ tags:
 - name: Merchants - Util
   description: Various utility operations
 paths:
+  /merchants/{merchant_id}/configuration:
+    get:
+      tags:
+      - Merchant Configurations
+      summary: Get Merchant Configuration
+      operationId: getMerchantConfiguration
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantConfiguration'
+              example:
+                global_feature_flags:
+                  sync_metadata: false
+                  sync_collections: true
+                platform_feature_flags:
+                  filter_by_collections: false
+                  use_custom_shipping_rates: true
+                orders_config:
+                  custom_tags:
+                  - tag1
+                  - tag2
+  /merchants/{merchant_id}/configuration/global_feature_flags/{feature_flag}:
+    put:
+      tags:
+      - Merchant Configurations
+      summary: Toggle Merchant Config Global Feature Flag
+      operationId: updateGlobalFeatureFlag
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: flag
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericToggleSettingRequest'
+            example:
+              enabled: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantConfiguration'
+              example:
+                global_feature_flags:
+                  sync_metadata: false
+                  sync_collections: true
+                platform_feature_flags:
+                  filter_by_collections: false
+                  use_custom_shipping_rates: true
+                orders_config:
+                  custom_tags:
+                  - tag1
+                  - tag2
+  /merchants/{merchant_id}/configuration/orders_config:
+    put:
+      tags:
+      - Merchant Configurations
+      summary: Update Merchants Orders Configuration
+      operationId: updateOrdersConfig
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdersConfig'
+            example:
+              custom_tags:
+              - tag1
+              - tag2
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantConfiguration'
+              example:
+                global_feature_flags:
+                  sync_metadata: false
+                  sync_collections: true
+                platform_feature_flags:
+                  filter_by_collections: false
+                  use_custom_shipping_rates: true
+                orders_config:
+                  custom_tags:
+                  - tag1
+                  - tag2
   /merchants:
     get:
       tags:
@@ -210,6 +363,46 @@ paths:
                 $ref: '#/components/schemas/VioletPageMerchantSummary'
 components:
   schemas:
+    MerchantConfiguration:
+      type: object
+      properties:
+        global_feature_flags:
+          type: object
+          additionalProperties:
+            type: boolean
+            description: "Feature flags that apply to a merchant globally, regardless\
+              \ of their commerce platform."
+          description: "Feature flags that apply to a merchant globally, regardless\
+            \ of their commerce platform."
+        platform_feature_flags:
+          type: object
+          additionalProperties:
+            type: boolean
+            description: Feature flags that apply to a merchant depending on their
+              commerce platform.
+          description: Feature flags that apply to a merchant depending on their commerce
+            platform.
+        orders_config:
+          $ref: '#/components/schemas/OrdersConfig'
+      description: A Container for Merchant Configuration info
+    OrdersConfig:
+      type: object
+      properties:
+        custom_tags:
+          uniqueItems: true
+          type: array
+          description: Custom tags to be added to a merchants orders upon submission.
+          items:
+            type: string
+            description: Custom tags to be added to a merchants orders upon submission.
+      description: Configurations for the merchants order behaviors.
+    GenericToggleSettingRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Is the setting enabled.
+      description: Request body for toggling the boolean value of a setting.
     Merchant:
       required:
       - email
@@ -444,6 +637,8 @@ components:
         default:
           type: boolean
           description: Is this a Users default merchant
+        merchantDisabled:
+          type: boolean
         billing_configured:
           type: boolean
           description: The billing status of the merchant. Deprecated (not reliable)
