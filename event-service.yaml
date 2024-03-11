@@ -1042,6 +1042,7 @@ components:
           type: string
           description: Status of webhook event
           enum:
+          - CREATED
           - IN_PROGRESS
           - SUCCEEDED
           - FAILED
@@ -1054,6 +1055,11 @@ components:
         date_last_modified:
           type: string
           description: Date of last update
+          format: date-time
+          readOnly: true
+        date_next_attempt:
+          type: string
+          description: Date of next delivery attempt
           format: date-time
           readOnly: true
       description: Webhook Event
@@ -1099,6 +1105,7 @@ components:
             type: string
             description: Statuses
             enum:
+            - CREATED
             - IN_PROGRESS
             - SUCCEEDED
             - FAILED
