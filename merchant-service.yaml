@@ -113,7 +113,7 @@ paths:
         schema:
           type: integer
           format: int32
-      - name: flag
+      - name: feature_flag
         in: path
         required: true
         schema:
