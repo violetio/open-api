@@ -482,8 +482,6 @@ components:
     Error:
       type: object
       properties:
-        id:
-          type: object
         message:
           type: string
         error:
@@ -491,6 +489,8 @@ components:
         code:
           type: integer
           format: int32
+        id:
+          type: object
         ids:
           type: array
           items:
@@ -1175,6 +1175,13 @@ components:
             type: string
             description: The list of columns included in the report. An empty list
               will default to all columns appropriate for the report type.
+        payout_account_type:
+          type: string
+          description: "Payout Account Type for which you are requesting a report.\
+            \ If null, both account types will be returned."
+          enum:
+          - MERCHANT
+          - DEVELOPER
         interval_start:
           type: string
           description: "The starting date of the report, inclusive."
