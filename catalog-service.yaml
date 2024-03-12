@@ -229,7 +229,7 @@ paths:
     get:
       tags:
       - Catalog - Offers
-      summary: Get Count of Merchant Offers
+      summary: Get Count of Merchant Offers !Test!
       operationId: getMerchantProductCount
       parameters:
       - name: X-Violet-Token
