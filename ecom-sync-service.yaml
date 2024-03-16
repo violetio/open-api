@@ -1068,7 +1068,7 @@ components:
           description: Product Albums
           items:
             $ref: '#/components/schemas/Album'
-        three_d_enables:
+        three_d_enabled:
           type: boolean
           description: Is the product 3D Enabled
         three_d_resource:
@@ -1081,6 +1081,11 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+          - BUNDLED
+          - PHYSICAL
+          - DIGITAL
+          - VIRTUAL
+          - BUNDLED
         status:
           type: string
           description: Status
@@ -1290,6 +1295,7 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+          - BUNDLED
         status:
           type: string
           description: SKU Status
@@ -2039,6 +2045,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -2051,9 +2060,6 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of Merchant
@@ -2347,6 +2353,9 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -2363,9 +2372,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Order
     OrderAddress:
       required:
@@ -2735,6 +2741,7 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+          - BUNDLED
         custom:
           type: boolean
           description: Is the Sku custom. True when the price has been overridden.
