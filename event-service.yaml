@@ -852,6 +852,11 @@ paths:
         required: true
         schema:
           type: string
+      - name: webhook_ids
+        in: query
+        description: Optional comma separated webhook ids list filter
+        schema:
+          type: string
       responses:
         default:
           description: default response
