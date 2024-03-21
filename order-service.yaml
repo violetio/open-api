@@ -1856,11 +1856,6 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
-        order_id:
-          type: integer
-          format: int64
-        guest:
-          type: boolean
         order_status:
           type: string
           enum:
@@ -1875,6 +1870,11 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        guest:
+          type: boolean
+        order_id:
+          type: integer
+          format: int64
       description: Order
     OrderAddress:
       required:
@@ -1919,9 +1919,9 @@ components:
         address_2:
           type: string
           description: Second line of the Address
-        first_name:
-          type: string
         last_name:
+          type: string
+        first_name:
           type: string
       description: The shipping or billing address of a user placing an order
     OrderCustomer:
@@ -2244,6 +2244,7 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+          - BUNDLED
         custom:
           type: boolean
           description: Is the Sku custom. True when the price has been overridden.
@@ -2619,6 +2620,7 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+          - BUNDLED
         line_price:
           type: integer
           description: Price of the SKU multiplied by the Quantity. In Cents
