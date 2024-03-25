@@ -1264,4 +1264,9 @@ components:
           description: 7 day failure rate
           format: double
           readOnly: true
+        temp_disable_ms:
+          type: integer
+          description: Temporary disable milliseconds
+          format: int64
+          readOnly: true
       description: External Hook Event
