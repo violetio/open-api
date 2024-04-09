@@ -1548,9 +1548,6 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -1563,6 +1560,9 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
         merchant_name:
           type: string
           description: Name of Merchant
@@ -1856,6 +1856,11 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
+        order_id:
+          type: integer
+          format: int64
+        guest:
+          type: boolean
         order_status:
           type: string
           enum:
@@ -1870,11 +1875,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        guest:
-          type: boolean
-        order_id:
-          type: integer
-          format: int64
       description: Order
     OrderAddress:
       required:
@@ -1919,9 +1919,9 @@ components:
         address_2:
           type: string
           description: Second line of the Address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
     OrderCustomer:
