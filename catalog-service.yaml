@@ -1104,7 +1104,7 @@ components:
           description: Product Albums
           items:
             $ref: '#/components/schemas/Album'
-        three_d_enables:
+        three_d_enabled:
           type: boolean
           description: Is the product 3D Enabled
         three_d_resource:
@@ -1117,6 +1117,11 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+          - BUNDLED
+          - PHYSICAL
+          - DIGITAL
+          - VIRTUAL
+          - BUNDLED
         status:
           type: string
           description: Status
@@ -1326,6 +1331,7 @@ components:
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
+          - BUNDLED
         status:
           type: string
           description: SKU Status
