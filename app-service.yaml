@@ -59,6 +59,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MerchantAppInstall'
+  /apps/{app_id}/webhooks/{webhook_id}/simulate:
+    post:
+      tags:
+      - Apps
+      summary: Simulate Webhook Event
+      description: Simulates a webhook event for testing purposes. A webhook event
+        will be created and delivered to the remote endpoint of the webhook.
+      operationId: simulateWebhook
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulateWebhookRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
   /apps/{app_id}/merchants/{merchant_id}/commission_rate:
     put:
       tags:
@@ -215,6 +259,26 @@ components:
           description: ID of Merchant being uninstalled
           format: int32
       description: A Request to uninstall/disconnect a merchant from an app
+    SimulateWebhookRequest:
+      type: object
+      properties:
+        order_id:
+          type: integer
+          description: Order ID to be used on simulation
+          format: int64
+        offer_id:
+          type: integer
+          description: Offer ID to be used on simulation
+          format: int64
+        collection_id:
+          type: integer
+          description: Collection ID to be used on simulation
+          format: int64
+        merchant_id:
+          type: integer
+          description: Merchant ID to be used on simulation
+          format: int32
+      description: Request body for webhook simulator
     MerchantAppInstallCommissionRateRequest:
       type: object
       properties:
