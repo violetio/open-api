@@ -348,6 +348,11 @@ paths:
         schema:
           type: string
           default: USD
+      - name: include
+        in: query
+        schema:
+          type: string
+          default: sku_dimensions
       responses:
         default:
           description: default response
@@ -542,7 +547,6 @@ paths:
         in: query
         schema:
           type: boolean
-          default: true
       responses:
         default:
           description: default response
@@ -550,6 +554,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+  /catalog/collections/{collection_id}/offers/ids:
+    get:
+      tags:
+      - Catalog - Collections
+      summary: Get Collection Offers IDs
+      description: Retrieve a list of all `Offer`s IDs inside a `Collection` for a
+        given `collection_id`.
+      operationId: getCollectionOffersIds
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: collection_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: exclude_hidden
+        in: query
+        schema:
+          type: boolean
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageLong'
   /catalog/collections:
     get:
       tags:
@@ -1666,6 +1721,58 @@ components:
           type: string
           description: Direction to sort by
       description: Offer Search Request
+    VioletPageLong:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            type: integer
+            description: The actual content of the response; A list of the result
+              objects
+            format: int64
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
     VioletPageCollection:
       type: object
       properties:
