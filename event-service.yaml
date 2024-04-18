@@ -1036,6 +1036,13 @@ components:
           - MERCHANT_ENABLED
           - MERCHANT_DISABLED
           - MERCHANT_COMPLETE
+          - COLLECTION_CREATED
+          - COLLECTION_UPDATED
+          - COLLECTION_REMOVED
+          - COLLECTION_OFFERS_UPDATED
+          - COLLECTION_SYNC_STARTED
+          - COLLECTION_SYNC_COMPLETED
+          - COLLECTION_SYNC_FAILED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook event was sent.
@@ -1145,6 +1152,13 @@ components:
             - MERCHANT_ENABLED
             - MERCHANT_DISABLED
             - MERCHANT_COMPLETE
+            - COLLECTION_CREATED
+            - COLLECTION_UPDATED
+            - COLLECTION_REMOVED
+            - COLLECTION_OFFERS_UPDATED
+            - COLLECTION_SYNC_STARTED
+            - COLLECTION_SYNC_COMPLETED
+            - COLLECTION_SYNC_FAILED
         entity_ids:
           uniqueItems: true
           type: array
@@ -1234,6 +1248,13 @@ components:
           - MERCHANT_ENABLED
           - MERCHANT_DISABLED
           - MERCHANT_COMPLETE
+          - COLLECTION_CREATED
+          - COLLECTION_UPDATED
+          - COLLECTION_REMOVED
+          - COLLECTION_OFFERS_UPDATED
+          - COLLECTION_SYNC_STARTED
+          - COLLECTION_SYNC_COMPLETED
+          - COLLECTION_SYNC_FAILED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook posts against.
