@@ -1316,6 +1316,8 @@ components:
           format: date-time
         sku_dimensions:
           $ref: '#/components/schemas/SkuDimensions'
+        shipping_dimensions:
+          $ref: '#/components/schemas/SkuDimensions'
         display_order:
           type: integer
           description: Order to display SKU
