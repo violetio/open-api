@@ -482,8 +482,6 @@ components:
     Error:
       type: object
       properties:
-        id:
-          type: object
         message:
           type: string
         error:
@@ -491,6 +489,8 @@ components:
         code:
           type: integer
           format: int32
+        id:
+          type: object
         ids:
           type: array
           items:
@@ -1182,6 +1182,16 @@ components:
           enum:
           - MERCHANT
           - DEVELOPER
+        currency_presentation_type:
+          type: string
+          description: "Presentation type for currency amounts during export. This\
+            \ only impacts the `amount` and `payout_amount` fields for a Distribution.\
+            \ This can be either MAIN (e.g. returned amounts in Dollars) or FRACTIONAL\
+            \ (e.g. returned amounts in Cents). If null, data will be returned in\
+            \ the Main currency unit."
+          enum:
+          - MAIN
+          - FRACTIONAL
         interval_start:
           type: string
           description: "The starting date of the report, inclusive."
