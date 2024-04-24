@@ -1213,52 +1213,6 @@ components:
           type: number
           description: Amount given by merchant
           format: double
-        weight_unit:
-          type: string
-          description: Weight Unit
-          enum:
-          - INCHES
-          - FEET
-          - CENTIMETERS
-          - OUNCES
-          - POUNDS
-          - GRAMS
-          - KILOGRAMS
-          - CARATS
-          - YARDS
-          - MILLIMETERS
-          - TONNES
-          - MILLIGRAMS
-          - LITERS
-          - MILLILITERS
-          - QUARTS
-          - QUARTERS
-          - GALLONS
-          - PINTS
-          - METERS
-        size_unit:
-          type: string
-          description: Size Unit
-          enum:
-          - INCHES
-          - FEET
-          - CENTIMETERS
-          - OUNCES
-          - POUNDS
-          - GRAMS
-          - KILOGRAMS
-          - CARATS
-          - YARDS
-          - MILLIMETERS
-          - TONNES
-          - MILLIGRAMS
-          - LITERS
-          - MILLILITERS
-          - QUARTS
-          - QUARTERS
-          - GALLONS
-          - PINTS
-          - METERS
         currency_symbol:
           type: string
           description: Symbol representing the desired currency
@@ -1406,6 +1360,8 @@ components:
           description: Date of last SKU update
           format: date-time
         sku_dimensions:
+          $ref: '#/components/schemas/SkuDimensions'
+        shipping_dimensions:
           $ref: '#/components/schemas/SkuDimensions'
         display_order:
           type: integer
