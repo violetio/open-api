@@ -2248,7 +2248,7 @@ components:
         custom:
           type: boolean
           description: Is the Sku custom. True when the price has been overridden.
-        CustomProperties:
+        custom_properties:
           type: array
           description: Used to provide the merchant with custom values for the product.
             This functionality is currently limited to Shopify merchants.
