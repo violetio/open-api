@@ -2001,6 +2001,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -2013,9 +2016,6 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of Merchant
