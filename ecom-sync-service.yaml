@@ -774,6 +774,11 @@ components:
           type: integer
           description: Merchant ID
           format: int32
+        parent_id:
+          type: integer
+          description: Parent ID for platforms that have a parent-child collection
+            structure.
+          format: int64
         name:
           type: string
           description: Name of this collection
