@@ -482,8 +482,6 @@ components:
     Error:
       type: object
       properties:
-        id:
-          type: object
         message:
           type: string
         error:
@@ -491,6 +489,8 @@ components:
         code:
           type: integer
           format: int32
+        id:
+          type: object
         ids:
           type: array
           items:
@@ -1122,6 +1122,7 @@ components:
           description: This run's report type.
           enum:
           - DISTRIBUTION
+          - PAYOUT
         status:
           type: string
           description: This run's status.
@@ -1163,6 +1164,10 @@ components:
           type: integer
           description: The UserId of the user that initiated this report run.
           format: int64
+        developer_id:
+          type: integer
+          description: The DeveloperId to generate this report for.
+          format: int32
         merchant_id:
           type: integer
           description: The MerchantId to generate this report for.
@@ -1235,6 +1240,7 @@ components:
           description: The type of report being requested.
           enum:
           - DISTRIBUTION
+          - PAYOUT
         parameters:
           $ref: '#/components/schemas/ReportRunParameters'
       description: The body object for use when requesting a report run.
