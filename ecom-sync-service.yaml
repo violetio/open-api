@@ -2457,6 +2457,7 @@ components:
           - EXTERNAL_ADD_DISCOUNT_CODE
           - EXTERNAL_REMOVE_DISCOUNT_CODE
           - EXTERNAL_DELETE_ORDER
+          - EXTERNAL_REFUND_ORDER
         message:
           type: string
           description: Error Message
