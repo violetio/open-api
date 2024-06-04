@@ -1634,6 +1634,10 @@ components:
           type: string
           description: Date of last bag discount update
           format: date-time
+        email:
+          type: string
+          description: "Customer email address, possibly necessary for once-per-customer\
+            \ discounts."
       description: Bag Discount
     BagFulfillment:
       type: object
@@ -1858,9 +1862,6 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -1877,6 +1878,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Order
     OrderAddress:
       required:
@@ -2001,6 +2005,7 @@ components:
           - EXTERNAL_ADD_DISCOUNT_CODE
           - EXTERNAL_REMOVE_DISCOUNT_CODE
           - EXTERNAL_DELETE_ORDER
+          - EXTERNAL_REFUND_ORDER
         message:
           type: string
           description: Error Message
@@ -2463,6 +2468,10 @@ components:
           type: integer
           description: ID of the Merchant the discount belongs to
           format: int32
+        email:
+          type: string
+          description: "Customer email address, possibly necessary for once-per-customer\
+            \ discounts."
       description: Discount request
     PaymentMethodRequest:
       type: object
