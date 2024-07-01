@@ -1862,8 +1862,9 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
-        guest:
-          type: boolean
+        order_id:
+          type: integer
+          format: int64
         order_status:
           type: string
           enum:
@@ -1874,13 +1875,12 @@ components:
           - PARTIALLY_REFUNDED
           - REFUNDED
           - REQUIRES_ACTION
+        guest:
+          type: boolean
         intent_based_checkout:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Order
     OrderAddress:
       required:
