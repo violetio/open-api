@@ -2318,6 +2318,12 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
+        payment_transactions:
+          uniqueItems: true
+          type: array
+          description: Payment Transactions associated to the bags on this Cart
+          items:
+            $ref: '#/components/schemas/PaymentTransaction'
         order_id:
           type: integer
           format: int64
@@ -2835,6 +2841,143 @@ components:
           type: string
           description: Description of the Tax
       description: Taxes belonging to an Order Bag
+    PaymentTransaction:
+      required:
+      - amount
+      - currency
+      - order_id
+      - payment_provider
+      - payment_provider_transaction_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object
+          format: int64
+        order_id:
+          type: integer
+          description: Identifier of the Order entity that this payment transaction
+            is associated with
+          format: int64
+        payment_provider:
+          type: string
+          description: 'Payment Provider that this transaction is executed against.
+            This is the provider that handles payment  processing for this transaction. '
+        payment_provider_transaction_id:
+          type: string
+          description: Identifier of the payment transaction in the underlying payment
+            provider system.
+        payment_method_id:
+          type: integer
+          description: 'Identifier of the payment method associated with this payment
+            transaction in Violet. '
+          format: int64
+        payment_provider_payment_method_id:
+          type: string
+          description: 'Identifier of the payment method associated with this payment
+            transaction in the underlying payment provider system. '
+        payment_intent_client_secret:
+          type: string
+          description: Client secret for the payment intent associated to this payment
+            transaction
+        amount:
+          type: integer
+          description: 'Amount of this payment in the fractional currency unit of
+            this transaction (e.g. cents). This is the amount charged to the shopper. '
+          format: int32
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Metadata from the payment provider associated to this payment
+              transaction
+          description: Metadata from the payment provider associated to this payment
+            transaction
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: 'Identifiers of the Bags in Violet that are associated with
+            this payment transaction. The amount of this payment transaction is directly
+            computed from the total amounts on the related bags. '
+          items:
+            type: string
+            description: 'Identifiers of the Bags in Violet that are associated with
+              this payment transaction. The amount of this payment transaction is
+              directly computed from the total amounts on the related bags. '
+        related_refunds:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Refunds in Violet that are associated with
+            this payment transaction. Refund amounts are not reflected in the amount
+            on this payment transaction.
+          items:
+            type: string
+            description: Identifiers of the Refunds in Violet that are associated
+              with this payment transaction. Refund amounts are not reflected in the
+              amount on this payment transaction.
+        currency:
+          type: string
+          description: Currency that the amount of this payment transaction is reflected
+            in. This is the currency that the payment provider uses to charge the
+            shopper payment method.
+        status:
+          type: string
+          description: Underlying status of the payment in the payment provider system
+            and should be used to determine what action to take next against this
+            payment transaction.
+          enum:
+          - PROCESSING
+          - CAPTURED
+          - CANCELLED
+          - FAILED
+          - BYPASSED
+          - REQUIRES_ACTION
+          - REQUIRES_PAYMENT_METHOD
+          - REQUIRES_AUTHORIZATION
+          - AUTHORIZED
+          - REFUNDED
+          - PARTIALLY_REFUNDED
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this payment transaction during
+            processing.. This value will only be populated if there are errors during
+            processing
+          items:
+            $ref: '#/components/schemas/PaymentTransactionError'
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: 'Time at which the object was last modified. In ISO-8601 format. '
+          format: date-time
+      description: Payment Transaction
+    PaymentTransactionError:
+      required:
+      - error_message
+      - payment_transaction_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        payment_transaction_id:
+          type: integer
+          description: Identifier of the PaymentTransaction entity that this error
+            is associated with
+          format: int64
+      description: Error associated to a payment transaction
     Transaction:
       required:
       - app_id
