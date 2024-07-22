@@ -535,6 +535,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CalculateCartResponse'
+  /orders/{order_id}/bags/{bag_id}/cancel:
+    post:
+      tags:
+      - Cancellations
+      summary: Cancel Bag
+      operationId: cancelBag
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: bag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bag'
+  /orders/{order_id}/cancel:
+    post:
+      tags:
+      - Cancellations
+      summary: Cancel Order
+      operationId: cancelOrder
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
   /checkout/cart:
     post:
       tags:
@@ -1937,9 +2007,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -1956,6 +2023,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Order
     OrderAddress:
       required:
@@ -3335,6 +3405,39 @@ components:
         shipping_address:
           $ref: '#/components/schemas/BaseAddress'
       description: Calculate Cart Request
+    CancelOrderRequest:
+      type: object
+      properties:
+        reason:
+          maxLength: 255
+          type: string
+          description: Custom message describing the reason for the cancellation.
+        reason_code:
+          maxLength: 255
+          type: string
+          description: Code that best represents the reason for the cancellation.
+          default: OTHER
+          enum:
+          - OTHER
+          - CUSTOMER
+          - INVENTORY
+          - FRAUD
+          - DECLINED
+          - OTHER
+          - CUSTOMER
+          - INVENTORY
+          - FRAUD
+          - DECLINED
+        restock_items:
+          type: boolean
+          description: Should the items be restocked. In most cases this should be
+            `true` since only unfulfilled orders can be cancelled.
+          default: true
+        notify_customer:
+          type: boolean
+          description: Should the customer be notified by the merchants system that
+            a cancellation has occurred.
+          default: false
     CartInitializationRequest:
       type: object
       properties:
