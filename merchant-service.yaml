@@ -30,6 +30,8 @@ tags:
   description: Merchant explore configurations
 - name: Merchants - Explore
   description: Merchant explore operations
+- name: Merchants - Onboarding
+  description: Merchant Onboarding Endpoints
 - name: Merchants - ReferenceId
   description: Operations relating to Merchant ReferenceIds
 - name: Merchants - Setup
