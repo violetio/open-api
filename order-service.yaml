@@ -18,6 +18,7 @@ tags:
 - name: Checkout - Completion
 - name: Orders
 - name: Refunds
+- name: Cancellations
 paths:
   /checkout/cart/{cart_id}/discounts:
     post:
@@ -567,13 +568,22 @@ paths:
         schema:
           type: integer
           format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelOrderRequest'
+            example:
+              notify_customer: false,
+              reason_code: CUSTOMER,
+              reason: Customer requested refund.
       responses:
-        default:
+        "200":
           description: default response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Bag'
+                $ref: '#/components/schemas/OrderCancellation'
   /orders/{order_id}/cancel:
     post:
       tags:
@@ -600,11 +610,22 @@ paths:
         schema:
           type: integer
           format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelOrderRequest'
+            example:
+              notify_customer: false,
+              reason_code: CUSTOMER,
+              reason: Customer requested refund.
       responses:
-        default:
+        "200":
           description: default response
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCancellation'
   /checkout/cart:
     post:
       tags:
@@ -979,6 +1000,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+  /orders/{order_id}/cancellations:
+    get:
+      tags:
+      - Cancellations
+      summary: Get Order Cancellations
+      operationId: getOrderCancellations
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCancellation'
   /orders/{order_id}/refunds/{refund_id}:
     get:
       tags:
@@ -2007,6 +2061,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -2023,9 +2080,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Order
     OrderAddress:
       required:
@@ -2763,6 +2817,11 @@ components:
           description: "Payment Token generated on a specific payment provider. When\
             \ a token is provided, payment_provider must also be specified in the\
             \ request."
+        customer_id:
+          type: string
+          description: "Unique identifier of the Customer in the payment provider\
+            \ that the payment method is associated to. When a customer_id is provided,\
+            \ payment_provider must also be specified in the request."
         intent_based_capture:
           type: boolean
           description: Trigger payment intent based capture
@@ -3144,6 +3203,12 @@ components:
         shipping_total:
           minimum: 0
           type: integer
+          description: The shipping total of the cart in cents.
+          format: int32
+          readOnly: true
+        tax_total:
+          minimum: 0
+          type: integer
           description: The tax total of the cart in cents.
           format: int32
           readOnly: true
@@ -3405,6 +3470,242 @@ components:
         shipping_address:
           $ref: '#/components/schemas/BaseAddress'
       description: Calculate Cart Request
+    BagCancellation:
+      type: object
+      properties:
+        order_id:
+          type: integer
+          description: The ID of the order this cancellation relates to.
+          format: int64
+          readOnly: true
+        bag_id:
+          type: integer
+          description: The ID of the bag this cancellation relates to.
+          format: int64
+          readOnly: true
+        merchant_id:
+          type: integer
+          description: The ID of the merchant this cancellation relates to.
+          format: int32
+          readOnly: true
+        external_order_id:
+          maxLength: 64
+          minLength: 1
+          type: string
+          description: The ID of the order in the external commerce platform this
+            cancellation relates to.
+          readOnly: true
+        status:
+          type: string
+          description: Status of the bag cancellation.
+          readOnly: true
+          enum:
+          - CANCELED
+          - CANCELLATION_FAILURE
+        originated_by:
+          type: string
+          description: Who is responsible for cancelling the order.
+          readOnly: true
+          enum:
+          - CHANNEL
+          - MERCHANT
+          - VIOLET
+        date_cancelled:
+          type: string
+          description: Date and time that the order was cancelled.
+          format: date-time
+          readOnly: true
+        refund:
+          $ref: '#/components/schemas/Refund'
+        errors:
+          type: array
+          description: "Errors, if any, that occurred when attempting to cancel the\
+            \ external order."
+          nullable: true
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/OrderError'
+      description: Cancellation record for a bag.
+      readOnly: true
+    OrderCancellation:
+      type: object
+      properties:
+        order_id:
+          type: integer
+          description: The ID of the order this cancellation relates to.
+          format: int64
+          readOnly: true
+        app_id:
+          type: integer
+          description: The ID of the app that originated this order.
+          format: int32
+          readOnly: true
+        status:
+          type: string
+          description: Status of the overall cancellation.
+          readOnly: true
+          enum:
+          - CANCELED
+          - PARTIALLY_CANCELED
+          - CANCELLATION_FAILURE
+        cancelled_bags:
+          type: array
+          description: Bags within the order that were cancelled.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/BagCancellation'
+        message:
+          type: string
+          description: Description of the outcome of the order cancellation request.
+          readOnly: true
+      description: Cancellation record for an order.
+    Refund:
+      required:
+      - amount
+      - app_id
+      - gateway_transaction_id
+      - merchant_id
+      - order_id
+      - transaction_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        order_id:
+          type: integer
+          description: ID of the Order being refunded
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the Bag being refunded
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the merchant making the refund
+          format: int32
+        app_id:
+          type: integer
+          description: ID of the App that created the Order
+          format: int32
+        transaction_id:
+          type: integer
+          description: ID of the Transaction being refunded
+          format: int64
+        gateway_transaction_id:
+          type: string
+          description: ID of the Transaction in the Payment Gateway
+        amount:
+          type: integer
+          description: Amount being refunded. In Cents
+          format: int32
+        merchant_transfer_reversal_amount_usd:
+          type: integer
+          description: Amount being taken back from the associated transfer to the
+            merchant. In Cents
+          format: int32
+        developer_transfer_reversal_amount_usd:
+          type: integer
+          description: Amount being taken back from the associated transfer to the
+            developer. In Cents
+          format: int32
+        reason:
+          type: string
+          description: Reason for refund
+        refund_currency:
+          type: string
+          description: Currency set for this refund by the external ecom platform
+        status:
+          type: string
+          description: Status of the Refund
+          enum:
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_COMPLETED
+          - FAILED
+          - EXTERNAL
+        skus:
+          uniqueItems: true
+          type: array
+          description: SKUs the refund applies to
+          items:
+            $ref: '#/components/schemas/RefundOrderSku'
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+        external_id:
+          type: string
+          description: ID of the refund on the external commerce platform. This value
+            will only be populated if the external commerce platform supports refund
+            ID's.
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this refund during processing.
+            This value will only be populated if there are errors during processing
+          items:
+            $ref: '#/components/schemas/RefundError'
+      description: Order Refund
+    RefundError:
+      required:
+      - error_message
+      - refund_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        refund_id:
+          type: integer
+          description: ID of the Refund this Error is associated to
+          format: int64
+      description: Error associated to a refund
+    RefundOrderSku:
+      required:
+      - order_sku_id
+      - refund_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        refund_id:
+          type: integer
+          description: Id of the Refund associated with Refund Order Sku
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the Bag being refunded
+          format: int64
+        quantity_refunded:
+          type: integer
+          description: Quantity of the this item refunded by this refund.
+          format: int32
+        external_id:
+          type: string
+          description: Variant Id in external Ecom platform
+        order_sku_id:
+          type: integer
+          description: Id of the Order Sku associated with Refund Order Sku
+          format: int64
+      description: Refunded Order Sku
     CancelOrderRequest:
       type: object
       properties:
@@ -3572,153 +3873,6 @@ components:
           items:
             $ref: '#/components/schemas/OrderShippingMethod'
       description: Order Shipping Method Wrapper
-    Refund:
-      required:
-      - amount
-      - app_id
-      - gateway_transaction_id
-      - merchant_id
-      - order_id
-      - transaction_id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        order_id:
-          type: integer
-          description: ID of the Order being refunded
-          format: int64
-        bag_id:
-          type: integer
-          description: ID of the Bag being refunded
-          format: int64
-        merchant_id:
-          type: integer
-          description: ID of the merchant making the refund
-          format: int32
-        app_id:
-          type: integer
-          description: ID of the App that created the Order
-          format: int32
-        transaction_id:
-          type: integer
-          description: ID of the Transaction being refunded
-          format: int64
-        gateway_transaction_id:
-          type: string
-          description: ID of the Transaction in the Payment Gateway
-        amount:
-          type: integer
-          description: Amount being refunded. In Cents
-          format: int32
-        merchant_transfer_reversal_amount_usd:
-          type: integer
-          description: Amount being taken back from the associated transfer to the
-            merchant. In Cents
-          format: int32
-        developer_transfer_reversal_amount_usd:
-          type: integer
-          description: Amount being taken back from the associated transfer to the
-            developer. In Cents
-          format: int32
-        reason:
-          type: string
-          description: Reason for refund
-        refund_currency:
-          type: string
-          description: Currency set for this refund by the external ecom platform
-        status:
-          type: string
-          description: Status of the Refund
-          enum:
-          - PROCESSING
-          - COMPLETED
-          - CANCELED
-          - PARTIALLY_COMPLETED
-          - FAILED
-          - EXTERNAL
-        skus:
-          uniqueItems: true
-          type: array
-          description: SKUs the refund applies to
-          items:
-            $ref: '#/components/schemas/RefundOrderSku'
-        date_created:
-          type: string
-          description: Date of creation
-          format: date-time
-        date_last_modified:
-          type: string
-          description: Date of last update
-          format: date-time
-        external_id:
-          type: string
-          description: ID of the refund on the external commerce platform. This value
-            will only be populated if the external commerce platform supports refund
-            ID's.
-        errors:
-          uniqueItems: true
-          type: array
-          description: List of errors associated to this refund during processing.
-            This value will only be populated if there are errors during processing
-          items:
-            $ref: '#/components/schemas/RefundError'
-      description: Order Refund
-    RefundError:
-      required:
-      - error_message
-      - refund_id
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Unique identifier for the object.
-          format: int64
-          readOnly: true
-        error_code:
-          type: integer
-          description: Unique error code corresponding to this error.
-          format: int32
-        error_message:
-          type: string
-          description: Error message describing the issue in the underlying system.
-        refund_id:
-          type: integer
-          description: ID of the Refund this Error is associated to
-          format: int64
-      description: Error associated to a refund
-    RefundOrderSku:
-      required:
-      - order_sku_id
-      - refund_id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        refund_id:
-          type: integer
-          description: Id of the Refund associated with Refund Order Sku
-          format: int64
-        bag_id:
-          type: integer
-          description: ID of the Bag being refunded
-          format: int64
-        quantity_refunded:
-          type: integer
-          description: Quantity of the this item refunded by this refund.
-          format: int32
-        external_id:
-          type: string
-          description: Variant Id in external Ecom platform
-        order_sku_id:
-          type: integer
-          description: Id of the Order Sku associated with Refund Order Sku
-          format: int64
-      description: Refunded Order Sku
     VioletPageBag:
       type: object
       properties:
