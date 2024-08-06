@@ -574,8 +574,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CancelOrderRequest'
             example:
-              notify_customer: false,
-              reason_code: CUSTOMER,
+              notify_customer: false
+              reason_code: CUSTOMER
               reason: Customer requested refund.
       responses:
         "200":
@@ -616,8 +616,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CancelOrderRequest'
             example:
-              notify_customer: false,
-              reason_code: CUSTOMER,
+              notify_customer: false
+              reason_code: CUSTOMER
               reason: Customer requested refund.
       responses:
         "200":
@@ -3719,11 +3719,6 @@ components:
           description: Code that best represents the reason for the cancellation.
           default: OTHER
           enum:
-          - OTHER
-          - CUSTOMER
-          - INVENTORY
-          - FRAUD
-          - DECLINED
           - OTHER
           - CUSTOMER
           - INVENTORY
