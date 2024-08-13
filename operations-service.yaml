@@ -538,57 +538,105 @@ components:
       properties:
         id:
           type: integer
-          description: ID
-          format: int32
-        account_id:
-          type: integer
-          description: Developer or Merchant ID
+          description: Unique identifier for the object
           format: int32
         account_type:
           type: string
-          description: Account Type
+          description: Type of the account entity in Violet. This is either DEVELOPER
+            or MERCHANT.
           enum:
           - MERCHANT
           - DEVELOPER
-        external_id:
-          type: string
-          description: External ID. Stripe Account ID
-        country_code:
-          type: string
-          description: Country Code. Country Code for this Payout Account
+          - DEVELOPER
+          - MERCHANT
+        account_id:
+          type: integer
+          description: Identifier of the account entity in Violet. This is either
+            the Violet developer or merchant identifier.
+          format: int32
         status:
           type: string
-          description: Status
+          description: Current status of this payout account. This status reflects
+            whether or not funds can be transferred to the connected payout account.
           enum:
           - INCOMPLETE
           - COMPLETE
           - REQUIRES_UPDATES
-        verified:
+        kyc_status:
+          type: string
+          description: Whether or not know-your-customer requirements have been fulfilled
+            for the underlying payment provider payout account.
+          enum:
+          - INCOMPLETE
+          - COMPLETE
+          - REQUIRES_UPDATES
+        payouts_enabled:
           type: boolean
-          description: Has the account been verified
-        date_created:
+          description: Whether or not transfers are being sent by Violet to the connected
+            payment provider account for transactions.
+        country_code:
           type: string
-          description: Date of account creation
-          format: date-time
-        date_last_modified:
+          description: Two-letter country code of the bank that this Payout Account
+            is associated to.
+        payment_provider:
           type: string
-          description: Date of last account update
-          format: date-time
-        payment_service_account_type:
+          description: Payment Provider that the underlying payout account was created
+            in. This is the provider that handles payment and payout processing for
+            this entity.
+          enum:
+          - STRIPE
+          - NUVEI
+        payment_provider_account_id:
           type: string
-          description: Type of account in the external payment service
+          description: Identifier of the payout account in the payment provider system.
+        payment_provider_account_type:
+          type: string
+          description: Type of account in the external payment provider. This field
+            may not be present if the underlying payment provider does not have multiple
+            account types.
           enum:
           - EXPRESS
           - CUSTOM
           - STANDARD
-        payment_service:
+          - PLATFORM
+        payment_provider_metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Metadata from the payment provider associated to this payout
+              account.
+          description: Metadata from the payment provider associated to this payout
+            account.
+        verified:
+          type: boolean
+          description: Verification status of the payout account connected to the
+            payment provider.
+        date_created:
           type: string
-          description: Payment Service used for this payout account
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+        externalId:
+          type: string
+        paymentServiceAccountType:
+          type: string
+          enum:
+          - EXPRESS
+          - CUSTOM
+          - STANDARD
+          - PLATFORM
+        paymentService:
+          type: string
           enum:
           - STRIPE
+          - NUVEI
         details:
           $ref: '#/components/schemas/PayoutAccountDetails'
-      description: Payout Account of the User. Maps to Stripe Connect Account.
+      description: Violet Payout Account that stores underlying payment provider account
+        information to be used for disbursing funds during Order processing.
     PayoutAccountDetails:
       type: object
       properties:
