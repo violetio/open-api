@@ -24,6 +24,8 @@ tags:
 - name: Merchants - External
   description: Convenience methods for external merchant management (i.e. createing
     merchants through Violet Connect or ecommerce apps)
+- name: Merchants - App Relationships
+  description: Merchant App Relationship Endpoints
 - name: Merchants - Merchant
   description: Operations directly relating to merchant entities themselves
 - name: Merchants - Explore Configuration
