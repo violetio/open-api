@@ -184,6 +184,55 @@ paths:
                 items:
                   type: integer
                   format: int32
+  /apps/commission_rate/change_log:
+    get:
+      tags:
+      - Apps - Merchant Install - Commission Rate
+      summary: Search All Commission Rates Change Log
+      operationId: getAllMerchantAppInstallCommissionRateChangeLog
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageMerchantAppInstallCommissionRateChangeWithAppNameAndMerchantName'
 components:
   schemas:
     MerchantAppInstall:
@@ -290,3 +339,122 @@ components:
           type: boolean
           description: Indicates if the commission rate is locked or not. Commission
             rates can only be locked or unlocked by a Channel.
+    MerchantAppInstallCommissionRateChange:
+      type: object
+      properties:
+        commission_rate:
+          type: number
+          description: The commission rate of the merchant app install
+          format: double
+        commission_locked:
+          type: boolean
+          description: Indicates if the commission rate was locked or not. Commission
+            rates can only be locked or unlocked by a Channel.
+        user_id:
+          type: integer
+          description: The user id that updated the merchant app install commission
+            rate
+          format: int64
+        user_type:
+          type: string
+          description: The user type that updated the merchant app install commission
+            rate
+          enum:
+          - SUPER_ADMIN
+          - ADMIN
+          - MERCHANT
+          - USER
+          - DEVELOPER
+          - INFLUENCER
+          - HYBRID
+          - OTHER
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+      description: Merchant app install commission rate change log
+    MerchantAppInstallCommissionRateChangeWithAppNameAndMerchantName:
+      type: object
+      properties:
+        MerchantAppInstallCommissionRateChange:
+          $ref: '#/components/schemas/MerchantAppInstallCommissionRateChange'
+        appId:
+          type: integer
+          description: The app id tied to the merchant app install record
+          format: int32
+        appName:
+          type: string
+          description: Name of the app tied to the merchant app install record
+        merchantId:
+          type: integer
+          description: The merchant id tied to the merchant app install record
+          format: int32
+        merchantName:
+          type: string
+          description: Name of the merchant tied to the merchant app install record
+        prevRate:
+          type: number
+          description: The previous commission rate value applied to the merchant
+            app install
+          format: double
+      description: A MerchantAppInstallCommissionRateChange with the relevant app
+        and merchant identification
+    PageMerchantAppInstallCommissionRateChangeWithAppNameAndMerchantName:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantAppInstallCommissionRateChangeWithAppNameAndMerchantName'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    Pageable:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+    Sort:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
