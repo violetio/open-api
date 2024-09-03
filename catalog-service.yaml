@@ -977,7 +977,8 @@ components:
           description: External ID
         cloud_id:
           type: string
-          description: ID of hosted cloud entity
+          description: ID of hosted cloud entity. Only present on media from self-hosted
+            platforms.
         url:
           type: string
           description: Media URL
@@ -994,6 +995,10 @@ components:
           type: integer
           description: Display Order
           format: int32
+        alt_text:
+          maxLength: 512
+          type: string
+          description: Text describing the media.
         primary:
           type: boolean
           description: Primary Media
