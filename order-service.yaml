@@ -573,13 +573,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CancelOrderRequest'
-            example:2
-                notify_customer: false
-                reason_code: CUSTOMER
-                reason: Customer requested refund.
+            example:
+              notify_customer: false
+              reason_code: CUSTOMER
+              reason: Customer requested refund.
       responses:
         "200":
-          description: default response
+          description: successful operation
           content:
             application/json:
               schema:
@@ -815,11 +815,10 @@ paths:
                   postal_code: '10282'
                 currency: USD
       responses:
-        default:
+        "200":
+          description: successful operation
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
               example:
                 id: 54609
                 token: f9bd116404dc4441838a94f31a942d5f
@@ -1638,12 +1637,42 @@ paths:
             example:
               app_order_id: asdf-ghjk-qwer-tyui
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+        "409":
+          description: order submission in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Order submission is in progress. Please wait for the submission to complete before trying again.
+                error: order_submission_in_progress
+                code: 4238
+        "400":
+          description: order already completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Order has already been completed.
+                error: order_completed
+                code: 4222
+        "404":
+          description: order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Order could not be found.
+                error: order_not_found
+                code: 4216
   /checkout/cart/{cart_id}/payment/update:
     post:
       tags:
@@ -2221,6 +2250,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -2237,9 +2269,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Order
     OrderAddress:
       required:
@@ -4181,6 +4210,22 @@ components:
           type: string
           description: Order ID in the Channels System
       description: Order Search Request
+    Error:
+      type: object
+      properties:
+        id:
+          type: object
+        message:
+          type: string
+        error:
+          type: string
+        code:
+          type: integer
+          format: int32
+        ids:
+          type: array
+          items:
+            type: object
     CartSubmissionRequest:
       type: object
       properties:
