@@ -959,6 +959,30 @@ components:
           description: Date of media creation on platform
           format: date-time
       description: Collection Media
+    Condition:
+      type: object
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        weight:
+          $ref: '#/components/schemas/Weight'
+        type:
+          type: string
+          description: "Condition type, whether it's price or weight based."
+          nullable: true
+          enum:
+          - TOTAL_PRICE
+          - TOTAL_WEIGHT
+        operator:
+          type: string
+          description: Operator indicating if the price or weight is >= or <= the
+            condition value.
+          nullable: true
+          enum:
+          - LESS_THAN_OR_EQUAL_TO
+          - GREATER_THAN_OR_EQUAL_TO
+      description: Conditions that must be met for the method to be available.
+      nullable: true
     Media:
       required:
       - album_id
@@ -1041,6 +1065,25 @@ components:
           - INTERNAL
           - EXTERNAL
       description: Meta Object
+    Method:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the shipping method
+          nullable: true
+        price:
+          $ref: '#/components/schemas/Price'
+        regions:
+          $ref: '#/components/schemas/Regions'
+        conditions:
+          type: array
+          description: Conditions that must be met for the method to be available.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Condition'
+      description: List of available shipping methods for this Offer.
+      nullable: true
     Offer:
       required:
       - available
@@ -1216,9 +1259,6 @@ components:
           description: Date of last consolidation. This date is jittered for performance
             reasons and can be in the future
           format: date-time
-        tag_string:
-          type: string
-          writeOnly: true
         commission_rate:
           type: number
           description: Amount given by merchant
@@ -1249,11 +1289,438 @@ components:
           description: Collections this offer belongs to
           items:
             $ref: '#/components/schemas/Collection'
+        shipping:
+          $ref: '#/components/schemas/Shipping'
         tags:
           type: array
           items:
             type: string
       description: Product Offer
+    Price:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Price in cents.
+          format: int32
+        currency:
+          type: string
+          description: ISO 4217 Currency Code
+          nullable: true
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
+      description: Price in cents required to enable the shipping method.
+      nullable: true
+    Regions:
+      type: object
+      properties:
+        countries:
+          type: array
+          description: List of ISO 3166 Country Codes
+          nullable: true
+          items:
+            type: string
+            description: List of ISO 3166 Country Codes
+            nullable: true
+            enum:
+            - US
+            - AU
+            - AT
+            - BE
+            - CA
+            - DK
+            - FI
+            - FR
+            - DE
+            - HK
+            - IE
+            - IT
+            - JP
+            - LU
+            - MX
+            - NL
+            - NZ
+            - "NO"
+            - PT
+            - SG
+            - ES
+            - SE
+            - CH
+            - GB
+            - AF
+            - AX
+            - AL
+            - DZ
+            - AS
+            - AD
+            - AO
+            - AI
+            - AQ
+            - AG
+            - AR
+            - AM
+            - AW
+            - AZ
+            - BS
+            - BH
+            - BD
+            - BB
+            - BY
+            - BZ
+            - BJ
+            - BM
+            - BT
+            - BO
+            - BA
+            - BW
+            - BV
+            - BR
+            - IO
+            - BN
+            - BG
+            - BF
+            - BI
+            - KH
+            - CM
+            - CV
+            - KY
+            - CF
+            - TD
+            - CL
+            - CN
+            - CX
+            - CC
+            - CO
+            - KM
+            - CG
+            - CD
+            - CK
+            - CR
+            - CI
+            - HR
+            - CU
+            - CY
+            - CZ
+            - DJ
+            - DM
+            - DO
+            - EC
+            - EG
+            - SV
+            - GQ
+            - ER
+            - EE
+            - ET
+            - FK
+            - FO
+            - FJ
+            - GF
+            - PF
+            - TF
+            - GA
+            - GM
+            - GE
+            - GH
+            - GI
+            - GR
+            - GL
+            - GD
+            - GP
+            - GU
+            - GT
+            - GG
+            - GN
+            - GW
+            - GY
+            - HT
+            - HM
+            - VA
+            - HN
+            - HU
+            - IS
+            - IN
+            - ID
+            - IR
+            - IQ
+            - IM
+            - IL
+            - JM
+            - JE
+            - JO
+            - KZ
+            - KE
+            - KI
+            - KP
+            - KR
+            - KW
+            - KG
+            - LA
+            - LV
+            - LB
+            - LS
+            - LR
+            - LY
+            - LI
+            - LT
+            - MO
+            - MK
+            - MG
+            - MW
+            - MY
+            - MV
+            - ML
+            - MT
+            - MH
+            - MQ
+            - MR
+            - MU
+            - YT
+            - FM
+            - MD
+            - MC
+            - MN
+            - ME
+            - MS
+            - MA
+            - MZ
+            - MM
+            - NA
+            - NR
+            - NP
+            - AN
+            - NC
+            - NI
+            - NE
+            - NG
+            - NU
+            - NF
+            - MP
+            - OM
+            - PK
+            - PW
+            - PS
+            - PA
+            - PG
+            - PY
+            - PE
+            - PH
+            - PN
+            - PL
+            - PR
+            - QA
+            - RE
+            - RO
+            - RU
+            - RW
+            - SH
+            - KN
+            - LC
+            - PM
+            - VC
+            - WS
+            - SM
+            - ST
+            - SA
+            - SN
+            - RS
+            - SC
+            - SL
+            - SK
+            - SI
+            - SB
+            - SO
+            - ZA
+            - GS
+            - LK
+            - SD
+            - SR
+            - SJ
+            - SZ
+            - SY
+            - TW
+            - TJ
+            - TZ
+            - TH
+            - TL
+            - TG
+            - TK
+            - TO
+            - TT
+            - TN
+            - TR
+            - TM
+            - TC
+            - TV
+            - UG
+            - UA
+            - AE
+            - UM
+            - UY
+            - UZ
+            - VU
+            - VE
+            - VN
+            - VG
+            - VI
+            - WF
+            - EH
+            - YE
+            - ZM
+            - ZW
+      description: Regions this shipping method is enabled for.
+      nullable: true
+    Shipping:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Context regarding the shipping data for this Offer.
+          nullable: true
+        methods:
+          type: array
+          description: List of available shipping methods for this Offer.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Method'
+      description: "[ALPHA] - Shipping data for the Offer."
+      nullable: true
+      readOnly: true
     Sku:
       required:
       - currency
@@ -1529,6 +1996,44 @@ components:
           $ref: '#/components/schemas/VioletPageable'
         sort:
           $ref: '#/components/schemas/VioletSort'
+    Weight:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Weight value
+          format: double
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - TONNES
+      description: Weight required to enable the shipping method.
+      nullable: true
     ProductCount:
       type: object
       properties:
@@ -1653,9 +2158,25 @@ components:
         publishing_status:
           type: string
           description: Publishing status
+          enum:
+          - NOT_PUBLISHED
+          - PUBLISHED
         subscription_status:
           type: string
           description: Subscription status
+          enum:
+          - NOT_SUBSCRIBED
+          - SUBSCRIBED
+        status:
+          type: string
+          description: Offer status
+          enum:
+          - UNAVAILABLE
+          - AVAILABLE
+          - DISABLED_UNAVAILABLE
+          - DISABLED_AVAILABLE
+          - FOR_DELETION
+          - ARCHIVED
         source_category_name:
           type: string
           description: Offer category from ecom-platform
