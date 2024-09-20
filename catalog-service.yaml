@@ -215,9 +215,13 @@ paths:
           type: string
       - name: include
         in: query
-        description: "Comma-separated list of extra data to be included. E.g. metadata,collections."
+        description: Comma-separated list of extra data to be included.
         schema:
           type: string
+          enum:
+          - metadata
+          - collections
+          - shipping
       responses:
         default:
           description: default response
@@ -307,16 +311,40 @@ paths:
           format: double
       - name: include
         in: query
-        description: "Comma-separated list of extra data to be included. E.g. metadata,collections."
+        description: Comma-separated list of extra data to be included.
         schema:
           type: string
+          enum:
+          - metadata
+          - collections
+          - shipping
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Offer'
+        "404":
+          description: offer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Offer could not be found.
+                error: offer_not_found
+                code: 2004
+        "403":
+          description: insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
   /catalog/skus/{sku_id}:
     get:
       tags:
@@ -2046,6 +2074,22 @@ components:
         notPublishedCount:
           type: integer
           format: int32
+    Error:
+      type: object
+      properties:
+        id:
+          type: object
+        message:
+          type: string
+        error:
+          type: string
+        code:
+          type: integer
+          format: int32
+        ids:
+          type: array
+          items:
+            type: object
     ScoredCategory:
       required:
       - depth
