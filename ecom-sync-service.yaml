@@ -75,6 +75,72 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageInvalidProduct'
+  /sync/offers/{offer_id}:
+    post:
+      tags:
+      - EcomSync
+      summary: Sync single offer. Retrieves a single product from the external ecommerce
+        platform and updates the corresponding offer in the Violet system
+      operationId: syncOffer
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: offer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          description: The ID of an Offer in the Violet system.
+          format: int64
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        "404":
+          description: offer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Offer could not be found.
+                error: offer_not_found
+                code: 2004
+        "401":
+          description: no merchant connection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: App not connected to merchant. Merchant must connect to your
+                  app before you can access their data.
+                error: merchant_not_connected
+                code: 7118
+        "403":
+          description: insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
   /relay/merchants/{merchant_id}/collections/{collection_id}:
     get:
       tags:
@@ -759,6 +825,38 @@ components:
           type: boolean
           description: Boolean indicating if the result set is empty
       description: Violet Wrapper for springframework sort
+    Album:
+      required:
+      - parent_id
+      - type
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        parent_id:
+          type: integer
+          description: ID of the parent entity
+          format: int64
+        type:
+          type: string
+          description: Parent Type
+          enum:
+          - OFFER
+          - SKU
+        name:
+          type: string
+          description: Name of Album
+        media:
+          uniqueItems: true
+          type: array
+          description: Album media
+          items:
+            $ref: '#/components/schemas/Media'
+        primary_media:
+          $ref: '#/components/schemas/Media'
+      description: Product Image Container
     Collection:
       required:
       - merchant_id
@@ -835,38 +933,6 @@ components:
           description: Date of media creation on platform
           format: date-time
       description: Collection Media
-    Album:
-      required:
-      - parent_id
-      - type
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        parent_id:
-          type: integer
-          description: ID of the parent entity
-          format: int64
-        type:
-          type: string
-          description: Parent Type
-          enum:
-          - OFFER
-          - SKU
-        name:
-          type: string
-          description: Name of Album
-        media:
-          uniqueItems: true
-          type: array
-          description: Album media
-          items:
-            $ref: '#/components/schemas/Media'
-        primary_media:
-          $ref: '#/components/schemas/Media'
-      description: Product Image Container
     Condition:
       type: object
       properties:
@@ -1856,6 +1922,60 @@ components:
           description: The order the variant values are displayed in.
           format: int32
       description: Individual Variation Value
+    Weight:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Weight value
+          format: double
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - TONNES
+      description: Weight required to enable the shipping method.
+      nullable: true
+    Error:
+      type: object
+      properties:
+        id:
+          type: object
+        message:
+          type: string
+        error:
+          type: string
+        code:
+          type: integer
+          format: int32
+        ids:
+          type: array
+          items:
+            type: object
     VioletPageOffer:
       type: object
       properties:
@@ -1905,44 +2025,6 @@ components:
           $ref: '#/components/schemas/VioletPageable'
         sort:
           $ref: '#/components/schemas/VioletSort'
-    Weight:
-      type: object
-      properties:
-        value:
-          type: number
-          description: Weight value
-          format: double
-          nullable: true
-        unit:
-          type: string
-          nullable: true
-          enum:
-          - INCHES
-          - FEET
-          - CENTIMETERS
-          - OUNCES
-          - POUNDS
-          - GRAMS
-          - KILOGRAMS
-          - CARATS
-          - YARDS
-          - MILLIMETERS
-          - TONNES
-          - MILLIGRAMS
-          - LITERS
-          - MILLILITERS
-          - QUARTS
-          - QUARTERS
-          - GALLONS
-          - PINTS
-          - METERS
-          - OUNCES
-          - POUNDS
-          - GRAMS
-          - KILOGRAMS
-          - TONNES
-      description: Weight required to enable the shipping method.
-      nullable: true
     VioletPageCollection:
       type: object
       properties:
