@@ -2054,7 +2054,7 @@ components:
           description: Raw name of carrier from the external commerce platform.
         status:
           type: string
-          description: ID of the Bag the fulfillment belongs to.
+          description: Status of the bag fullfillment.
           enum:
           - PENDING
           - PROCESSING
@@ -2065,7 +2065,7 @@ components:
           - NONE_PROVIDED
         carrier_status:
           type: string
-          description: ID of the Bag the fulfillment belongs to.
+          description: Status provided by the carrier.
           enum:
           - PENDING
           - LABEL_PURCHASED
@@ -2080,10 +2080,10 @@ components:
           - NONE_PROVIDED
         tracking_number:
           type: string
-          description: Tracking number provider by the carrier.
+          description: Tracking number provided by the carrier.
         tracking_url:
           type: string
-          description: Tracking URL provider by the carrier.
+          description: Tracking URL provided by the carrier.
         skus:
           uniqueItems: true
           type: array
@@ -2355,22 +2355,34 @@ components:
       properties:
         id:
           type: integer
+          description: Unique ID of the error.
           format: int64
           readOnly: true
         order_id:
           type: integer
-          description: Order ID
+          description: ID of the parent Order this error occurred in.
           format: int64
         bag_id:
           type: integer
-          description: Bag ID
+          description: ID of the parent Bag this error occurred in.
           format: int64
         entity_id:
           type: string
-          description: Entity ID
+          description: ID of the entity that caused the error. See the `entity_type`
+            property to determine which entity this ID is associated with.
+        entity_type:
+          type: string
+          description: Type of entity that caused the error. See the `entity_id` property
+            to determine which entity of this type is related to the error.
+          nullable: true
+          enum:
+          - ORDER
+          - BAG
+          - SKU
         type:
           type: string
-          description: Error Type
+          description: "Type of error, indicates which action was being taken when\
+            \ the error occurred."
           enum:
           - EXTERNAL_CREATE_CART
           - EXTERNAL_ADD_ITEM
@@ -2395,14 +2407,17 @@ components:
           - EXTERNAL_DELETE_ORDER
           - EXTERNAL_REFUND_ORDER
         message:
+          maxLength: 255
           type: string
-          description: Error Message
+          description: A string message providing more details about the error.
+          nullable: true
         date_created:
           type: string
-          description: Date of creation
+          description: Date the error was first created in Violet.
           format: date-time
         platform:
           type: string
+          description: The external commerce platform the error occurred in.
           enum:
           - OTHER
           - SHOPIFY
@@ -4220,12 +4235,37 @@ components:
         code:
           type: integer
           format: int32
+        data:
+          $ref: '#/components/schemas/ErrorData'
         id:
           type: object
         ids:
           type: array
           items:
             type: object
+    ErrorData:
+      type: object
+      properties:
+        skus:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkuError'
+    SkuError:
+      type: object
+      properties:
+        message:
+          type: string
+        name:
+          type: string
+        skuId:
+          type: integer
+          format: int64
+        orderSkuId:
+          type: integer
+          format: int64
+        bagId:
+          type: integer
+          format: int64
     CartSubmissionRequest:
       type: object
       properties:
