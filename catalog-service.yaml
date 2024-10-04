@@ -2077,6 +2077,8 @@ components:
     Error:
       type: object
       properties:
+        id:
+          type: object
         message:
           type: string
         error:
@@ -2084,8 +2086,6 @@ components:
         code:
           type: integer
           format: int32
-        id:
-          type: object
         ids:
           type: array
           items:
