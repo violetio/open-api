@@ -972,17 +972,22 @@ components:
           format: int64
         external_id:
           type: string
-          description: External ID
+          description: The ID of the media in the merchants store.
+          nullable: true
         cloud_id:
           type: string
-          description: ID of hosted cloud entity. Only present on media from self-hosted
-            platforms.
+          description: The unique ID of hosted cloud entity. Only present on media
+            from self-hosted platforms.
+          nullable: true
         url:
           type: string
-          description: Media URL
+          description: The URL that should be used when displaying media within your
+            app. For cloud hosted commerce platforms that provide a CDN this will
+            often be the same as the `source_url` property. For self-hosted platforms
+            this will typically be a Violet CDN URL.
         source_url:
           type: string
-          description: Media Source URL
+          description: The original URL from the merchants system.
         type:
           type: string
           description: Media Type
@@ -991,15 +996,19 @@ components:
           - VIDEO
         display_order:
           type: integer
-          description: Display Order
+          description: The order in which the merchant displayed the media in relation
+            to other media in the same collection.
           format: int32
         alt_text:
           maxLength: 512
           type: string
-          description: Text describing the media.
+          description: Text describing the media. This value is sourced from the merchant.
+          nullable: true
         primary:
           type: boolean
-          description: Primary Media
+          description: If the media is the primary or default image in the merchants
+            store for an Offer or Sku. This is typically the cover image on a product
+            details page.
       description: Product and SKU Media
     MetaObject:
       type: object
@@ -1076,18 +1085,20 @@ components:
         product_id:
           type: string
           description: The parent/container product ID
+          deprecated: true
         external_id:
           type: string
-          description: External ID
+          description: The ID of the product in the merchants external store.
         external_url:
           type: string
-          description: External URL
+          description: The URL to the product page in the merchants store.
         name:
           type: string
           description: Name of Product in Offer
         description:
           type: string
           description: Product Description
+          nullable: true
         source:
           type: string
           description: Source Platform
@@ -1134,20 +1145,25 @@ components:
           - CUSTOM
         seller:
           type: string
-          description: Name of Merchant Selling Product
+          description: Name of merchant selling product.
+          nullable: true
+          example: Foot Locker
         vendor:
           type: string
-          description: Name of Original Vendor
+          description: Name of source vendor or brand.
+          nullable: true
+          example: Nike
         merchant_id:
           type: integer
           description: Merchant ID
           format: int32
         available:
           type: boolean
-          description: Is Product Available
+          description: Is the product available for purchase.
         visible:
           type: boolean
-          description: Is Product Visible
+          description: "Is the product hidden in the merchants store. Note: a product\
+            \ can be hidden while still being available for purchase."
         min_price:
           type: integer
           description: Minimum Price the Product sells for
@@ -1163,36 +1179,45 @@ components:
         source_category_name:
           type: string
           description: Original Category on Source Platform
+          nullable: true
         metadata:
           uniqueItems: true
           type: array
           description: Additional Meta Data of the Offer
+          nullable: true
           items:
             $ref: '#/components/schemas/MetaObject'
         variants:
           uniqueItems: true
           type: array
-          description: Product Variations
+          description: "Product variations configured by the merchant in their external\
+            \ store. Note: Variations can have any name the merchant chooses to use.\
+            \ There is no pre-defined set of possible variants or variant values."
           items:
             $ref: '#/components/schemas/Variant'
         skus:
           uniqueItems: true
           type: array
-          description: Product SKUs
+          description: Sku's are unique combinations of Variants the compose a purchasable
+            entity. When placing orders a Sku is the item that will be purchased.
           items:
             $ref: '#/components/schemas/Sku'
         albums:
           uniqueItems: true
           type: array
-          description: Product Albums
+          description: "Grouped of media for the Offer. Note: For most commerce platforms\
+            \ there will only be a single album per Offer."
           items:
             $ref: '#/components/schemas/Album'
         three_d_enabled:
           type: boolean
           description: Is the product 3D Enabled
+          nullable: true
+          default: false
         three_d_resource:
           type: string
           description: 3D Resource Object
+          nullable: true
         type:
           type: string
           description: Product Type
@@ -1241,6 +1266,7 @@ components:
         currency_symbol:
           type: string
           description: Symbol representing the desired currency
+          nullable: true
         presented_currency:
           type: string
           description: The presented currency of this SKU
@@ -1711,65 +1737,71 @@ components:
           readOnly: true
         offer_id:
           type: integer
-          description: ID of the Offer
+          description: ID of the parent Offer that this Sku is a child of.
           format: int64
         merchant_id:
           type: integer
-          description: ID of the Merchant
+          description: ID of the Merchant that originated the Sku.
           format: int32
         external_id:
           type: string
-          description: ID of the SKU on the External Ecom Platform
+          description: The ID of the Sku in the merchants external store.
         name:
           type: string
           description: Sku Name
         asin:
           type: string
           description: Amazon Standard Identification Number
+          nullable: true
         gtin:
           type: string
           description: Global Trade Item Number
+          nullable: true
         upc:
           type: string
           description: Universal Product Code
+          nullable: true
         ean:
           type: string
           description: European Article Number
+          nullable: true
         isbn:
           type: string
           description: International Standard Book Number
+          nullable: true
         in_stock:
           type: boolean
-          description: Is the Product in Stock
+          description: Is the Sku in stock in the merchants external store.
         quantity_available:
           type: integer
-          description: Quantity Available
+          description: The total quantity of this Sku available for purchase.
           format: int32
         inventory_tracked:
           type: boolean
-          description: Is the SKUs inventory tracked
+          description: Is the Sku's inventory tracked in the merchants system. Untracked
+            inventory can be oversold even when the available quantity is 0.
         sale_price:
           type: integer
-          description: Sale Price of the SKU. This is the actual sale cost of the
-            product is purchased.
+          description: Sale Price of the Sku. This is the actual sale cost when the
+            Sku is purchased.
           format: int32
         retail_price:
           type: integer
-          description: Retail Price of the SKU. This is the recommended or common
-            price of the SKU.
+          description: Retail Price of the Sku. This is the recommended or common
+            price of the Sku and is typically not what the customer will be charged..
           format: int32
         currency:
           type: string
-          description: The base currency of this SKU
+          description: The base currency of this Sku.
         presented_currency:
           type: string
-          description: The presented currency of this SKU
+          description: The presented currency of this Sku.
         taxable:
           type: boolean
-          description: Is the product taxable
+          description: Is the Sku taxable.
         tax_type:
           type: string
-          description: Type of Tax on this SKU
+          description: Type of Tax on this Sku.
           enum:
           - DEFAULT
           - APPAREL
@@ -1778,12 +1810,14 @@ components:
           uniqueItems: true
           type: array
           description: Sku Albums
+          nullable: true
           items:
             $ref: '#/components/schemas/Album'
         variant_values:
           uniqueItems: true
           type: array
           description: Variant Values that apply to this SKU
+          nullable: true
           items:
             $ref: '#/components/schemas/SkuVariantValue'
         type:
@@ -1805,11 +1839,11 @@ components:
           - ARCHIVED
         date_created:
           type: string
-          description: Date of SKU creation
+          description: Date when the Sku was first created in Violet.
           format: date-time
         date_last_modified:
           type: string
-          description: Date of last SKU update
+          description: Date when the Sku was last updated in Violet.
           format: date-time
         sku_dimensions:
           $ref: '#/components/schemas/SkuDimensions'
@@ -1817,7 +1851,8 @@ components:
           $ref: '#/components/schemas/SkuDimensions'
         display_order:
           type: integer
-          description: Order to display SKU
+          description: The order that the merchant has chosen to display this Sku
+            in relation to other Sku's that are children of the same Offer.
           format: int32
       description: Stock Keeping Unit
     SkuDimensions:
@@ -1850,6 +1885,7 @@ components:
           - SKU
           - SHIPPING
       description: Individual Sku Dimensions
+      nullable: true
     SkuVariantValue:
       required:
       - value
@@ -1863,6 +1899,7 @@ components:
           type: string
           description: Variant Value
       description: Individual Variation Value for a Sku
+      nullable: true
     Variant:
       type: object
       properties:
@@ -1873,15 +1910,17 @@ components:
         product_variant_id:
           type: string
           description: ID of the Product Variant
+          deprecated: true
         external_id:
           type: string
           description: ID of the Variant on the External Ecommerce Platform
         name:
           type: string
-          description: Variant Name
+          description: The name given to the Variant by the merchant.
         visual:
           type: boolean
-          description: Is the variant visual
+          description: "Is the variant a visual characteristic. Common examples of\
+            \ this would be Color, Pattern, or Material."
         values:
           uniqueItems: true
           type: array
@@ -1963,8 +2002,6 @@ components:
     Error:
       type: object
       properties:
-        id:
-          type: object
         message:
           type: string
         error:
@@ -1972,10 +2009,37 @@ components:
         code:
           type: integer
           format: int32
+        data:
+          $ref: '#/components/schemas/ErrorData'
+        id:
+          type: object
         ids:
           type: array
           items:
             type: object
+    ErrorData:
+      type: object
+      properties:
+        skus:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkuError'
+    SkuError:
+      type: object
+      properties:
+        message:
+          type: string
+        name:
+          type: string
+        skuId:
+          type: integer
+          format: int64
+        orderSkuId:
+          type: integer
+          format: int64
+        bagId:
+          type: integer
+          format: int64
     VioletPageOffer:
       type: object
       properties:
@@ -2720,7 +2784,7 @@ components:
           description: Raw name of carrier from the external commerce platform.
         status:
           type: string
-          description: ID of the Bag the fulfillment belongs to.
+          description: Status of the bag fullfillment.
           enum:
           - PENDING
           - PROCESSING
@@ -2731,7 +2795,7 @@ components:
           - NONE_PROVIDED
         carrier_status:
           type: string
-          description: ID of the Bag the fulfillment belongs to.
+          description: Status provided by the carrier.
           enum:
           - PENDING
           - LABEL_PURCHASED
@@ -2746,10 +2810,10 @@ components:
           - NONE_PROVIDED
         tracking_number:
           type: string
-          description: Tracking number provider by the carrier.
+          description: Tracking number provided by the carrier.
         tracking_url:
           type: string
-          description: Tracking URL provider by the carrier.
+          description: Tracking URL provided by the carrier.
         skus:
           uniqueItems: true
           type: array
@@ -3021,22 +3085,34 @@ components:
       properties:
         id:
           type: integer
+          description: Unique ID of the error.
           format: int64
           readOnly: true
         order_id:
           type: integer
-          description: Order ID
+          description: ID of the parent Order this error occurred in.
           format: int64
         bag_id:
           type: integer
-          description: Bag ID
+          description: ID of the parent Bag this error occurred in.
           format: int64
         entity_id:
           type: string
-          description: Entity ID
+          description: ID of the entity that caused the error. See the `entity_type`
+            property to determine which entity this ID is associated with.
+        entity_type:
+          type: string
+          description: Type of entity that caused the error. See the `entity_id` property
+            to determine which entity of this type is related to the error.
+          nullable: true
+          enum:
+          - ORDER
+          - BAG
+          - SKU
         type:
           type: string
-          description: Error Type
+          description: "Type of error, indicates which action was being taken when\
+            \ the error occurred."
           enum:
           - EXTERNAL_CREATE_CART
           - EXTERNAL_ADD_ITEM
@@ -3061,14 +3137,17 @@ components:
           - EXTERNAL_DELETE_ORDER
           - EXTERNAL_REFUND_ORDER
         message:
+          maxLength: 255
           type: string
-          description: Error Message
+          description: A string message providing more details about the error.
+          nullable: true
         date_created:
           type: string
-          description: Date of creation
+          description: Date the error was first created in Violet.
           format: date-time
         platform:
           type: string
+          description: The external commerce platform the error occurred in.
           enum:
           - OTHER
           - SHOPIFY
