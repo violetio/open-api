@@ -1649,30 +1649,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              example:
-                message: Order submission is in progress. Please wait for the submission to complete before trying again.
-                error: order_submission_in_progress
-                code: 4238
+              examples:
+                Submission in Progress:
+                  description: Submission in Progress
+                  value:
+                    message: Order submission is in progress. Please wait for the
+                      submission to complete before trying again.
+                    error: order_submission_in_progress
+                    code: 4238
         "400":
           description: order already completed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              example:
-                message: Order has already been completed.
-                error: order_completed
-                code: 4222
+              examples:
+                Order Completed Exception:
+                  description: Order Completed Exception
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+                External Cart Completed Exception:
+                  description: External Cart Completed Exception
+                  value:
+                    message: "Could not complete external cart: One or more items\
+                      \ in the cart are no longer available for purchase."
+                    error: external_cart_completion_error
+                    code: 2503
+                    data:
+                      skus:
+                      - message: This item is no longer available for purchase.
+                        name: Sample Product
+                        sku_id: 99999
+                        order_sku_id: 88888
+                        bag_id: 77777
         "404":
           description: order not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              example:
-                message: Order could not be found.
-                error: order_not_found
-                code: 4216
+              examples:
+                Order Not Found Exception:
+                  description: Order Not Found Exception
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/payment/update:
     post:
       tags:
