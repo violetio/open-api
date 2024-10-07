@@ -387,8 +387,6 @@ components:
     Error:
       type: object
       properties:
-        id:
-          type: object
         message:
           type: string
         error:
@@ -396,11 +394,22 @@ components:
         code:
           type: integer
           format: int32
+        data:
+          $ref: '#/components/schemas/ErrorData'
+        id:
+          type: object
         ids:
           type: array
           items:
             type: object
       description: The error encountered while retrieving status
+    ErrorData:
+      type: object
+      properties:
+        skus:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkuError'
     InvalidProduct:
       type: object
       properties:
@@ -825,6 +834,22 @@ components:
           type: boolean
           description: Have the webhooks been created
       description: Shopify Product Sync Tracking & Status
+    SkuError:
+      type: object
+      properties:
+        message:
+          type: string
+        name:
+          type: string
+        skuId:
+          type: integer
+          format: int64
+        orderSkuId:
+          type: integer
+          format: int64
+        bagId:
+          type: integer
+          format: int64
     StoreScopes:
       type: object
       properties:
