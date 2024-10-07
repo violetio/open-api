@@ -387,6 +387,8 @@ components:
     Error:
       type: object
       properties:
+        id:
+          type: object
         message:
           type: string
         error:
@@ -394,8 +396,6 @@ components:
         code:
           type: integer
           format: int32
-        id:
-          type: object
         ids:
           type: array
           items:
@@ -586,6 +586,7 @@ components:
           enum:
           - STRIPE
           - NUVEI
+          - CREDOVA
         payment_provider_account_id:
           type: string
           description: Identifier of the payout account in the payment provider system.
@@ -633,6 +634,7 @@ components:
           enum:
           - STRIPE
           - NUVEI
+          - CREDOVA
         details:
           $ref: '#/components/schemas/PayoutAccountDetails'
       description: Violet Payout Account that stores underlying payment provider account
