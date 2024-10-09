@@ -1052,9 +1052,13 @@ components:
     Method:
       type: object
       properties:
+        external_id:
+          type: string
+          description: ID of the shipping method in the external commerce system.
+          nullable: true
         name:
           type: string
-          description: Name of the shipping method
+          description: Name of the shipping method as provided by the merchant.
           nullable: true
         price:
           $ref: '#/components/schemas/Price'
@@ -1069,14 +1073,6 @@ components:
       description: List of available shipping methods for this Offer.
       nullable: true
     Offer:
-      required:
-      - available
-      - merchant_id
-      - min_price
-      - name
-      - product_id
-      - source
-      - visible
       type: object
       properties:
         id:
@@ -1084,7 +1080,8 @@ components:
           format: int64
         product_id:
           type: string
-          description: The parent/container product ID
+          description: "The parent/container product ID. Note: this is a legacy property\
+            \ and is now considered deprecated."
           deprecated: true
         external_id:
           type: string
@@ -1166,11 +1163,11 @@ components:
             \ can be hidden while still being available for purchase."
         min_price:
           type: integer
-          description: Minimum Price the Product sells for
+          description: Minimum Price the Offer sells for.
           format: int32
         max_price:
           type: integer
-          description: Maximum Price the Product sells for
+          description: Maximum Price the Offer sells for.
           format: int32
         currency:
           type: string
@@ -2448,32 +2445,32 @@ components:
       - app_id
       - merchant_id
       - order_id
-      - shipping_method
-      - taxes
       type: object
       properties:
         id:
           type: integer
+          description: Unique ID of the Bag.
           format: int64
           readOnly: true
         order_id:
           type: integer
-          description: ID of the Order the Bag belongs to
+          description: ID of the parent order the Bag is a child of.
           format: int64
         merchant_id:
           type: integer
-          description: ID of the Merchant the Bag references
+          description: ID of the merchant the Bag is related to.
           format: int32
         app_id:
           type: integer
-          description: ID of the App creating this Bag
+          description: ID of the app creating this Bag.
           format: int32
         external_id:
           type: string
-          description: ID of the Order on the External Ecommerce Platform
+          description: ID of the Order on the external commerce platform.
+          nullable: true
         status:
           type: string
-          description: Status
+          description: Overall status of the Bag.
           enum:
           - IN_PROGRESS
           - SUBMITTED
@@ -2486,7 +2483,7 @@ components:
           - BACKORDERED
         fulfillment_status:
           type: string
-          description: Fulfillment Status
+          description: Fulfillment status of the Bag.
           enum:
           - PROCESSING
           - SHIPPED
@@ -2496,7 +2493,7 @@ components:
           - RETURNED
         financial_status:
           type: string
-          description: Financial Status
+          description: Financial status of the Bag.
           enum:
           - UNPAID
           - AUTHORIZED
@@ -2508,20 +2505,21 @@ components:
           - VOIDED
         skus:
           type: array
-          description: SKUs added to the bag
+          description: Line items that have been added to this Bag.
           items:
             $ref: '#/components/schemas/OrderSku'
         shipping_method:
           $ref: '#/components/schemas/OrderShippingMethod'
         taxes:
           type: array
-          description: Taxes applied to the bag
+          description: Taxes applied to the Bag.
+          nullable: true
           items:
             $ref: '#/components/schemas/OrderTax'
         sub_total:
           type: integer
           description: "The price of the Bag in the base currency before discounts,\
-            \ shipping, duties, taxes, and tips. In Cents"
+            \ shipping, duties, taxes, and tips. In Cents."
           format: int32
         shipping_total:
           type: integer
@@ -2545,48 +2543,57 @@ components:
           format: int32
         taxes_included:
           type: boolean
-          description: Are taxes included in the cart total.
+          description: Are taxes included in the cart subtotal. When `true` the taxes
+            will not be summed separately.
+          default: false
         transactions:
           type: array
-          description: Transactions of the bag
+          description: List of transactions applied to the Bag.
+          nullable: true
           items:
             $ref: '#/components/schemas/Transaction'
         external_checkout:
           type: boolean
-          description: If bag is tracked externally
+          description: If the Bag is attached to an external cart in the commerce
+            platform.
+          default: true
         commission_rate:
           type: number
-          description: The developer commission rate
+          description: The rate used to calculate the apps commission rate for the
+            Bag.
           format: double
         date_created:
           type: string
-          description: Date of creation
+          description: Date the Bag was created in Violet.
           format: date-time
         date_last_modified:
           type: string
-          description: Date of last update
+          description: Date the Bag was last modified in Violet.
           format: date-time
         date_last_consolidated:
           type: string
-          description: Date of last consolidation
+          description: Date the Bag was last checked for updates. This is a part of
+            Order Parity and is used to discover missed or unsent webhooks from the
+            external commerce platforms.
           format: date-time
         remorse_period_ends:
           type: string
-          description: Date when the bag can no longer be refunded
+          description: Date when the Bag can no longer be refunded.
           format: date-time
         currency:
           type: string
-          description: Base currency of cart
+          description: Base currency of the Bag.
         external_currency:
           type: string
-          description: Currency of cart on external ecommerce platform
+          description: Currency of the equivalent cart on external commerce platform.
         currency_exchange_rate:
           type: number
           description: "Exchange rate of currency and external currency, if different,\
-            \ at the time the bag was last priced."
+            \ at the time the Bag was last priced."
+          nullable: true
         channel:
           type: string
-          description: The channel that originated this order.
+          description: The type of Channel that originated this Bag.
           enum:
           - APP
           - MARKETPLACE
@@ -2599,8 +2606,9 @@ components:
           - PINTEREST
         app_order_id:
           type: string
-          description: App Order ID. Automatically obtained through the app_order_id
-            applied to the order.
+          description: Optional ID of the Order in the channels system. Automatically
+            obtained through the app_order_id applied to the Order.
+          nullable: true
         platform:
           type: string
           description: The commerce platform used by this merchant.
@@ -2648,16 +2656,23 @@ components:
         fulfillments:
           uniqueItems: true
           type: array
+          description: "A list of fulfillments, if any, that have been applied to\
+            \ this Bag."
+          nullable: true
           items:
             $ref: '#/components/schemas/BagFulfillment'
         discounts:
           uniqueItems: true
           type: array
+          description: "A list of discounts, if any, that have been applied to this\
+            \ Bag."
+          nullable: true
           items:
             $ref: '#/components/schemas/BagDiscount'
         wallet_based_checkout:
           type: boolean
-          description: Is this bag going to be placed through wallet-based checkout
+          description: Is this Bag going to be placed through wallet-based checkout.
+          default: false
         app_name:
           type: string
           description: Name of app that originated the order. Use the "extended" query
@@ -2679,7 +2694,7 @@ components:
           format: int64
         merchant_name:
           type: string
-          description: Name of Merchant
+          description: Name of the merchant the Bag is related to.
       description: Per Merchant Bag in Order
     BagDiscount:
       type: object
@@ -2751,6 +2766,7 @@ components:
           description: "Customer email address, possibly necessary for once-per-customer\
             \ discounts."
       description: Bag Discount
+      nullable: true
     BagFulfillment:
       type: object
       properties:
@@ -2821,6 +2837,7 @@ components:
           items:
             $ref: '#/components/schemas/BagFulfillmentSku'
       description: A Bag Fulfillment
+      nullable: true
     BagFulfillmentSku:
       type: object
       properties:
@@ -3296,6 +3313,7 @@ components:
           type: string
           description: Carrier Tracking Number
       description: Shipping Methods belonging to an Order
+      nullable: true
     OrderSku:
       required:
       - sku_id
@@ -3512,6 +3530,7 @@ components:
           type: string
           description: Description of the Tax
       description: Taxes belonging to an Order Bag
+      nullable: true
     PaymentTransaction:
       required:
       - amount
@@ -3728,6 +3747,7 @@ components:
         order_payment_method:
           $ref: '#/components/schemas/OrderPaymentMethod'
       description: Order Transaction
+      nullable: true
     VioletPageOrder:
       type: object
       properties:
