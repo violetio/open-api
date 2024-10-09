@@ -1106,9 +1106,13 @@ components:
     Method:
       type: object
       properties:
+        external_id:
+          type: string
+          description: ID of the shipping method in the external commerce system.
+          nullable: true
         name:
           type: string
-          description: Name of the shipping method
+          description: Name of the shipping method as provided by the merchant.
           nullable: true
         price:
           $ref: '#/components/schemas/Price'
@@ -1123,14 +1127,6 @@ components:
       description: List of available shipping methods for this Offer.
       nullable: true
     Offer:
-      required:
-      - available
-      - merchant_id
-      - min_price
-      - name
-      - product_id
-      - source
-      - visible
       type: object
       properties:
         id:
@@ -1138,7 +1134,8 @@ components:
           format: int64
         product_id:
           type: string
-          description: The parent/container product ID
+          description: "The parent/container product ID. Note: this is a legacy property\
+            \ and is now considered deprecated."
           deprecated: true
         external_id:
           type: string
@@ -1220,11 +1217,11 @@ components:
             \ can be hidden while still being available for purchase."
         min_price:
           type: integer
-          description: Minimum Price the Product sells for
+          description: Minimum Price the Offer sells for.
           format: int32
         max_price:
           type: integer
-          description: Maximum Price the Product sells for
+          description: Maximum Price the Offer sells for.
           format: int32
         currency:
           type: string
