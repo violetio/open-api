@@ -1036,14 +1036,50 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "200":
+          description: available shipping methods
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/OrderShippingMethodWrapper'
+              examples:
+                Has Available Shipping Methods:
+                  description: Has Available Shipping Methods
+                  value:
+                  - bag_id: 99999
+                    shipping_methods:
+                    - carrier: OTHER
+                      label: Free Ground Shipping
+                      price: 0
+                      shipping_method_id: 904508f53e55effda7fe3ed2aee21132
+                      bag_id: 99999
+                      merchant_id: 11111
+                    - carrier: USPS
+                      label: Priority Mail
+                      price: 664
+                      shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                      bag_id: 99999
+                      merchant_id: 11111
+                No Available Shipping Methods:
+                  description: No Available Shipping Methods
+                  value:
+                  - bag_id: 99999
+                    shipping_methods: []
+        "404":
+          description: order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /orders/{order_id}/bags/{bag_id}/refunds:
     get:
       tags:
@@ -1658,20 +1694,20 @@ paths:
                     error: order_submission_in_progress
                     code: 4238
         "400":
-          description: order already completed
+          description: order completion errors
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               examples:
-                Order Completed Exception:
-                  description: Order Completed Exception
+                Order Completed Error:
+                  description: Order Completed Error
                   value:
                     message: Order has already been completed.
                     error: order_completed
                     code: 4222
-                External Cart Completed Exception:
-                  description: External Cart Completed Exception
+                External Cart Completion Error:
+                  description: External Cart Completion Error
                   value:
                     message: "Could not complete external cart: One or more items\
                       \ in the cart are no longer available for purchase."
@@ -1742,32 +1778,32 @@ components:
       - app_id
       - merchant_id
       - order_id
-      - shipping_method
-      - taxes
       type: object
       properties:
         id:
           type: integer
+          description: Unique ID of the Bag.
           format: int64
           readOnly: true
         order_id:
           type: integer
-          description: ID of the Order the Bag belongs to
+          description: ID of the parent order the Bag is a child of.
           format: int64
         merchant_id:
           type: integer
-          description: ID of the Merchant the Bag references
+          description: ID of the merchant the Bag is related to.
           format: int32
         app_id:
           type: integer
-          description: ID of the App creating this Bag
+          description: ID of the app creating this Bag.
           format: int32
         external_id:
           type: string
-          description: ID of the Order on the External Ecommerce Platform
+          description: ID of the Order on the external commerce platform.
+          nullable: true
         status:
           type: string
-          description: Status
+          description: Overall status of the Bag.
           enum:
           - IN_PROGRESS
           - SUBMITTED
@@ -1780,7 +1816,7 @@ components:
           - BACKORDERED
         fulfillment_status:
           type: string
-          description: Fulfillment Status
+          description: Fulfillment status of the Bag.
           enum:
           - PROCESSING
           - SHIPPED
@@ -1790,7 +1826,7 @@ components:
           - RETURNED
         financial_status:
           type: string
-          description: Financial Status
+          description: Financial status of the Bag.
           enum:
           - UNPAID
           - AUTHORIZED
@@ -1802,20 +1838,21 @@ components:
           - VOIDED
         skus:
           type: array
-          description: SKUs added to the bag
+          description: Line items that have been added to this Bag.
           items:
             $ref: '#/components/schemas/OrderSku'
         shipping_method:
           $ref: '#/components/schemas/OrderShippingMethod'
         taxes:
           type: array
-          description: Taxes applied to the bag
+          description: Taxes applied to the Bag.
+          nullable: true
           items:
             $ref: '#/components/schemas/OrderTax'
         sub_total:
           type: integer
           description: "The price of the Bag in the base currency before discounts,\
-            \ shipping, duties, taxes, and tips. In Cents"
+            \ shipping, duties, taxes, and tips. In Cents."
           format: int32
         shipping_total:
           type: integer
@@ -1839,48 +1876,57 @@ components:
           format: int32
         taxes_included:
           type: boolean
-          description: Are taxes included in the cart total.
+          description: Are taxes included in the cart subtotal. When `true` the taxes
+            will not be summed separately.
+          default: false
         transactions:
           type: array
-          description: Transactions of the bag
+          description: List of transactions applied to the Bag.
+          nullable: true
           items:
             $ref: '#/components/schemas/Transaction'
         external_checkout:
           type: boolean
-          description: If bag is tracked externally
+          description: If the Bag is attached to an external cart in the commerce
+            platform.
+          default: true
         commission_rate:
           type: number
-          description: The developer commission rate
+          description: The rate used to calculate the apps commission rate for the
+            Bag.
           format: double
         date_created:
           type: string
-          description: Date of creation
+          description: Date the Bag was created in Violet.
           format: date-time
         date_last_modified:
           type: string
-          description: Date of last update
+          description: Date the Bag was last modified in Violet.
           format: date-time
         date_last_consolidated:
           type: string
-          description: Date of last consolidation
+          description: Date the Bag was last checked for updates. This is a part of
+            Order Parity and is used to discover missed or unsent webhooks from the
+            external commerce platforms.
           format: date-time
         remorse_period_ends:
           type: string
-          description: Date when the bag can no longer be refunded
+          description: Date when the Bag can no longer be refunded.
           format: date-time
         currency:
           type: string
-          description: Base currency of cart
+          description: Base currency of the Bag.
         external_currency:
           type: string
-          description: Currency of cart on external ecommerce platform
+          description: Currency of the equivalent cart on external commerce platform.
         currency_exchange_rate:
           type: number
           description: "Exchange rate of currency and external currency, if different,\
-            \ at the time the bag was last priced."
+            \ at the time the Bag was last priced."
+          nullable: true
         channel:
           type: string
-          description: The channel that originated this order.
+          description: The type of Channel that originated this Bag.
           enum:
           - APP
           - MARKETPLACE
@@ -1893,8 +1939,9 @@ components:
           - PINTEREST
         app_order_id:
           type: string
-          description: App Order ID. Automatically obtained through the app_order_id
-            applied to the order.
+          description: Optional ID of the Order in the channels system. Automatically
+            obtained through the app_order_id applied to the Order.
+          nullable: true
         platform:
           type: string
           description: The commerce platform used by this merchant.
@@ -1942,23 +1989,27 @@ components:
         fulfillments:
           uniqueItems: true
           type: array
+          description: "A list of fulfillments, if any, that have been applied to\
+            \ this Bag."
+          nullable: true
           items:
             $ref: '#/components/schemas/BagFulfillment'
         discounts:
           uniqueItems: true
           type: array
+          description: "A list of discounts, if any, that have been applied to this\
+            \ Bag."
+          nullable: true
           items:
             $ref: '#/components/schemas/BagDiscount'
         wallet_based_checkout:
           type: boolean
-          description: Is this bag going to be placed through wallet-based checkout
+          description: Is this Bag going to be placed through wallet-based checkout.
+          default: false
         app_name:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -1971,9 +2022,12 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
         merchant_name:
           type: string
-          description: Name of Merchant
+          description: Name of the merchant the Bag is related to.
       description: Per Merchant Bag in Order
     BagDiscount:
       type: object
@@ -2045,6 +2099,7 @@ components:
           description: "Customer email address, possibly necessary for once-per-customer\
             \ discounts."
       description: Bag Discount
+      nullable: true
     BagFulfillment:
       type: object
       properties:
@@ -2115,6 +2170,7 @@ components:
           items:
             $ref: '#/components/schemas/BagFulfillmentSku'
       description: A Bag Fulfillment
+      nullable: true
     BagFulfillmentSku:
       type: object
       properties:
@@ -2274,9 +2330,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -2293,6 +2346,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Order
     OrderAddress:
       required:
@@ -2590,6 +2646,7 @@ components:
           type: string
           description: Carrier Tracking Number
       description: Shipping Methods belonging to an Order
+      nullable: true
     OrderSku:
       required:
       - sku_id
@@ -2597,6 +2654,10 @@ components:
       properties:
         id:
           type: integer
+          format: int64
+        offer_id:
+          type: integer
+          description: ID of the parent Offer that this Sku is a child of.
           format: int64
         merchant_id:
           type: integer
@@ -2806,6 +2867,7 @@ components:
           type: string
           description: Description of the Tax
       description: Taxes belonging to an Order Bag
+      nullable: true
     PaymentTransaction:
       required:
       - amount
@@ -3022,6 +3084,7 @@ components:
         order_payment_method:
           $ref: '#/components/schemas/OrderPaymentMethod'
       description: Order Transaction
+      nullable: true
     DiscountRequest:
       type: object
       properties:
@@ -4096,6 +4159,47 @@ components:
           items:
             $ref: '#/components/schemas/OrderShippingMethod'
       description: Order Shipping Method Wrapper
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        code:
+          type: integer
+          format: int32
+        data:
+          $ref: '#/components/schemas/ErrorData'
+        id:
+          type: object
+        ids:
+          type: array
+          items:
+            type: object
+    ErrorData:
+      type: object
+      properties:
+        skus:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkuError'
+    SkuError:
+      type: object
+      properties:
+        message:
+          type: string
+        name:
+          type: string
+        skuId:
+          type: integer
+          format: int64
+        orderSkuId:
+          type: integer
+          format: int64
+        bagId:
+          type: integer
+          format: int64
     VioletPageBag:
       type: object
       properties:
@@ -4249,47 +4353,6 @@ components:
           type: string
           description: Order ID in the Channels System
       description: Order Search Request
-    Error:
-      type: object
-      properties:
-        message:
-          type: string
-        error:
-          type: string
-        code:
-          type: integer
-          format: int32
-        data:
-          $ref: '#/components/schemas/ErrorData'
-        id:
-          type: object
-        ids:
-          type: array
-          items:
-            type: object
-    ErrorData:
-      type: object
-      properties:
-        skus:
-          type: array
-          items:
-            $ref: '#/components/schemas/SkuError'
-    SkuError:
-      type: object
-      properties:
-        message:
-          type: string
-        name:
-          type: string
-        skuId:
-          type: integer
-          format: int64
-        orderSkuId:
-          type: integer
-          format: int64
-        bagId:
-          type: integer
-          format: int64
     CartSubmissionRequest:
       type: object
       properties:
