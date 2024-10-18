@@ -3085,6 +3085,7 @@ components:
           - SINGLE_USE_CARD_TOKEN
           - MULTI_USE_CARD_TOKEN
           - BANK_TOKEN
+          - PAYMENT_INTENT
         card_number:
           type: string
           description: Number on the credit or debit card.
