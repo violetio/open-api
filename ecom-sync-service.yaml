@@ -2017,6 +2017,14 @@ components:
     ErrorData:
       type: object
       properties:
+        cause:
+          type: string
+          enum:
+          - ORDER_ERROR
+          - SKU_ERROR
+          - CUSTOMER_ERROR
+          - ADDRESS_ERROR
+          - MERCHANT_ERROR
         skus:
           type: array
           items:
@@ -2997,9 +3005,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -3016,6 +3021,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Order
     OrderAddress:
       required:
