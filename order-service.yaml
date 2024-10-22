@@ -696,7 +696,7 @@ paths:
                     same_address: true
       responses:
         "200":
-          description: create cart
+          description: create cart success
           content:
             application/json:
               schema:
@@ -780,10 +780,10 @@ paths:
                       shipping_method: null
                       taxes: null
                       sub_total: 19998
-                      shipping_total: 500
-                      tax_total: 2121
+                      shipping_total: 0
+                      tax_total: 0
                       discount_total: 0
-                      total: 22619
+                      total: 19998
                       taxes_included: false
                       transactions: null
                       external_checkout: true
@@ -825,10 +825,136 @@ paths:
                       last_name: Mario
                     payment_method: null
                     sub_total: 19998
-                    shipping_total: 500
-                    tax_total: 2121
+                    shipping_total: 0
+                    tax_total: 0
                     discount_total: 0
-                    total: 22619
+                    total: 19998
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "202":
+          description: create cart with error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Multi-Bag External Failure:
+                  description: Multi-Bag External Failure
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    errors:
+                    - id: 121212
+                      order_id: 22222
+                      entity_id: "99999"
+                      entity_type: SKU
+                      type: EXTERNAL_CREATE_CART
+                      message: Nintendo Entertainment System is no longer available
+                        for purchase. This prevented external cart creation.
+                      date_created: 2023-11-07T05:31:56Z
+                      platform: SHOPIFY
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 44444
+                      order_id: 22222
+                      merchant_id: 10001
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10001
+                        app_id: 10000
+                        sku_id: 919191
+                        external_id: "0987654321"
+                        name: The Black Chroma Tumbler
+                        brand: Stanley 1913
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729610505/product_media/ievx5zdgtocrovafyu3oys3znqdenzar.webp"
+                        quantity: 1
+                        price: 5500
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 5500
+                      shipping_method: null
+                      taxes: null
+                      sub_total: 5500
+                      shipping_total: 0
+                      tax_total: 0
+                      discount_total: 0
+                      total: 5500
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 15
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 44444
+                      bag_status: IN_PROGRESS
+                      merchant_name: Stanley 1913
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 5500
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 5500
                     app_order_id: "00100100"
                     status: IN_PROGRESS
                     is_guest: true
@@ -846,7 +972,7 @@ paths:
                     guest: true
                     order_id: 11111
         "422":
-          description: Single Bag External Failure
+          description: create cart with exception
           content:
             application/json:
               schema:
@@ -2160,9 +2286,6 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -2175,6 +2298,9 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -2485,6 +2611,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -2501,9 +2630,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
