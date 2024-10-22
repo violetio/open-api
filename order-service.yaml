@@ -669,31 +669,202 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CartInitializationRequest'
-            example:
-              base_currency: USD
-              skus:
-              - sku_id: 12345
-                quantity: 1
-              customer:
-                email: p.sherman@findingnemo.com
-                first_name: P
-                last_name: Sherman
-                shipping_address:
-                  address_1: 42 Wallaby Way
-                  city: Sydney
-                  country: AU
-                  postal_code: 4000
-                  state: NSW
-                  type: SHIPPING
-                  phone: 1234567890
-                same_address: true
+            examples:
+              Create Cart:
+                description: Create Cart
+                value:
+                  base_currency: USD
+              Create Populated Cart:
+                description: Create Populated Cart
+                value:
+                  base_currency: USD
+                  skus:
+                  - sku_id: 99999
+                    quantity: 2
+                  customer:
+                    first_name: Super
+                    last_name: Mario
+                    email: super@mar.io
+                    shipping_address:
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                    same_address: true
       responses:
-        default:
-          description: default response
+        "200":
+          description: create cart
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Create Cart:
+                  description: Create Cart
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer: null
+                    bags: null
+                    shipping_address: null
+                    billing_address: null
+                    payment_method: null
+                    sub_total: 0
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 0
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+                Create Populated Cart:
+                  description: Create Populated Cart
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method: null
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 500
+                      tax_total: 2121
+                      discount_total: 0
+                      total: 22619
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 500
+                    tax_total: 2121
+                    discount_total: 0
+                    total: 22619
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "422":
+          description: Single Bag External Failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Single Bag External Failure:
+                  description: Single Bag External Failure
+                  value:
+                    message: "SHOPIFY returned a Server Error, preventing the creation\
+                      \ of the external cart. Please retry your request."
+                    error: external_cart_creation_failure
+                    code: 2503
+                    data:
+                      cause: ORDER_ERROR
+                      skus:
+                      - message: Unable to add item to cart due to cart creation failure.
+                        name: Nintendo Entertainment System
+                        sku_id: 99999
   /orders:
     get:
       tags:
@@ -2314,9 +2485,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -2333,6 +2501,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -3982,6 +4153,55 @@ components:
           description: Should the customer be notified by the merchants system that
             a cancellation has occurred.
           default: false
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        code:
+          type: integer
+          format: int32
+        data:
+          $ref: '#/components/schemas/ErrorData'
+        id:
+          type: object
+        ids:
+          type: array
+          items:
+            type: object
+    ErrorData:
+      type: object
+      properties:
+        cause:
+          type: string
+          enum:
+          - ORDER_ERROR
+          - SKU_ERROR
+          - CUSTOMER_ERROR
+          - ADDRESS_ERROR
+          - MERCHANT_ERROR
+        skus:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkuError'
+    SkuError:
+      type: object
+      properties:
+        message:
+          type: string
+        name:
+          type: string
+        skuId:
+          type: integer
+          format: int64
+        orderSkuId:
+          type: integer
+          format: int64
+        bagId:
+          type: integer
+          format: int64
     CartInitializationRequest:
       type: object
       properties:
@@ -4125,47 +4345,6 @@ components:
           items:
             $ref: '#/components/schemas/OrderShippingMethod'
       description: Order Shipping Method Wrapper
-    Error:
-      type: object
-      properties:
-        message:
-          type: string
-        error:
-          type: string
-        code:
-          type: integer
-          format: int32
-        data:
-          $ref: '#/components/schemas/ErrorData'
-        id:
-          type: object
-        ids:
-          type: array
-          items:
-            type: object
-    ErrorData:
-      type: object
-      properties:
-        skus:
-          type: array
-          items:
-            $ref: '#/components/schemas/SkuError'
-    SkuError:
-      type: object
-      properties:
-        message:
-          type: string
-        name:
-          type: string
-        skuId:
-          type: integer
-          format: int64
-        orderSkuId:
-          type: integer
-          format: int64
-        bagId:
-          type: integer
-          format: int64
     VioletPageBag:
       type: object
       properties:
