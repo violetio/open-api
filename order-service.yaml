@@ -1247,12 +1247,135 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "200":
+          description: get cart
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Get Cart:
+                  description: Get Cart
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method: null
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 0
+                      tax_total: 0
+                      discount_total: 0
+                      total: 19998
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 19998
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "404":
+          description: cart not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
     delete:
       tags:
       - Checkout - Cart
@@ -1279,10 +1402,13 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "204":
+          description: delete cart
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: string
+                example: no content
   /checkout/cart/{cart_id}/shipping/available:
     get:
       tags:
@@ -1395,38 +1521,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Refund'
-  /checkout/cart/byToken/{token}:
-    get:
-      tags:
-      - Checkout - Cart
-      summary: Get Cart by Token
-      operationId: getCartByToken
-      parameters:
-      - name: X-Violet-Token
-        in: header
-        schema:
-          type: string
-      - name: X-Violet-App-Secret
-        in: header
-        schema:
-          type: string
-      - name: X-Violet-App-Id
-        in: header
-        schema:
-          type: integer
-          format: int32
-      - name: token
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
   /orders/{order_id}:
     get:
       tags:
@@ -2286,6 +2380,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -2298,9 +2395,6 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
