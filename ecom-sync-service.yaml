@@ -2470,11 +2470,13 @@ components:
           format: int32
         app_id:
           type: integer
-          description: ID of the app creating this Bag.
+          description: ID of the App responsible for the creation and submission of
+            this Order.
           format: int32
         external_id:
           type: string
-          description: ID of the Order on the external commerce platform.
+          description: ID of the Order on the external commerce platform. This value
+            will be `null` until the Order submitted.
           nullable: true
         status:
           type: string
@@ -2513,14 +2515,14 @@ components:
           - VOIDED
         skus:
           type: array
-          description: Line items that have been added to this Bag.
+          description: Sku's (line items) that have been added to the Bag.
           items:
             $ref: '#/components/schemas/OrderSku'
         shipping_method:
           $ref: '#/components/schemas/OrderShippingMethod'
         taxes:
           type: array
-          description: Taxes applied to the Bag.
+          description: Tax rates applied to the Bag.
           nullable: true
           items:
             $ref: '#/components/schemas/OrderTax'
@@ -2892,19 +2894,24 @@ components:
           type: integer
           description: ID of the User placing the order
           format: int64
+          deprecated: true
         app_id:
           type: integer
-          description: ID of the App creating the order
+          description: ID of the App responsible for the creation and submission of
+            this Order.
           format: int32
         developer_id:
           type: integer
-          description: ID of the Developer who placed
+          description: ID of the Developer responsible for the creation and submission
+            of this Order.
           format: int32
         customer:
           $ref: '#/components/schemas/OrderCustomer'
         bags:
           type: array
-          description: Bags in the Order
+          description: "One or more Bags that make up the Order. Each Bag will contain\
+            \ the Sku's, shipping methods, and totals unique to a merchant. Each merchant\
+            \ in an Order will have their own Bag."
           items:
             $ref: '#/components/schemas/Bag'
         shipping_address:
@@ -2987,7 +2994,7 @@ components:
             Max length of 128 characters.
         currency_symbol:
           type: string
-          description: Symbol representing the desired currency
+          description: Symbol representing the currency the Order operates in.
         app_name:
           type: string
           description: Name of app that originated the order. Use the "extended" query
@@ -3005,6 +3012,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -3021,10 +3031,7 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
-      description: Order
+      description: Violet Order Entity
     OrderAddress:
       required:
       - address_1
@@ -3085,16 +3092,17 @@ components:
           format: int64
         first_name:
           type: string
-          description: First Name
+          description: Customer's first name.
         last_name:
           type: string
-          description: Last Name
+          description: Customer's last name.
         email:
           type: string
-          description: Email Address of Customer
+          description: Customer's valid email address.
         external_id:
           type: string
           description: ID of the Customer on the External Platform
+          nullable: true
         shipping_address:
           $ref: '#/components/schemas/OrderAddress'
         billing_address:
@@ -3102,9 +3110,11 @@ components:
         same_address:
           type: boolean
           description: Use Same Address for Both
+          default: false
         name:
           type: string
       description: The Customer Placing the Order
+      nullable: true
     OrderError:
       type: object
       properties:
@@ -3245,6 +3255,7 @@ components:
           type: boolean
           description: Is Default Method
       description: Payment Method belonging to an Order
+      nullable: true
     OrderShippingMethod:
       required:
       - bag_id
@@ -3329,67 +3340,79 @@ components:
       properties:
         id:
           type: integer
+          description: Unique ID of the Sku in relation to the order.
+          format: int64
+        offer_id:
+          type: integer
+          description: ID of the parent Offer that this Sku is a child of.
           format: int64
         merchant_id:
           type: integer
-          description: ID of the Merchant the SKU belongs to
+          description: ID of the Merchant this Sku belongs to.
           format: int32
         app_id:
           type: integer
-          description: ID of the App creating the Order
+          description: ID of the App responsible for the creation and submission of
+            this Order.
           format: int32
         product_id:
           type: string
-          description: ID of the Product
+          description: ID of the parent product the offer is a child off.
+          deprecated: true
         sku_id:
           type: integer
-          description: ID of the referenced SKU
+          description: ID of the referenced Sku from the Violet catalog.
           format: int64
         external_id:
           type: string
-          description: ID of the SKU on the External Ecommerce Platform
+          description: ID of the SKU on the external commerce platform.
         name:
           type: string
-          description: Name of the SKU
+          description: "Name of the Sku, as provided by the merchant."
         brand:
           type: string
-          description: Brand Name
+          description: Name of the brand selling this Sku.
         thumbnail:
           type: string
-          description: URL of the thumbnail image. Useful for order overview displays
+          description: URL of the thumbnail image. Useful for order overview displays.
         quantity:
+          maximum: 1000
           type: integer
-          description: Quantity of the SKU being purchased. Quantities over 1000 will
-            default to 1000
+          description: Quantity of the Sku being purchased. Quantities over 1000 will
+            default to 1000.
           format: int32
         price:
           type: integer
-          description: Price of the individual SKU. In Cents
+          description: "Price of the individual SKU, in cents."
           format: int32
         weight:
           type: number
-          description: Weight of SKU
+          description: Weight of Sku.
           format: double
+          nullable: true
         height:
           type: number
-          description: Height of SKU
+          description: Height of Sku.
           format: double
+          nullable: true
         width:
           type: number
-          description: Width of SKU
+          description: Width of Sku.
           format: double
+          nullable: true
         length:
           type: number
-          description: Length of SKU
+          description: Length of Sku.
           format: double
+          nullable: true
         available:
           type: boolean
-          description: Is the product still available for purchase. If a SKU becomes
+          description: Is the product still available for purchase. If a Sku becomes
             unavailable it likely means that the product became out of stock after
-            it was added to the cart. Unavailable SKUs cannot be purchased.
+            it was added to the cart. Unavailable Sku's cannot be purchased.
         status:
           type: string
-          description: Sku Status
+          description: Current status of the Sku.
           enum:
           - IN_PROGRESS
           - PROCESSING
@@ -3405,7 +3428,7 @@ components:
           - PARTIALLY_REFUNDED
         product_type:
           type: string
-          description: Product Type
+          description: Product type that describes the Sku.
           enum:
           - PHYSICAL
           - DIGITAL
@@ -3413,7 +3436,7 @@ components:
           - BUNDLED
         custom:
           type: boolean
-          description: Is the Sku custom. True when the price has been overridden.
+          description: Is the Sku custom. Is `true` when the price has been overridden.
         custom_properties:
           type: array
           description: Used to provide the merchant with custom values for the product.
@@ -3426,15 +3449,11 @@ components:
             $ref: '#/components/schemas/OrderSkuCustomProperty'
         quantity_fulfilled:
           type: integer
-          description: The quantity of this item that has been fulfilled
+          description: The quantity of this item that has been fulfilled by the merchant.
           format: int32
-        order_sku_rates:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderSkuRate'
         line_price:
           type: integer
-          description: Price of the SKU multiplied by the Quantity. In Cents
+          description: "Price of the Sku multiplied by the quantity, in Cents"
           format: int32
       description: SKUs belonging to an Order
     OrderSkuCustomProperty:
@@ -3457,44 +3476,6 @@ components:
       example:
       - name: engraving
         value: Happy Birthday!
-    OrderSkuRate:
-      required:
-      - amount
-      - name
-      - order_sku_id
-      - type
-      type: object
-      properties:
-        order_sku_id:
-          type: integer
-          description: ID of the Order SKU the Rate belongs to
-          format: int64
-        amount:
-          type: integer
-          description: Total Tax amount on Bag. In Cents
-          format: int32
-        rate:
-          type: number
-          description: Rate
-          format: double
-        type:
-          type: string
-          description: Rate Type
-          enum:
-          - TAX
-          - SHIPPING
-          - FEE
-          - DUTY
-        name:
-          type: string
-          description: Rate Name
-        decimal_rate:
-          type: number
-          format: double
-        dollar_amount:
-          type: number
-          format: double
-      description: Rates belonging to Order SKUs
     OrderTax:
       required:
       - amount
