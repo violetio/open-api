@@ -1409,6 +1409,19 @@ paths:
               schema:
                 type: string
                 example: no content
+        "404":
+          description: cart not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/shipping/available:
     get:
       tags:
@@ -2380,9 +2393,6 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -2395,6 +2405,9 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
