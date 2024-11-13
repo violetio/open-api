@@ -1108,7 +1108,7 @@ paths:
                   - id: 64579
                     order_id: 54609
                     merchant_id: 10064
-                    status: ACCEPTED
+                    captureStatus: ACCEPTED
                     fulfillment_status: PROCESSING
                     financial_status: PAID
                     skus:
@@ -1125,7 +1125,7 @@ paths:
                         price: 100000
                         weight: 3
                         available: true
-                        status: PROCESSING
+                        captureStatus: PROCESSING
                         product_type: PHYSICAL
                         line_price: 100000
                     shipping_method:
@@ -1198,7 +1198,7 @@ paths:
                       payment_intent_client_secret: pi_3PXoWvK29KDiBVld1n7ym4B0_secret_tB77zb3BoTCKigUe5R38hrCKS
                       payment_intent_id: pi_3PXoWvK29KDiBVld1n7ym4B0
                     currency: USD
-                    status: CAPTURED
+                    captureStatus: CAPTURED
                     errors: [ ]
                     date_created: '2024-07-01T18:00:45+0000'
                     date_last_modified: '2024-07-01T18:00:48+0000'
@@ -1207,7 +1207,7 @@ paths:
                 tax_total: 0
                 total: 0
                 app_order_id: mario-test-1
-                status: COMPLETED
+                captureStatus: COMPLETED
                 is_guest: true
                 date_created: '2024-06-28T20:31:56+0000'
                 date_last_modified: '2024-06-28T20:31:56+0000'
@@ -2262,12 +2262,6 @@ components:
           description: Are taxes included in the cart subtotal. When `true` the taxes
             will not be summed separately.
           default: false
-        transactions:
-          type: array
-          description: List of transactions applied to the Bag.
-          nullable: true
-          items:
-            $ref: '#/components/schemas/Transaction'
         external_checkout:
           type: boolean
           description: If the Bag is attached to an external cart in the commerce
@@ -3246,8 +3240,8 @@ components:
           format: int64
         payment_provider:
           type: string
-          description: 'Payment Provider that this transaction is executed against.
-            This is the provider that handles payment  processing for this transaction. '
+          description: Payment Provider that this transaction is executed against.
+            This is the provider that handles payment processing for this transaction.
         payment_provider_transaction_id:
           type: string
           description: Identifier of the payment transaction in the underlying payment
@@ -3305,11 +3299,11 @@ components:
           description: Currency that the amount of this payment transaction is reflected
             in. This is the currency that the payment provider uses to charge the
             shopper payment method.
-        status:
+        capture_status:
           type: string
-          description: Underlying status of the payment in the payment provider system
-            and should be used to determine what action to take next against this
-            payment transaction.
+          description: Underlying status of the payment capture in the payment provider
+            system and should be used to determine what action to take next against
+            this payment transaction.
           enum:
           - PROCESSING
           - CAPTURED
@@ -3322,6 +3316,35 @@ components:
           - AUTHORIZED
           - REFUNDED
           - PARTIALLY_REFUNDED
+        capture_method:
+          type: string
+          description: Underlying status of the payment in the payment provider system
+            and should be used to determine what action to take next against this
+            payment transaction.
+          enum:
+          - AUTOMATIC
+          - CUSTOM
+          - EXTERNAL
+        transfer_status:
+          type: string
+          description: Status of the transfer of distributions associated with this
+            payment transaction.
+          enum:
+          - SENT
+          - REVERSED
+          - PARTIALLY_REVERSED
+          - PENDING
+          - FAILED
+          - BYPASSED
+        transfer_method:
+          type: string
+          description: Underlying status of the payment in the payment provider system
+            and should be used to determine what action to take next against this
+            payment transaction.
+          enum:
+          - AUTOMATIC
+          - CUSTOM
+          - EXTERNAL
         errors:
           uniqueItems: true
           type: array
@@ -3336,8 +3359,22 @@ components:
           format: date-time
         date_last_modified:
           type: string
-          description: 'Time at which the object was last modified. In ISO-8601 format. '
+          description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+        status:
+          type: string
+          enum:
+          - PROCESSING
+          - CAPTURED
+          - CANCELLED
+          - FAILED
+          - BYPASSED
+          - REQUIRES_ACTION
+          - REQUIRES_PAYMENT_METHOD
+          - REQUIRES_AUTHORIZATION
+          - AUTHORIZED
+          - REFUNDED
+          - PARTIALLY_REFUNDED
       description: Payment Transaction
     PaymentTransactionError:
       required:
@@ -3363,86 +3400,6 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
-    Transaction:
-      required:
-      - app_id
-      - bag_id
-      - merchant_id
-      - payment_method_id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        merchant_id:
-          type: integer
-          description: ID of the Merchant receiving the transaction
-          format: int32
-        app_id:
-          type: integer
-          description: ID of the App that created the Order
-          format: int32
-        order_id:
-          type: integer
-          description: ID of the Order the Transaction applies to
-          format: int64
-        bag_id:
-          type: integer
-          description: ID of the Bag the Transaction applies to
-          format: int64
-        payment_method_id:
-          type: integer
-          description: ID of the referenced Payment Method
-          format: int64
-        gateway_transaction_id:
-          type: string
-          description: ID of the Transaction in the Payment Gateway
-        gateway:
-          type: string
-          description: Gateway processing the Transaction
-        amount:
-          type: integer
-          description: Total amount being transacted
-          format: int32
-        currency:
-          type: string
-          description: Currency the Transaction takes place in
-        type:
-          type: string
-          description: Transaction Type
-          enum:
-          - AUTHORIZATION
-          - CAPTURE
-          - SALE
-          - VOID
-          - REFUND
-        error_code:
-          type: string
-          description: Error Code from gateway if error occurred
-        status:
-          type: string
-          description: Transaction Status
-          enum:
-          - PROCESSING
-          - COMPLETED
-          - REFUNDED
-          - REQUIRES_ACTION
-        test:
-          type: boolean
-          description: Is this a test Transaction
-        date_created:
-          type: string
-          description: Date of transaction creation
-          format: date-time
-        date_last_modified:
-          type: string
-          description: Date of last transaction update
-          format: date-time
-        order_payment_method:
-          $ref: '#/components/schemas/OrderPaymentMethod'
-      description: Order Transaction
-      nullable: true
     DiscountRequest:
       type: object
       properties:
@@ -3490,6 +3447,7 @@ components:
           - MULTI_USE_CARD_TOKEN
           - BANK_TOKEN
           - PAYMENT_INTENT
+          - VIOLET_PAYMENT_METHOD_ID
         card_number:
           type: string
           description: Number on the credit or debit card.
