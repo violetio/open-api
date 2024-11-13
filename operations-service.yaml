@@ -596,6 +596,7 @@ components:
           - STRIPE
           - NUVEI
           - CREDOVA
+          - EXTERNAL
         payment_provider_account_id:
           type: string
           description: Identifier of the payout account in the payment provider system.
@@ -621,6 +622,8 @@ components:
           type: boolean
           description: Verification status of the payout account connected to the
             payment provider.
+        payment_provider_account:
+          type: object
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
@@ -644,6 +647,7 @@ components:
           - STRIPE
           - NUVEI
           - CREDOVA
+          - EXTERNAL
         details:
           $ref: '#/components/schemas/PayoutAccountDetails'
       description: Violet Payout Account that stores underlying payment provider account
@@ -830,9 +834,21 @@ components:
         taxonomy_synced:
           type: boolean
           description: Has the taxonomy been synced
+          nullable: true
         webhooks_created:
           type: boolean
           description: Have the webhooks been created
+          nullable: true
+        date_shipping_last_synced:
+          type: string
+          description: Date of last shipping data sync
+          format: date-time
+          nullable: true
+        app_id:
+          type: integer
+          description: "The app, if any, that originated the sync request."
+          format: int32
+          nullable: true
       description: Shopify Product Sync Tracking & Status
     SkuError:
       type: object
