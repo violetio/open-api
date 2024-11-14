@@ -367,6 +367,26 @@ paths:
                 $ref: '#/components/schemas/VioletPageMerchantSummary'
 components:
   schemas:
+    CatalogConfig:
+      type: object
+      properties:
+        inventory:
+          $ref: '#/components/schemas/InventoryConfig'
+      description: Configurations for the merchants catalog behaviors.
+    InventoryConfig:
+      type: object
+      properties:
+        safetyStockRules:
+          $ref: '#/components/schemas/StockRules'
+      description: Configurations for the merchants inventory behaviors.
+    InventoryStockRule:
+      type: object
+      properties:
+        outOfStockLevel:
+          type: integer
+          format: int32
+      description: Configured stock rules that can override the data from the external
+        commerce platform.
     MerchantConfiguration:
       type: object
       properties:
@@ -386,8 +406,12 @@ components:
               commerce platform.
           description: Feature flags that apply to a merchant depending on their commerce
             platform.
+        store_config:
+          $ref: '#/components/schemas/StoreConfig'
         orders_config:
           $ref: '#/components/schemas/OrdersConfig'
+        catalog_config:
+          $ref: '#/components/schemas/CatalogConfig'
       description: A Container for Merchant Configuration info
     OrdersConfig:
       type: object
@@ -400,6 +424,227 @@ components:
             type: string
             description: Custom tags to be added to a merchants orders upon submission.
       description: Configurations for the merchants order behaviors.
+    StockRules:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InventoryStockRule'
+        categories:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InventoryStockRule'
+        collections:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InventoryStockRule'
+        vendors:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InventoryStockRule'
+      description: Configured stock rules that can override the data from the external
+        commerce platform.
+    StoreConfig:
+      type: object
+      properties:
+        default_weight_unit:
+          type: string
+          description: Default weight unit used by the merchant.
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+        default_size_unit:
+          type: string
+          description: Default size unit used by the merchant.
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+        default_locale:
+          type: string
+          description: Default locale used by the merchant.
+        default_currency:
+          type: string
+          description: Default currency code used by the merchant.
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
+        base_url:
+          type: string
+          description: Base URL of the merchant's store.
+        base_media_url:
+          type: string
+          description: Base Media URL of the media from a merchant's store.
+      description: Configurations for the merchants store.
     GenericToggleSettingRequest:
       type: object
       properties:
