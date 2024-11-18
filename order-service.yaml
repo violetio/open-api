@@ -19,6 +19,8 @@ tags:
 - name: Orders
 - name: Refunds
 - name: Cancellations
+- name: Checkout - Order Transfers
+- name: Checkout - Bag Transfers
 paths:
   /checkout/cart/{cart_id}/discounts:
     post:
@@ -56,13 +58,172 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DiscountRequest'
+            examples:
+              Add Discount Code:
+                description: Add Discount Code
+                value:
+                  code: discount-code
+                  merchant_id: 10000
+              Add Discount Code with Email:
+                description: Add Discount Code with Email
+                value:
+                  code: discount-code
+                  merchant_id: 10000
+                  email: super@mar.io
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Add Discount to Cart:
+                  description: Add Discount to Cart
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      discounts:
+                      - id: 33333
+                        bag_id: 11111
+                        status: APPLIED
+                        type: CODE
+                        value_type: PERCENTAGE
+                        target_type: ORDER
+                        code: discount-code
+                        percentage: 10
+                        amount_total: 1999
+                        date_created: 2017-06-15T01:01:01+0000
+                        date_last_modified: 2017-06-15T01:01:01+0000
+                      shipping_method: null
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 0
+                      tax_total: 0
+                      discount_total: 0
+                      total: 19998
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 1999
+                    total: 17999
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/skus:
     post:
       tags:
@@ -90,11 +251,6 @@ paths:
           type: integer
           format: int64
       - name: price_cart
-        in: query
-        schema:
-          type: boolean
-          default: false
-      - name: async
         in: query
         schema:
           type: boolean
@@ -428,57 +584,13 @@ paths:
                     message: Insufficient inventory for item with ID 99999.
                     error: insufficient_inventory
                     code: 4223
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
   /checkout/cart/{cart_id}/billing_address:
-    put:
-      tags:
-      - Checkout - Customer
-      summary: Update Billing Address
-      operationId: updateBillingAddress
-      parameters:
-      - name: X-Violet-Token
-        in: header
-        schema:
-          type: string
-      - name: X-Violet-App-Secret
-        in: header
-        schema:
-          type: string
-      - name: X-Violet-App-Id
-        in: header
-        schema:
-          type: integer
-          format: int32
-      - name: cart_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      - name: price_cart
-        in: query
-        schema:
-          type: boolean
-          default: false
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrderAddress'
-            example:
-              address_1: 42 Wallaby Way
-              city: Sydney
-              country: AU
-              postal_code: 4000
-              state: NSW
-              type: SHIPPING
-              phone: 1234567890
-      responses:
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
     post:
       tags:
       - Checkout - Customer
@@ -514,26 +626,108 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderAddress'
-            example:
-              address_1: 42 Wallaby Way
-              city: Sydney
-              country: AU
-              postal_code: 4000
-              state: NSW
-              type: SHIPPING
-              phone: 1234567890
+            examples:
+              Apply Billing Address:
+                description: Apply Billing Address
+                value:
+                  city: Seattle
+                  state: WA
+                  country: US
+                  postal_code: "98121"
+                  phone: "1234567890"
+                  address_1: 2815 Elliott Ave
+                  address_2: Unit 100
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+              examples:
+                Set Billing Address:
+                  description: Set Billing Address
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer: null
+                    bags: []
+                    shipping_address: null
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 0
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 0
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Blocked Address:
+                  description: Blocked Address
+                  value:
+                    message: The provided address has been blocked due to a history
+                      of being used for fraudulent orders.
+                    error: blocked_address
+                    code: 4236
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/customer:
     post:
       tags:
       - Checkout - Customer
-      summary: Apply Guest Customer to Cart
+      summary: Apply Customer to Cart
       operationId: applyGuestCustomerToCart
       parameters:
       - name: X-Violet-Token
@@ -555,36 +749,173 @@ paths:
         schema:
           type: integer
           format: int64
-      - name: async
-        in: query
-        schema:
-          type: boolean
-          default: false
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderCustomer'
-            example:
-              email: p.sherman@findingnemo.com
-              first_name: P
-              last_name: Sherman
-              shipping_address:
-                address_1: 42 Wallaby Way
-                city: Sydney
-                country: AU
-                postal_code: 4000
-                state: NSW
-                type: SHIPPING
-                phone: 1234567890
-              same_address: true
+            examples:
+              Apply Customer Details:
+                description: Apply Customer Details
+                value:
+                  customer:
+                    first_name: Super
+                    last_name: Mario
+                    email: super@mar.io
+              Apply Customer Details with Addresses:
+                description: Apply Customer Details with Addresses
+                value:
+                  customer:
+                    first_name: Super
+                    last_name: Mario
+                    email: super@mar.io
+                    shipping_address:
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      address_1: "2815 Elliott Ave, Unit 100"
+                    same_address: true
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+              examples:
+                Apply Customer Details:
+                  description: Apply Customer Details
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags: []
+                    shipping_address: null
+                    billing_address: null
+                    payment_method: null
+                    sub_total: 0
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 0
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+                Apply Customer Details with Addresses:
+                  description: Apply Customer Details with Addresses
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags: []
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 19998
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Blocked Address:
+                  description: Blocked Address
+                  value:
+                    message: The provided address has been blocked due to a history
+                      of being used for fraudulent orders.
+                    error: blocked_address
+                    code: 4236
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/payment:
     post:
       tags:
@@ -628,63 +959,177 @@ paths:
               card_exp_year: 29
               card_postal_code: '11211'
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Payment Method Applied:
+                  description: Payment Method Applied
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 10000
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: ACCEPTED
+                      fulfillment_status: PROCESSING
+                      financial_status: PAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method:
+                        carrier: USPS
+                        shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                        bag_id: 11111
+                        merchant_id: 10000
+                        label: Priority Mail
+                        price: 644
+                        custom: false
+                      taxes:
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 6.5
+                        amount: 1300
+                        description: Washington State Tax
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 0
+                        amount: 0
+                        description: King County Tax
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 3.85
+                        amount: 770
+                        description: Seattle City Tax
+                      sub_total: 19998
+                      shipping_total: 644
+                      tax_total: 2070
+                      discount_total: 0
+                      total: 22712
+                      taxes_included: false
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method:
+                      brand: visa
+                      last_four: "4242"
+                      exp_month: 12
+                      exp_year: 2025
+                      payment_method_id: 35236
+                    sub_total: 19998
+                    shipping_total: 644
+                    tax_total: 2070
+                    discount_total: 0
+                    total: 22712
+                    app_order_id: "00100100"
+                    status: COMPLETED
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: true
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 10000
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/shipping_address:
-    put:
-      tags:
-      - Checkout - Customer
-      summary: Update Shipping Address
-      operationId: updateShippingAddress
-      parameters:
-      - name: X-Violet-Token
-        in: header
-        schema:
-          type: string
-      - name: X-Violet-App-Secret
-        in: header
-        schema:
-          type: string
-      - name: X-Violet-App-Id
-        in: header
-        schema:
-          type: integer
-          format: int32
-      - name: cart_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      - name: price_cart
-        in: query
-        schema:
-          type: boolean
-          default: false
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrderAddress'
-            example:
-              address_1: 42 Wallaby Way
-              city: Sydney
-              country: AU
-              postal_code: 4000
-              state: NSW
-              type: SHIPPING
-              phone: 1234567890
-      responses:
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
     post:
       tags:
       - Checkout - Customer
@@ -720,21 +1165,103 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderAddress'
-            example:
-              address_1: 42 Wallaby Way
-              city: Sydney
-              country: AU
-              postal_code: 4000
-              state: NSW
-              type: SHIPPING
-              phone: 1234567890
+            examples:
+              Apply Shipping Address:
+                description: Apply Shipping Address
+                value:
+                  city: Seattle
+                  state: WA
+                  country: US
+                  postal_code: "98121"
+                  phone: "1234567890"
+                  address_1: 2815 Elliott Ave
+                  address_2: Unit 100
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+              examples:
+                Set Shipping Address:
+                  description: Set Shipping Address
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer: null
+                    bags: []
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      first_name: Super
+                      last_name: Mario
+                    billing_address: null
+                    payment_method: null
+                    sub_total: 0
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 0
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Blocked Address:
+                  description: Blocked Address
+                  value:
+                    message: The provided address has been blocked due to a history
+                      of being used for fraudulent orders.
+                    error: blocked_address
+                    code: 4236
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/shipping:
     post:
       tags:
@@ -773,13 +1300,291 @@ paths:
               type: array
               items:
                 $ref: '#/components/schemas/BagShippingMethod'
+            examples:
+              Apply Shipping Method:
+                description: Apply Shipping Method
+                value:
+                - bag_id: 11111
+                  shipping_method_id: 07d19139fc0f4558687c1900c696f071
+              Apply Custom Shipping Method:
+                description: Apply Custom Shipping Method
+                value:
+                - bag_id: 11111
+                  shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                  shipping_method_label: $5 Flat Rate Shipping
+                  shipping_method_price: 500
+                  custom: true
+              Apply Multiple Shipping Methods:
+                description: Apply Multiple Shipping Methods
+                value:
+                - bag_id: 11111
+                  shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                - bag_id: 20000
+                  shipping_method_id: 61eaf1df-477a-4141-baac-6599113b90f1
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Set Shipping Method:
+                  description: Set Shipping Method
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method:
+                        carrier: USPS
+                        shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                        bag_id: 11111
+                        merchant_id: 10000
+                        label: Priority Mail
+                        price: 664
+                        custom: false
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 664
+                      tax_total: 0
+                      discount_total: 0
+                      total: 20662
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 664
+                    tax_total: 0
+                    discount_total: 0
+                    total: 20662
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: true
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+                Set Custom Shipping Method:
+                  description: Set Custom Shipping Method
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method:
+                        carrier: OTHER
+                        shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                        bag_id: 11111
+                        merchant_id: 10000
+                        label: $5 Flat Rate Shipping
+                        price: 500
+                        custom: true
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 664
+                      tax_total: 0
+                      discount_total: 0
+                      total: 20662
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 664
+                    tax_total: 0
+                    discount_total: 0
+                    total: 20662
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: true
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/authorize:
     post:
       tags:
@@ -822,7 +1627,7 @@ paths:
     post:
       tags:
       - Orders
-      summary: Estimate Cart - BETA
+      summary: Estimate Cart
       operationId: calculateCart
       parameters:
       - name: X-Violet-Token
@@ -1005,7 +1810,6 @@ paths:
                       country: US
                       postal_code: "98121"
                       phone: "1234567890"
-                      type: SHIPPING
                       address_1: "2815 Elliott Ave, Unit 100"
                     same_address: true
               Create Cart with Discounts:
@@ -1015,6 +1819,9 @@ paths:
                   skus:
                   - sku_id: 99999
                     quantity: 2
+                  discounts:
+                  - code: discount-code
+                    merchant_id: 11111
                   customer:
                     first_name: Super
                     last_name: Mario
@@ -1025,12 +1832,8 @@ paths:
                       country: US
                       postal_code: "98121"
                       phone: "1234567890"
-                      type: SHIPPING
                       address_1: "2815 Elliott Ave, Unit 100"
                     same_address: true
-                  discounts:
-                  - code: discount-code
-                    merchant_id: 11111
       responses:
         "200":
           description: create cart success
@@ -1182,6 +1985,124 @@ paths:
                     intent_based_checkout: true
                     guest: true
                     order_id: 11111
+                Create Populated Cart with Discount:
+                  description: Create Populated Cart with Discount
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      discounts:
+                      - id: 33333
+                        bag_id: 11111
+                        status: APPLIED
+                        type: CODE
+                        value_type: PERCENTAGE
+                        target_type: ORDER
+                        code: discount-code
+                        percentage: 10
+                        amount_total: 1999
+                        date_created: 2017-06-15T01:01:01+0000
+                        date_last_modified: 2017-06-15T01:01:01+0000
+                      shipping_method: null
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 0
+                      tax_total: 0
+                      discount_total: 0
+                      total: 19998
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 1999
+                    total: 17999
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
         "202":
           description: create cart with error
           content:
@@ -1308,8 +2229,22 @@ paths:
                     intent_based_checkout: true
                     guest: true
                     order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Blocked Address:
+                  description: Blocked Address
+                  value:
+                    message: The provided address has been blocked due to a history
+                      of being used for fraudulent orders.
+                    error: blocked_address
+                    code: 4236
         "422":
-          description: create cart with exception
+          description: unprocessable entity
           content:
             application/json:
               schema:
@@ -1746,8 +2681,21 @@ paths:
               schema:
                 type: string
                 example: no content
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
         "404":
-          description: cart not found
+          description: not found
           content:
             application/json:
               schema:
@@ -1759,6 +2707,38 @@ paths:
                     message: Order could not be found.
                     error: order_not_found
                     code: 4216
+  /orders/estimate:
+    post:
+      tags:
+      - Orders
+      summary: Estimate Order
+      operationId: estimateOrder
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateCartRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculateCartResponse'
   /checkout/cart/{cart_id}/shipping/available:
     get:
       tags:
@@ -1787,7 +2767,7 @@ paths:
           format: int64
       responses:
         "200":
-          description: available shipping methods
+          description: success
           content:
             application/json:
               schema:
@@ -1798,7 +2778,7 @@ paths:
                 Has Available Shipping Methods:
                   description: Has Available Shipping Methods
                   value:
-                  - bag_id: 99999
+                  - bag_id: 11111
                     shipping_methods:
                     - carrier: OTHER
                       label: Free Ground Shipping
@@ -1815,8 +2795,21 @@ paths:
                 No Available Shipping Methods:
                   description: No Available Shipping Methods
                   value:
-                  - bag_id: 99999
+                  - bag_id: 11111
                     shipping_methods: []
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
         "404":
           description: order not found
           content:
@@ -2047,12 +3040,184 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+              examples:
+                Cart Priced:
+                  description: Cart Priced
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method:
+                        carrier: USPS
+                        shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                        bag_id: 11111
+                        merchant_id: 10000
+                        label: Priority Mail
+                        price: 644
+                        custom: false
+                      taxes:
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 6.5
+                        amount: 1300
+                        description: Washington State Tax
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 0
+                        amount: 0
+                        description: King County Tax
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 3.85
+                        amount: 770
+                        description: Seattle City Tax
+                      sub_total: 19998
+                      shipping_total: 644
+                      tax_total: 2070
+                      discount_total: 0
+                      total: 22712
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 644
+                    tax_total: 2070
+                    discount_total: 0
+                    total: 22712
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: true
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Completed Error:
+                  description: Order Completed Error
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found Exception:
+                  description: Order Not Found Exception
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
+        "412":
+          description: precondition failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Empty Cart:
+                  description: Empty Cart
+                  value:
+                    message: Cart is empty and cannot be priced or submitted.
+                    error: empty_cart
+                    code: 4204
   /checkout/cart/{cart_id}/discounts/{discount_id}:
     delete:
       tags:
@@ -2091,12 +3256,154 @@ paths:
           type: boolean
           default: false
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Remove Discount from Cart:
+                  description: Remove Discount from Cart
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      discounts: null
+                      shipping_method: null
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 0
+                      tax_total: 0
+                      discount_total: 0
+                      total: 19998
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 1999
+                    total: 17999
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Discount Not Found:
+                  description: Discount Not Found
+                  value:
+                    message: Bag discount could not be found.
+                    error: bag_discount_not_found
+                    code: 4234
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/shipping/{shipping_method_id}:
     delete:
       tags:
@@ -2135,12 +3442,154 @@ paths:
           type: boolean
           default: false
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Remove Shipping Method:
+                  description: Remove Shipping Method
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method: null
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 0
+                      tax_total: 0
+                      discount_total: 0
+                      total: 19998
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 19998
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: true
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Shipping Method Not Found:
+                  description: Order Shipping Method Not Found
+                  value:
+                    message: Order Shipping Method could not be found.
+                    error: order_shipping_method_not_found
+                    code: 4218
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/skus/{order_sku_id}:
     put:
       tags:
@@ -2178,11 +3627,6 @@ paths:
         schema:
           type: boolean
           default: false
-      - name: async
-        in: query
-        schema:
-          type: boolean
-          default: false
       requestBody:
         content:
           application/json:
@@ -2191,12 +3635,129 @@ paths:
             example:
               quantity: 2
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Update Sku in Cart:
+                  description: Update Sku in Cart
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer: null
+                    bags:
+                    - id: 11111
+                      order_id: 22222
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: IN_PROGRESS
+                      fulfillment_status: PROCESSING
+                      financial_status: UNPAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method: null
+                      taxes: null
+                      sub_total: 19998
+                      shipping_total: 0
+                      tax_total: 0
+                      discount_total: 0
+                      total: 19998
+                      taxes_included: false
+                      transactions: null
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address: null
+                    billing_address: null
+                    payment_method: null
+                    sub_total: 19998
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 19998
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
+                Order Sku Not Found:
+                  description: Order Sku Not Found
+                  value:
+                    message: Order Sku identified by 88888 could not be found.
+                    error: order_sku_not_found
+                    code: 4219
     delete:
       tags:
       - Checkout - Items
@@ -2233,18 +3794,82 @@ paths:
         schema:
           type: boolean
           default: false
-      - name: async
-        in: query
-        schema:
-          type: boolean
-          default: false
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Remove Sku from Cart:
+                  description: Remove Sku from Cart
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer: null
+                    bags: null
+                    shipping_address: null
+                    billing_address: null
+                    payment_method: null
+                    sub_total: 0
+                    shipping_total: 0
+                    tax_total: 0
+                    discount_total: 0
+                    total: 0
+                    app_order_id: "00100100"
+                    status: IN_PROGRESS
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: false
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions: null
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 11111
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Not Found:
+                  description: Cart Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
+                Order Sku Not Found:
+                  description: Order Sku Not Found
+                  value:
+                    message: Order Sku identified by 88888 could not be found.
+                    error: order_sku_not_found
+                    code: 4219
   /orders/bags/search:
     post:
       tags:
@@ -2392,27 +4017,169 @@ paths:
               app_order_id: asdf-ghjk-qwer-tyui
       responses:
         "200":
-          description: successful operation
+          description: success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
-        "409":
-          description: order submission in progress
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
               examples:
-                Submission in Progress:
-                  description: Submission in Progress
+                Order Submitted:
+                  description: Order Submitted
                   value:
-                    message: Order submission is in progress. Please wait for the
-                      submission to complete before trying again.
-                    error: order_submission_in_progress
-                    code: 4238
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 10000
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: ACCEPTED
+                      fulfillment_status: PROCESSING
+                      financial_status: PAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method:
+                        carrier: USPS
+                        shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                        bag_id: 11111
+                        merchant_id: 10000
+                        label: Priority Mail
+                        price: 644
+                        custom: false
+                      taxes:
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 6.5
+                        amount: 1300
+                        description: Washington State Tax
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 0
+                        amount: 0
+                        description: King County Tax
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 3.85
+                        amount: 770
+                        description: Seattle City Tax
+                      sub_total: 19998
+                      shipping_total: 644
+                      tax_total: 2070
+                      discount_total: 0
+                      total: 22712
+                      taxes_included: false
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method:
+                      brand: visa
+                      last_four: "4242"
+                      exp_month: 12
+                      exp_year: 2025
+                      payment_method_id: 35236
+                    sub_total: 19998
+                    shipping_total: 644
+                    tax_total: 2070
+                    discount_total: 0
+                    total: 22712
+                    app_order_id: "00100100"
+                    status: COMPLETED
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: true
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    payment_transactions:
+                    - id: 99999
+                      order_id: 10000
+                      payment_provider: STRIPE
+                      payment_provider_transaction_id: pi_vw8krrsvposl347c5l7x1nt5
+                      payment_method_id: 77777
+                      payment_provider_payment_method_id: pm_1PtHCnK29KDiBVldrynYIy0k
+                      payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                      amount: 22712
+                      metadata:
+                        payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                        payment_intent_id: pi_vw8krrsvposl347c5l7x1nt5
+                      related_bags:
+                      - "11111"
+                      currency: USD
+                      capture_status: CAPTURED
+                      errors: []
+                      date_created: 2024-08-29T22:52:42+0000
+                      date_last_modified: 2024-08-29T22:52:52+0000
+                      status: CAPTURED
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 10000
         "400":
-          description: order completion errors
+          description: bad request
           content:
             application/json:
               schema:
@@ -2438,8 +4205,34 @@ paths:
                         sku_id: 99999
                         order_sku_id: 88888
                         bag_id: 77777
+                Missing Customer Email:
+                  description: Missing Customer Email
+                  value:
+                    message: Required parameter 'email' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+                Order Sku Not Available:
+                  description: Order Sku Not Available
+                  value:
+                    message: Order Sku identified by 99999 is no longer available
+                      for purchase.
+                    error: order_sku_not_available
+                    code: 4219
+                Offer Not Published:
+                  description: Offer Not Published
+                  value:
+                    message: One or more of the SKUs in your order is no longer available
+                      for purchase due to offer no longer published.
+                    error: offer_not_published
+                    code: 2011
+                Null Shipping Method:
+                  description: Null Shipping Method
+                  value:
+                    message: One or more bags is missing a required shipping method.
+                    error: null_shipping_method
+                    code: 4211
         "404":
-          description: order not found
+          description: not found
           content:
             application/json:
               schema:
@@ -2451,6 +4244,33 @@ paths:
                     message: Order could not be found.
                     error: order_not_found
                     code: 4216
+        "409":
+          description: conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Submission in Progress:
+                  description: Submission in Progress
+                  value:
+                    message: Order submission is in progress. Please wait for the
+                      submission to complete before trying again.
+                    error: order_submission_in_progress
+                    code: 4238
+        "412":
+          description: precondition failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Empty Cart:
+                  description: Empty Cart
+                  value:
+                    message: Cart is empty and cannot be priced or submitted.
+                    error: empty_cart
+                    code: 4204
   /checkout/cart/{cart_id}/payment/update:
     post:
       tags:
@@ -2483,12 +4303,282 @@ paths:
           type: boolean
           default: false
       responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              examples:
+                Payment Method Applied:
+                  description: Payment Method Applied
+                  value:
+                    id: 10000
+                    token: fz8x7gksdjsy2p9fdlonw7k9svwjso4b
+                    user_id: 10000
+                    app_id: 10000
+                    developer_id: 10000
+                    customer:
+                      user_id: 10000
+                      first_name: Super
+                      last_name: Mario
+                      email: super@mar.io
+                      name: Super Mario
+                    bags:
+                    - id: 11111
+                      order_id: 10000
+                      merchant_id: 10000
+                      app_id: 10000
+                      status: ACCEPTED
+                      fulfillment_status: PROCESSING
+                      financial_status: PAID
+                      skus:
+                      - id: 10000
+                        merchant_id: 10000
+                        app_id: 10000
+                        sku_id: 99999
+                        external_id: "1234567890"
+                        name: Nintendo Entertainment System
+                        brand: Nintendo
+                        thumbnail: "https://res.cloudinary.com/violet/image/upload/c_thumb,w_200,g_face/v1729220594/product_media/2taesr1g7sciu8agrrtgaafi2dnzzmsv.jpg"
+                        quantity: 2
+                        price: 9999
+                        weight: 1
+                        available: true
+                        status: PROCESSING
+                        product_type: PHYSICAL
+                        custom: false
+                        line_price: 19998
+                      shipping_method:
+                        carrier: USPS
+                        shipping_method_id: 07d19139fc0f4558687c1900c696f071
+                        bag_id: 11111
+                        merchant_id: 10000
+                        label: Priority Mail
+                        price: 644
+                        custom: false
+                      taxes:
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 6.5
+                        amount: 1300
+                        description: Washington State Tax
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 0
+                        amount: 0
+                        description: King County Tax
+                      - order_id: 127021
+                        merchant_id: 10009
+                        state: WA
+                        rate: 3.85
+                        amount: 770
+                        description: Seattle City Tax
+                      sub_total: 19998
+                      shipping_total: 644
+                      tax_total: 2070
+                      discount_total: 0
+                      total: 22712
+                      taxes_included: false
+                      external_checkout: true
+                      commission_rate: 10
+                      date_created: 2017-06-15T01:01:01+0000
+                      date_last_modified: 2017-06-15T01:01:01+0000
+                      remorse_period_ends: 2017-06-15T01:01:01+0000
+                      currency: USD
+                      external_currency: USD
+                      channel: APP
+                      platform: SHOPIFY
+                      fulfillments: []
+                      discounts: []
+                      wallet_based_checkout: false
+                      bag_id: 22222
+                      bag_status: IN_PROGRESS
+                      merchant_name: Legacy Games
+                    shipping_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: SHIPPING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    billing_address:
+                      name: Super Mario
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "1234567890"
+                      type: BILLING
+                      address_1: "2815 Elliott Ave, Unit 100"
+                      first_name: Super
+                      last_name: Mario
+                    payment_method:
+                      brand: visa
+                      last_four: "4242"
+                      exp_month: 12
+                      exp_year: 2025
+                      payment_method_id: 35236
+                    sub_total: 19998
+                    shipping_total: 644
+                    tax_total: 2070
+                    discount_total: 0
+                    total: 22712
+                    app_order_id: "00100100"
+                    status: COMPLETED
+                    is_guest: true
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    priced: true
+                    wallet_based_checkout: false
+                    currency: USD
+                    channel: APP
+                    currency_symbol: $
+                    stripe_key: pk_test_UHg8oLvg4rrDCbvtqfwTE8qd
+                    payment_intent_client_secret: pi_vw8krrsvposl347c5l7x1nt5_secret_vbcw5t2bze37iptq430tmx7s
+                    intent_based_checkout: true
+                    guest: true
+                    order_id: 10000
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Cart Completed:
+                  description: Cart Completed
+                  value:
+                    message: Order has already been completed.
+                    error: order_completed
+                    code: 4222
+        "404":
+          description: order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
+  /orders/{order_id}/bags/{bag_id}/transfer_funds:
+    post:
+      tags:
+      - Bag - Transfers
+      summary: Process Transfers for a single Bag
+      operationId: processTransfersForBag
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: bag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
         default:
           description: default response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/PayoutTransfer'
+  /orders/bags/transfer_funds:
+    post:
+      tags:
+      - Bag - Transfers
+      summary: Process Transfers for Bags
+      operationId: processTransfersForBags
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessTransfersRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessTransfersResponse'
+  /orders/{order_id}/transfer_funds:
+    post:
+      tags:
+      - Order - Transfers
+      summary: Process Transfers for a single Order
+      operationId: processTransfersForOrder
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PayoutTransfer'
 components:
   schemas:
     Bag:
@@ -2724,9 +4814,6 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -2739,6 +4826,9 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -2906,17 +4996,19 @@ components:
           format: int32
       description: A bag fulfillment sku
     Order:
-      required:
-      - status
       type: object
       properties:
         id:
           type: integer
+          description: ID of the Violet cart or order.
           format: int64
           readOnly: true
         token:
           type: string
+          description: An alternative UUID that can be used as an ID to reference
+            the cart or order.
           readOnly: true
+          deprecated: true
         errors:
           type: array
           description: "Errors on the Order. During checkout, if there was an error\
@@ -2925,6 +5017,7 @@ components:
             \ the order object in the response even if there was an issue with a bag\
             \ so you must always check the response for errors in this list to know\
             \ if there was an issue on the order."
+          nullable: true
           items:
             $ref: '#/components/schemas/OrderError'
         user_id:
@@ -2962,39 +5055,47 @@ components:
           description: "The price of the Order in the base currency before discounts,\
             \ shipping, duties, taxes, and tips. In Cents."
           format: int32
+          default: 0
         shipping_total:
           type: integer
           description: The sum of all shipping methods applied to the Order in the
             base currency. In Cents.
           format: int32
+          default: 0
         tax_total:
           type: integer
           description: The sum of all the taxes applied to the Order in the base currency.
             In Cents.
           format: int32
+          default: 0
         discount_total:
           type: integer
           description: The total discounts applied to the price of the Order in the
             base currency. In Cents.
           format: int32
+          default: 0
         total:
           type: integer
           description: "The sum of all item prices, discounts, shipping, and taxes\
             \ applied to the Order in the base currency. In Cents."
           format: int32
+          default: 0
         app_customer_id:
           type: string
           description: App Customer ID. This should be used to map the order to the
             ID of the customer in your application.
+          nullable: true
         app_order_id:
           type: string
           description: "App Order ID. This should be set to a unique identifier in\
             \ your system. While not enforced unique in Violet's system, it is strongly\
             \ recommended that unique values are used for each cart to help correlate\
             \ identifiers between Violet's system and yours."
+          nullable: true
         status:
           type: string
           description: Status of the Order
+          readOnly: true
           enum:
           - IN_PROGRESS
           - PROCESSING
@@ -3006,29 +5107,38 @@ components:
         is_guest:
           type: boolean
           description: Order is Guest
+          readOnly: true
+          default: true
         date_created:
           type: string
           description: Date of order creation
           format: date-time
+          readOnly: true
         date_last_modified:
           type: string
           description: Date of last order update
           format: date-time
+          readOnly: true
         priced:
           type: boolean
           description: Is the cart priced
+          readOnly: true
+          default: false
         wallet_based_checkout:
           type: boolean
           description: Is this cart going to be placed through wallet-based checkout
+          default: false
         currency:
           type: string
           description: Base currency of cart
+          default: USD
         referral_id:
           type: string
           description: Optional value used to represent an identifier in your system.
             This value is not required to represent a referral. It can represent the
             ID of anything in your system and can be used to filter order lookup results.
             Max length of 128 characters.
+          nullable: true
         currency_symbol:
           type: string
           description: Symbol representing the currency the Order operates in.
@@ -3117,16 +5227,21 @@ components:
         last_name:
           type: string
       description: The shipping or billing address of a user placing an order
+      nullable: true
     OrderCustomer:
       required:
+      - email
       - first_name
       - last_name
       type: object
       properties:
         user_id:
           type: integer
-          description: ID of the User the Order Customer references
+          description: Reference ID of the customer placing the order.
           format: int64
+          nullable: true
+          readOnly: true
+          deprecated: true
         first_name:
           type: string
           description: Customer's first name.
@@ -3146,11 +5261,14 @@ components:
           $ref: '#/components/schemas/OrderAddress'
         same_address:
           type: boolean
-          description: Use Same Address for Both
+          description: "When only one address is provided, should the one address\
+            \ be used for both the shipping and billing addresses."
           default: false
         name:
           type: string
-      description: The Customer Placing the Order
+          description: Full name of the customer.
+          readOnly: true
+      description: Details of the customer placing the order.
       nullable: true
     OrderError:
       type: object
@@ -3262,6 +5380,7 @@ components:
           - BIGCARTEL
           - CUSTOM
       description: Order Error
+      nullable: true
     OrderPaymentMethod:
       required:
       - payment_method_id
@@ -3601,36 +5720,6 @@ components:
           description: 'Amount of this payment in the fractional currency unit of
             this transaction (e.g. cents). This is the amount charged to the shopper. '
           format: int32
-        metadata:
-          type: object
-          additionalProperties:
-            type: object
-            description: Metadata from the payment provider associated to this payment
-              transaction
-          description: Metadata from the payment provider associated to this payment
-            transaction
-        related_bags:
-          uniqueItems: true
-          type: array
-          description: 'Identifiers of the Bags in Violet that are associated with
-            this payment transaction. The amount of this payment transaction is directly
-            computed from the total amounts on the related bags. '
-          items:
-            type: string
-            description: 'Identifiers of the Bags in Violet that are associated with
-              this payment transaction. The amount of this payment transaction is
-              directly computed from the total amounts on the related bags. '
-        related_refunds:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Refunds in Violet that are associated with
-            this payment transaction. Refund amounts are not reflected in the amount
-            on this payment transaction.
-          items:
-            type: string
-            description: Identifiers of the Refunds in Violet that are associated
-              with this payment transaction. Refund amounts are not reflected in the
-              amount on this payment transaction.
         currency:
           type: string
           description: Currency that the amount of this payment transaction is reflected
@@ -3682,6 +5771,36 @@ components:
           - AUTOMATIC
           - CUSTOM
           - EXTERNAL
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Metadata from the payment provider associated to this payment
+              transaction
+          description: Metadata from the payment provider associated to this payment
+            transaction
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: 'Identifiers of the Bags in Violet that are associated with
+            this payment transaction. The amount of this payment transaction is directly
+            computed from the total amounts on the related bags. '
+          items:
+            type: string
+            description: 'Identifiers of the Bags in Violet that are associated with
+              this payment transaction. The amount of this payment transaction is
+              directly computed from the total amounts on the related bags. '
+        related_refunds:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Refunds in Violet that are associated with
+            this payment transaction. Refund amounts are not reflected in the amount
+            on this payment transaction.
+          items:
+            type: string
+            description: Identifiers of the Refunds in Violet that are associated
+              with this payment transaction. Refund amounts are not reflected in the
+              amount on this payment transaction.
         errors:
           uniqueItems: true
           type: array
@@ -3698,20 +5817,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        status:
-          type: string
-          enum:
-          - PROCESSING
-          - CAPTURED
-          - CANCELLED
-          - FAILED
-          - BYPASSED
-          - REQUIRES_ACTION
-          - REQUIRES_PAYMENT_METHOD
-          - REQUIRES_AUTHORIZATION
-          - AUTHORIZED
-          - REFUNDED
-          - PARTIALLY_REFUNDED
       description: Payment Transaction
     PaymentTransactionError:
       required:
@@ -3737,22 +5842,6 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
-    DiscountRequest:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Discount code being applied
-        merchant_id:
-          type: integer
-          description: ID of the Merchant the discount belongs to
-          format: int32
-        email:
-          type: string
-          description: "Customer email address, possibly necessary for once-per-customer\
-            \ discounts."
-      description: Discount request
-      nullable: true
     Error:
       type: object
       properties:
@@ -3802,6 +5891,28 @@ components:
         bagId:
           type: integer
           format: int64
+    DiscountRequest:
+      required:
+      - code
+      - merchant_id
+      type: object
+      properties:
+        code:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Discount code being applied.
+        merchant_id:
+          type: integer
+          description: ID of the Merchant the discount belongs to.
+          format: int32
+        email:
+          maxLength: 255
+          type: string
+          description: "Optional customer email address, possibly necessary for once-per-customer\
+            \ discounts."
+      description: Details of the discount being applied to a cart.
+      nullable: true
     PaymentMethodRequest:
       type: object
       properties:
@@ -5050,3 +7161,216 @@ components:
         order_customer:
           $ref: '#/components/schemas/OrderCustomer'
       description: Properties for cart submission.
+    PayoutTransfer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        payout_id:
+          type: integer
+          description: "ID of the Payout, if any, this Transfer is associated to"
+          format: int32
+        payment_provider_id:
+          type: string
+          description: ID of the transfer record in Stripe
+        payment_provider_payout_id:
+          type: string
+          description: External ID of the payout record
+        payout_account_id:
+          type: integer
+          description: ID of the Payout Account this Transfer belongs to.
+          format: int32
+        bag_amount:
+          type: integer
+          description: Total value for the bag associated to this transfer
+          format: int32
+        bag_currency:
+          type: string
+          description: Original currency that this bag was processed in.
+        amount:
+          type: integer
+          description: Total amount in fractional currency unit (e.g. cents) for this
+            transfer.
+          format: int32
+        currency:
+          type: string
+          description: Currency that this transfer was processed in.
+        status:
+          type: string
+          description: Status of the transfer.
+          enum:
+          - SENT
+          - REVERSED
+          - PARTIALLY_REVERSED
+          - PENDING
+          - FAILED
+          - BYPASSED
+        payment_provider:
+          type: string
+          description: Payment Provider that this transfer is executed with. This
+            is the provider that handles transfer processing for this payout account.
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        related_orders:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Orders in Violet that are associated with
+            this transfer.
+          items:
+            type: string
+            description: Identifiers of the Orders in Violet that are associated with
+              this transfer.
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Bags in Violet that are associated with
+            this transfer.
+          items:
+            type: string
+            description: Identifiers of the Bags in Violet that are associated with
+              this transfer.
+        related_distributions:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Distributions in Violet that are associated
+            with this transfer. The amount of this Transfer is directly computed as
+            the sum of all Distributions related to it.
+          items:
+            type: string
+            description: Identifiers of the Distributions in Violet that are associated
+              with this transfer. The amount of this Transfer is directly computed
+              as the sum of all Distributions related to it.
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this payout transfer during processing..
+            This value will only be populated if there are errors during processing
+          items:
+            $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
+        payoutExternalId:
+          type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+      description: Record of Payout Transfer
+    PayoutTransferError:
+      required:
+      - error_message
+      - payout_transfer_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        payout_transfer_id:
+          type: integer
+          description: ID of the Payout Transfer this Error is associated to
+          format: int64
+      description: Error associated to a payout transfer
+    ProcessTransfersResponse:
+      type: object
+      properties:
+        successful_transfers:
+          $ref: '#/components/schemas/TransferSummary'
+        failed_transfers:
+          $ref: '#/components/schemas/TransferSummary'
+      description: "Summary of process transfers request, split by successful and\
+        \ failed transfers."
+    TransferSummary:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Count of transfers for which details are present in the transfers
+            list.
+          format: int32
+        order_count:
+          type: integer
+          description: Count of orders that this transfer summary record is associated
+            with.
+          format: int32
+        order_ids:
+          type: array
+          description: List of Violet Order identifiers for which transfers were processed.
+            Details of each transfer are included in the transfers list.
+          items:
+            type: integer
+            description: List of Violet Order identifiers for which transfers were
+              processed. Details of each transfer are included in the transfers list.
+            format: int64
+        bag_ids:
+          type: array
+          description: List of Violet Bag identifiers for which transfers were processed.
+            Details of each transfer are included in the transfers list.
+          items:
+            type: integer
+            description: List of Violet Bag identifiers for which transfers were processed.
+              Details of each transfer are included in the transfers list.
+            format: int64
+        transfers:
+          type: array
+          description: List of Transfer details for each transfer that was processed
+            as a part of the job that this transfer summary is associated with.
+          items:
+            $ref: '#/components/schemas/PayoutTransfer'
+      description: Summary of job to process transfers for a list of given order or
+        bag identifiers.
+    ProcessTransfersRequest:
+      type: object
+      properties:
+        application_id:
+          type: integer
+          description: Identifier of the app that this request is being made for.
+          format: int32
+        developer_id:
+          type: integer
+          description: Identifier of the channel making this request.
+          format: int32
+        order_ids:
+          type: array
+          description: List of Violet Order identifiers for which to process pending
+            transfers.
+          items:
+            type: integer
+            description: List of Violet Order identifiers for which to process pending
+              transfers.
+            format: int64
+        bag_ids:
+          type: array
+          description: List of Violet Bag identifiers for which to process pending
+            transfers.
+          items:
+            type: integer
+            description: List of Violet Bag identifiers for which to process pending
+              transfers.
+            format: int64
+      description: Request to process pending transfers for a given list of Order
+        or Bag identifiers
