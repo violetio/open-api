@@ -2863,17 +2863,19 @@ components:
           format: int32
       description: A bag fulfillment sku
     Order:
-      required:
-      - status
       type: object
       properties:
         id:
           type: integer
+          description: ID of the Violet cart or order.
           format: int64
           readOnly: true
         token:
           type: string
+          description: An alternative UUID that can be used as an ID to reference
+            the cart or order.
           readOnly: true
+          deprecated: true
         errors:
           type: array
           description: "Errors on the Order. During checkout, if there was an error\
@@ -2882,6 +2884,7 @@ components:
             \ the order object in the response even if there was an issue with a bag\
             \ so you must always check the response for errors in this list to know\
             \ if there was an issue on the order."
+          nullable: true
           items:
             $ref: '#/components/schemas/OrderError'
         user_id:
@@ -2919,39 +2922,47 @@ components:
           description: "The price of the Order in the base currency before discounts,\
             \ shipping, duties, taxes, and tips. In Cents."
           format: int32
+          default: 0
         shipping_total:
           type: integer
           description: The sum of all shipping methods applied to the Order in the
             base currency. In Cents.
           format: int32
+          default: 0
         tax_total:
           type: integer
           description: The sum of all the taxes applied to the Order in the base currency.
             In Cents.
           format: int32
+          default: 0
         discount_total:
           type: integer
           description: The total discounts applied to the price of the Order in the
             base currency. In Cents.
           format: int32
+          default: 0
         total:
           type: integer
           description: "The sum of all item prices, discounts, shipping, and taxes\
             \ applied to the Order in the base currency. In Cents."
           format: int32
+          default: 0
         app_customer_id:
           type: string
           description: App Customer ID. This should be used to map the order to the
             ID of the customer in your application.
+          nullable: true
         app_order_id:
           type: string
           description: "App Order ID. This should be set to a unique identifier in\
             \ your system. While not enforced unique in Violet's system, it is strongly\
             \ recommended that unique values are used for each cart to help correlate\
             \ identifiers between Violet's system and yours."
+          nullable: true
         status:
           type: string
           description: Status of the Order
+          readOnly: true
           enum:
           - IN_PROGRESS
           - PROCESSING
@@ -2963,29 +2974,38 @@ components:
         is_guest:
           type: boolean
           description: Order is Guest
+          readOnly: true
+          default: true
         date_created:
           type: string
           description: Date of order creation
           format: date-time
+          readOnly: true
         date_last_modified:
           type: string
           description: Date of last order update
           format: date-time
+          readOnly: true
         priced:
           type: boolean
           description: Is the cart priced
+          readOnly: true
+          default: false
         wallet_based_checkout:
           type: boolean
           description: Is this cart going to be placed through wallet-based checkout
+          default: false
         currency:
           type: string
           description: Base currency of cart
+          default: USD
         referral_id:
           type: string
           description: Optional value used to represent an identifier in your system.
             This value is not required to represent a referral. It can represent the
             ID of anything in your system and can be used to filter order lookup results.
             Max length of 128 characters.
+          nullable: true
         currency_symbol:
           type: string
           description: Symbol representing the currency the Order operates in.
@@ -3074,16 +3094,21 @@ components:
         last_name:
           type: string
       description: The shipping or billing address of a user placing an order
+      nullable: true
     OrderCustomer:
       required:
+      - email
       - first_name
       - last_name
       type: object
       properties:
         user_id:
           type: integer
-          description: ID of the User the Order Customer references
+          description: Reference ID of the customer placing the order.
           format: int64
+          nullable: true
+          readOnly: true
+          deprecated: true
         first_name:
           type: string
           description: Customer's first name.
@@ -3103,11 +3128,14 @@ components:
           $ref: '#/components/schemas/OrderAddress'
         same_address:
           type: boolean
-          description: Use Same Address for Both
+          description: "When only one address is provided, should the one address\
+            \ be used for both the shipping and billing addresses."
           default: false
         name:
           type: string
-      description: The Customer Placing the Order
+          description: Full name of the customer.
+          readOnly: true
+      description: Details of the customer placing the order.
       nullable: true
     OrderError:
       type: object
@@ -3219,6 +3247,7 @@ components:
           - BIGCARTEL
           - CUSTOM
       description: Order Error
+      nullable: true
     OrderPaymentMethod:
       required:
       - payment_method_id
@@ -3558,36 +3587,6 @@ components:
           description: 'Amount of this payment in the fractional currency unit of
             this transaction (e.g. cents). This is the amount charged to the shopper. '
           format: int32
-        metadata:
-          type: object
-          additionalProperties:
-            type: object
-            description: Metadata from the payment provider associated to this payment
-              transaction
-          description: Metadata from the payment provider associated to this payment
-            transaction
-        related_bags:
-          uniqueItems: true
-          type: array
-          description: 'Identifiers of the Bags in Violet that are associated with
-            this payment transaction. The amount of this payment transaction is directly
-            computed from the total amounts on the related bags. '
-          items:
-            type: string
-            description: 'Identifiers of the Bags in Violet that are associated with
-              this payment transaction. The amount of this payment transaction is
-              directly computed from the total amounts on the related bags. '
-        related_refunds:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Refunds in Violet that are associated with
-            this payment transaction. Refund amounts are not reflected in the amount
-            on this payment transaction.
-          items:
-            type: string
-            description: Identifiers of the Refunds in Violet that are associated
-              with this payment transaction. Refund amounts are not reflected in the
-              amount on this payment transaction.
         currency:
           type: string
           description: Currency that the amount of this payment transaction is reflected
@@ -3639,6 +3638,36 @@ components:
           - AUTOMATIC
           - CUSTOM
           - EXTERNAL
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Metadata from the payment provider associated to this payment
+              transaction
+          description: Metadata from the payment provider associated to this payment
+            transaction
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: 'Identifiers of the Bags in Violet that are associated with
+            this payment transaction. The amount of this payment transaction is directly
+            computed from the total amounts on the related bags. '
+          items:
+            type: string
+            description: 'Identifiers of the Bags in Violet that are associated with
+              this payment transaction. The amount of this payment transaction is
+              directly computed from the total amounts on the related bags. '
+        related_refunds:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Refunds in Violet that are associated with
+            this payment transaction. Refund amounts are not reflected in the amount
+            on this payment transaction.
+          items:
+            type: string
+            description: Identifiers of the Refunds in Violet that are associated
+              with this payment transaction. Refund amounts are not reflected in the
+              amount on this payment transaction.
         errors:
           uniqueItems: true
           type: array
@@ -3655,20 +3684,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        status:
-          type: string
-          enum:
-          - PROCESSING
-          - CAPTURED
-          - CANCELLED
-          - FAILED
-          - BYPASSED
-          - REQUIRES_ACTION
-          - REQUIRES_PAYMENT_METHOD
-          - REQUIRES_AUTHORIZATION
-          - AUTHORIZED
-          - REFUNDED
-          - PARTIALLY_REFUNDED
       description: Payment Transaction
     PaymentTransactionError:
       required:
