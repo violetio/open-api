@@ -76,9 +76,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Add Discount to Cart:
                   description: Add Discount to Cart
@@ -286,9 +284,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Add Sku to Cart:
                   description: Add Sku to Cart
@@ -964,9 +960,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Payment Method Applied:
                   description: Payment Method Applied
@@ -1327,9 +1321,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Set Shipping Method:
                   description: Set Shipping Method
@@ -1648,13 +1640,84 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CalculateCartRequest'
+            examples:
+              Estimate Cart:
+                description: Estimate Cart
+                value:
+                  base_currency: USD
+                  skus:
+                  - sku_id: 10000
+                    quantity: 2
+                  shipping_address:
+                    address_1: 2815 Elliott Ave
+                    address_2: Unit 100
+                    city: Seattle
+                    state: WA
+                    country: US
+                    postal_code: "98121"
+                    phone: "1234567890"
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CalculateCartResponse'
+                $ref: '#/components/schemas/Refund'
+              examples:
+                Estimated Cart:
+                  description: Estimated Cart
+                  value:
+                    estimated_carts:
+                    - merchant_id: 10000
+                      platform: SHOPIFY
+                      base_currency: USD
+                      sub_total: 19998
+                      shipping_total: 0
+                      tax_total: 2119
+                      total: 22117
+                      skus:
+                      - quantity: 2
+                        sku_id: 10000
+                        name: Nintendo Entertainment System
+                        price: 9999
+                        merchant_id: 11111
+                        external_id: "31516807528534"
+                        available: true
+                        requires_shipping: true
+                        product_type: PHYSICAL
+                        line_price: 19998
+                      available_shipping_methods:
+                      - label: Free Shipping
+                        carrier: OTHER
+                        price: 0
+                        shipping_method_id: 18ff5c0a16d83cb8ba46848e48e06532
+                      - label: Ground Advantage
+                        carrier: USPS
+                        price: 712
+                        shipping_method_id: 468c823c817c753e850ff6658ef1480f
+                      - label: Priority Mail
+                        carrier: USPS
+                        price: 934
+                        shipping_method_id: 02ef65ebff687faa10c71830d41144b2
+                      - label: Standard
+                        carrier: OTHER
+                        price: 1990
+                        shipping_method_id: 7a4763e6b861a281511834b449e0c574
+                      has_shipping_methods: true
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Blocked Address:
+                  description: Blocked Address
+                  value:
+                    message: The provided address has been blocked due to a history
+                      of being used for fraudulent orders.
+                    error: blocked_address
+                    code: 4236
   /orders/{order_id}/bags/{bag_id}/cancel:
     post:
       tags:
@@ -1692,17 +1755,125 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CancelOrderRequest'
-            example:
-              notify_customer: false
-              reason_code: CUSTOMER
-              reason: Customer requested refund.
+            examples:
+              Customer Requested Cancellation:
+                description: Customer Requested Cancellation
+                value:
+                  notify_customer: true
+                  reason_code: CUSTOMER
+                  reason: Customer requested refund.
+              Suspected Fraud Cancellation:
+                description: Suspected Fraud Cancellation
+                value:
+                  notify_customer: false
+                  reason_code: FRAUD
+                  reason: Payment method flagged for high risk of fraud.
       responses:
         "200":
-          description: successful operation
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderCancellation'
+                $ref: '#/components/schemas/Refund'
+              examples:
+                Completed Cancellation:
+                  description: Completed Cancellation
+                  value:
+                    order_id: 10000
+                    app_id: 10000
+                    status: CANCELED
+                    cancelled_bags:
+                    - order_id: 10000
+                      bag_id: 11111
+                      merchant_id: 22222
+                      external_order_id: "7438192837181"
+                      status: CANCELED
+                      originated_by: VIOLET
+                      date_cancelled: 2024-10-24T14:00:39.000+00:00
+                      refund:
+                        id: 99999
+                        order_id: 10000
+                        bag_id: 11111
+                        merchant_id: 22222
+                        app_id: 10000
+                        transaction_id: 44444
+                        amount: 9900
+                        reason: Order canceled
+                        refund_currency: USD
+                        status: COMPLETED
+                        skus:
+                        - id: 55555
+                          bag_id: 11111
+                          quantity_refunded: 1
+                          external_id: "41818918453315"
+                          order_sku_id: 8014657
+                        - id: 55556
+                          bag_id: 77777
+                          quantity_refunded: 1
+                          external_id: "41832890171459"
+                          order_sku_id: 77777
+                        date_created: 2024-10-24T14:00:35+0000
+                        date_last_modified: 2024-10-24T14:00:35+0000
+                        external_id: "943916482627"
+                        errors: []
+                    message: All external orders were cancelled.
+        "202":
+          description: accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+              examples:
+                Bag Cancelled with Errors:
+                  description: Bag Cancelled with Errors
+                  value:
+                    order_id: 10000
+                    app_id: 10000
+                    status: CANCELLATION_FAILURE
+                    cancelled_bags:
+                    - order_id: 10000
+                      bag_id: 11111
+                      merchant_id: 22222
+                      external_order_id: "7438192837181"
+                      status: CANCELLATION_FAILURE
+                      originated_by: VIOLET
+                      date_cancelled: 2024-10-24T14:00:39.000+00:00
+                      refund: null
+                      errors:
+                      - bag_id: 11111
+                        order_id: 10000
+                        type: EXTERNAL_CANCEL_ORDER
+                        message: Paid and fulfilled bags cannot be cancelled.
+                    message: All external orders failed to be cancelled.
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Bag Cannot be Cancelled:
+                  description: Bag Cannot be Cancelled
+                  value:
+                    message: "Bag 11111 cannot be cancelled as it must be in an accepted,\
+                      \ completed, or partially refunded state to qualify for cancellation.\
+                      \ Please use the Bag Cancellation endpoint to cancel individual\
+                      \ bags."
+                    error: invalid_bag_state
+                    code: 4225
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /orders/{order_id}/cancel:
     post:
       tags:
@@ -1734,17 +1905,125 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CancelOrderRequest'
-            example:
-              notify_customer: false
-              reason_code: CUSTOMER
-              reason: Customer requested refund.
+            examples:
+              Customer Requested Cancellation:
+                description: Customer Requested Cancellation
+                value:
+                  notify_customer: true
+                  reason_code: CUSTOMER
+                  reason: Customer requested refund.
+              Suspected Fraud Cancellation:
+                description: Suspected Fraud Cancellation
+                value:
+                  notify_customer: false
+                  reason_code: FRAUD
+                  reason: Payment method flagged for high risk of fraud.
       responses:
         "200":
-          description: default response
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderCancellation'
+                $ref: '#/components/schemas/Refund'
+              examples:
+                Completed Cancellation:
+                  description: Completed Cancellation
+                  value:
+                    order_id: 10000
+                    app_id: 10000
+                    status: CANCELED
+                    cancelled_bags:
+                    - order_id: 10000
+                      bag_id: 11111
+                      merchant_id: 22222
+                      external_order_id: "7438192837181"
+                      status: CANCELED
+                      originated_by: VIOLET
+                      date_cancelled: 2024-10-24T14:00:39.000+00:00
+                      refund:
+                        id: 99999
+                        order_id: 10000
+                        bag_id: 11111
+                        merchant_id: 22222
+                        app_id: 10000
+                        transaction_id: 44444
+                        amount: 9900
+                        reason: Order canceled
+                        refund_currency: USD
+                        status: COMPLETED
+                        skus:
+                        - id: 55555
+                          bag_id: 11111
+                          quantity_refunded: 1
+                          external_id: "41818918453315"
+                          order_sku_id: 8014657
+                        - id: 55556
+                          bag_id: 77777
+                          quantity_refunded: 1
+                          external_id: "41832890171459"
+                          order_sku_id: 77777
+                        date_created: 2024-10-24T14:00:35+0000
+                        date_last_modified: 2024-10-24T14:00:35+0000
+                        external_id: "943916482627"
+                        errors: []
+                    message: All external orders were cancelled.
+        "202":
+          description: accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+              examples:
+                Order Cancelled with Errors:
+                  description: Order Cancelled with Errors
+                  value:
+                    order_id: 10000
+                    app_id: 10000
+                    status: CANCELLATION_FAILURE
+                    cancelled_bags:
+                    - order_id: 10000
+                      bag_id: 11111
+                      merchant_id: 22222
+                      external_order_id: "7438192837181"
+                      status: CANCELLATION_FAILURE
+                      originated_by: VIOLET
+                      date_cancelled: 2024-10-24T14:00:39.000+00:00
+                      refund: null
+                      errors:
+                      - bag_id: 11111
+                        order_id: 10000
+                        type: EXTERNAL_CANCEL_ORDER
+                        message: Paid and fulfilled bags cannot be cancelled.
+                    message: All external orders failed to be cancelled.
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order or Bag Cannot be Cancelled:
+                  description: Order or Bag Cannot be Cancelled
+                  value:
+                    message: "Bag 11111 cannot be cancelled as it must be in an accepted,\
+                      \ completed, or partially refunded state to qualify for cancellation.\
+                      \ Please use the Bag Cancellation endpoint to cancel individual\
+                      \ bags."
+                    error: invalid_bag_state
+                    code: 4225
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart:
     post:
       tags:
@@ -1840,9 +2119,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Create Cart:
                   description: Create Cart
@@ -2108,9 +2385,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Multi-Bag External Failure:
                   description: Multi-Bag External Failure
@@ -2524,9 +2799,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Get Cart:
                   description: Get Cart
@@ -2771,9 +3044,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrderShippingMethodWrapper'
+                $ref: '#/components/schemas/OrderShippingMethodWrapper'
               examples:
                 Has Available Shipping Methods:
                   description: Has Available Shipping Methods
@@ -2856,14 +3127,130 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Refund'
+              examples:
+                Single Refund:
+                  description: Single Refund
+                  value:
+                  - id: 10000
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 2500
+                    reason: Item is out of stock.
+                    refund_currency: USD
+                    status: COMPLETED
+                    skus:
+                    - id: 33333
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "43522846032108"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    external_id: "910123663596"
+                    errors: []
+                Multiple Partial Refunds:
+                  description: Multiple Partial Refunds
+                  value:
+                  - id: 10001
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 3500
+                    reason: Item returned by customer.
+                    refund_currency: USD
+                    status: COMPLETED
+                    skus:
+                    - id: 44444
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "88172371283712"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-25T01:01:01+0000
+                    date_last_modified: 2017-06-25T01:01:01+0000
+                    external_id: "712846237462738"
+                    errors: []
+                  - id: 10000
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 2500
+                    reason: Item is out of stock.
+                    refund_currency: USD
+                    status: COMPLETED
+                    skus:
+                    - id: 33333
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "43522846032108"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    external_id: "910123663596"
+                    errors: []
+                Failed Refund:
+                  description: Failed Refund
+                  value:
+                  - id: 10000
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 2500
+                    reason: Refund requested by customer due to product not being
+                      received.
+                    refund_currency: USD
+                    status: FAILED
+                    skus:
+                    - id: 33333
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "43522846032108"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    external_id: "910123663596"
+                    errors:
+                    - id: 20000
+                      error_code: 9000
+                      error_message: Payment was disputed by cardholder and can no
+                        longer be refunded.
+                      refund_id: 10000
+                Bag Has No Refunds:
+                  description: Bag Has No Refunds
+                  value: []
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /orders/{order_id}:
     get:
       tags:
@@ -2934,11 +3321,73 @@ paths:
           format: int64
       responses:
         "200":
-          description: default response
+          description: success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderCancellation'
+              examples:
+                Order Cancellations:
+                  description: Order Cancellations
+                  value:
+                    order_id: 10000
+                    app_id: 10000
+                    status: CANCELED
+                    cancelled_bags:
+                    - order_id: 10000
+                      bag_id: 11111
+                      merchant_id: 22222
+                      external_order_id: "7438192837181"
+                      status: CANCELED
+                      originated_by: VIOLET
+                      date_cancelled: 2024-10-24T14:00:39.000+00:00
+                      refund:
+                        id: 99999
+                        order_id: 10000
+                        bag_id: 11111
+                        merchant_id: 22222
+                        app_id: 10000
+                        transaction_id: 44444
+                        amount: 9900
+                        reason: Order canceled
+                        refund_currency: USD
+                        status: COMPLETED
+                        skus:
+                        - id: 55555
+                          bag_id: 11111
+                          quantity_refunded: 1
+                          external_id: "41818918453315"
+                          order_sku_id: 8014657
+                        - id: 55556
+                          bag_id: 77777
+                          quantity_refunded: 1
+                          external_id: "41832890171459"
+                          order_sku_id: 77777
+                        date_created: 2024-10-24T14:00:35+0000
+                        date_last_modified: 2024-10-24T14:00:35+0000
+                        external_id: "943916482627"
+                        errors: []
+                    message: All external orders were cancelled.
+        "204":
+          description: no content
+          content:
+            application/json:
+              schema:
+                type: string
+                example: no content
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /orders/{order_id}/refunds/{refund_id}:
     get:
       tags:
@@ -2972,12 +3421,88 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Refund'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Refund'
+              examples:
+                Completed Refund:
+                  description: Completed Refund
+                  value:
+                    id: 10001
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 3500
+                    reason: Item returned by customer.
+                    refund_currency: USD
+                    status: COMPLETED
+                    skus:
+                    - id: 44444
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "88172371283712"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-25T01:01:01+0000
+                    date_last_modified: 2017-06-25T01:01:01+0000
+                    external_id: "712846237462738"
+                    errors: []
+                Failed Refund:
+                  description: Failed Refund
+                  value:
+                    id: 10000
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 2500
+                    reason: Refund requested by customer due to product not being
+                      received.
+                    refund_currency: USD
+                    status: FAILED
+                    skus:
+                    - id: 33333
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "43522846032108"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    external_id: "910123663596"
+                    errors:
+                    - id: 20000
+                      error_code: 9000
+                      error_message: Payment was disputed by cardholder and can no
+                        longer be refunded.
+                      refund_id: 10000
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Refund Not Found:
+                  description: Refund Not Found
+                  value:
+                    message: Order refund could not be found.
+                    error: order_refund_not_found
+                    code: 4227
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /orders/{order_id}/refunds:
     get:
       tags:
@@ -3005,14 +3530,130 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Refund'
+              examples:
+                Single Refund:
+                  description: Single Refund
+                  value:
+                  - id: 10000
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 2500
+                    reason: Item is out of stock.
+                    refund_currency: USD
+                    status: COMPLETED
+                    skus:
+                    - id: 33333
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "43522846032108"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    external_id: "910123663596"
+                    errors: []
+                Multiple Partial Refunds:
+                  description: Multiple Partial Refunds
+                  value:
+                  - id: 10001
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 3500
+                    reason: Item returned by customer.
+                    refund_currency: USD
+                    status: COMPLETED
+                    skus:
+                    - id: 44444
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "88172371283712"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-25T01:01:01+0000
+                    date_last_modified: 2017-06-25T01:01:01+0000
+                    external_id: "712846237462738"
+                    errors: []
+                  - id: 10000
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 2500
+                    reason: Item is out of stock.
+                    refund_currency: USD
+                    status: COMPLETED
+                    skus:
+                    - id: 33333
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "43522846032108"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    external_id: "910123663596"
+                    errors: []
+                Failed Refund:
+                  description: Failed Refund
+                  value:
+                  - id: 10000
+                    order_id: 11111
+                    bag_id: 22222
+                    merchant_id: 11111
+                    app_id: 10000
+                    transaction_id: 99999
+                    amount: 2500
+                    reason: Refund requested by customer due to product not being
+                      received.
+                    refund_currency: USD
+                    status: FAILED
+                    skus:
+                    - id: 33333
+                      refund_id: 10000
+                      bag_id: 22222
+                      quantity_refunded: 1
+                      external_id: "43522846032108"
+                      order_sku_id: 9999999999
+                    date_created: 2017-06-15T01:01:01+0000
+                    date_last_modified: 2017-06-15T01:01:01+0000
+                    external_id: "910123663596"
+                    errors:
+                    - id: 20000
+                      error_code: 9000
+                      error_message: Payment was disputed by cardholder and can no
+                        longer be refunded.
+                      refund_id: 10000
+                Order Has No Refunds:
+                  description: Order Has No Refunds
+                  value: []
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  description: Order Not Found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
   /checkout/cart/{cart_id}/price:
     get:
       tags:
@@ -3199,8 +3840,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               examples:
-                Order Not Found Exception:
-                  description: Order Not Found Exception
+                Order Not Found:
+                  description: Order Not Found
                   value:
                     message: Order could not be found.
                     error: order_not_found
@@ -3261,9 +3902,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Remove Discount from Cart:
                   description: Remove Discount from Cart
@@ -3447,9 +4086,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Remove Shipping Method:
                   description: Remove Shipping Method
@@ -3640,9 +4277,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Update Sku in Cart:
                   description: Update Sku in Cart
@@ -3800,9 +4435,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Remove Sku from Cart:
                   description: Remove Sku from Cart
@@ -4238,8 +4871,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               examples:
-                Order Not Found Exception:
-                  description: Order Not Found Exception
+                Order Not Found:
+                  description: Order Not Found
                   value:
                     message: Order could not be found.
                     error: order_not_found
@@ -4308,9 +4941,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
               examples:
                 Payment Method Applied:
                   description: Payment Method Applied
@@ -5849,6 +6480,20 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+        status:
+          type: string
+          enum:
+          - PROCESSING
+          - CAPTURED
+          - CANCELLED
+          - FAILED
+          - BYPASSED
+          - REQUIRES_ACTION
+          - REQUIRES_PAYMENT_METHOD
+          - REQUIRES_AUTHORIZATION
+          - AUTHORIZED
+          - REFUNDED
+          - PARTIALLY_REFUNDED
       description: Payment Transaction
     PaymentTransactionError:
       required:
@@ -6026,6 +6671,153 @@ components:
           description: Is the shipping method custom. True when the price has been
             overridden.
       description: Shipping Method applied to a Bag
+    Refund:
+      required:
+      - amount
+      - app_id
+      - gateway_transaction_id
+      - merchant_id
+      - order_id
+      - transaction_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        order_id:
+          type: integer
+          description: ID of the Order being refunded
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the Bag being refunded
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the merchant making the refund
+          format: int32
+        app_id:
+          type: integer
+          description: ID of the App that created the Order
+          format: int32
+        transaction_id:
+          type: integer
+          description: ID of the Transaction being refunded
+          format: int64
+        gateway_transaction_id:
+          type: string
+          description: ID of the Transaction in the Payment Gateway
+        amount:
+          type: integer
+          description: Amount being refunded. In Cents
+          format: int32
+        merchant_transfer_reversal_amount_usd:
+          type: integer
+          description: Amount being taken back from the associated transfer to the
+            merchant. In Cents
+          format: int32
+        developer_transfer_reversal_amount_usd:
+          type: integer
+          description: Amount being taken back from the associated transfer to the
+            developer. In Cents
+          format: int32
+        reason:
+          type: string
+          description: Reason for refund
+        refund_currency:
+          type: string
+          description: Currency set for this refund by the external ecom platform
+        status:
+          type: string
+          description: Status of the Refund
+          enum:
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_COMPLETED
+          - FAILED
+          - EXTERNAL
+        skus:
+          uniqueItems: true
+          type: array
+          description: SKUs the refund applies to
+          items:
+            $ref: '#/components/schemas/RefundOrderSku'
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+        external_id:
+          type: string
+          description: ID of the refund on the external commerce platform. This value
+            will only be populated if the external commerce platform supports refund
+            ID's.
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this refund during processing.
+            This value will only be populated if there are errors during processing
+          items:
+            $ref: '#/components/schemas/RefundError'
+      description: Order Refund
+    RefundError:
+      required:
+      - error_message
+      - refund_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        refund_id:
+          type: integer
+          description: ID of the Refund this Error is associated to
+          format: int64
+      description: Error associated to a refund
+    RefundOrderSku:
+      required:
+      - order_sku_id
+      - refund_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        refund_id:
+          type: integer
+          description: Id of the Refund associated with Refund Order Sku
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the Bag being refunded
+          format: int64
+        quantity_refunded:
+          type: integer
+          description: Quantity of the this item refunded by this refund.
+          format: int32
+        external_id:
+          type: string
+          description: Variant Id in external Ecom platform
+        order_sku_id:
+          type: integer
+          description: Id of the Order Sku associated with Refund Order Sku
+          format: int64
+      description: Refunded Order Sku
     CalculateCartResponse:
       type: object
       properties:
@@ -6609,242 +7401,6 @@ components:
         shipping_address:
           $ref: '#/components/schemas/BaseAddress'
       description: Calculate Cart Request
-    BagCancellation:
-      type: object
-      properties:
-        order_id:
-          type: integer
-          description: The ID of the order this cancellation relates to.
-          format: int64
-          readOnly: true
-        bag_id:
-          type: integer
-          description: The ID of the bag this cancellation relates to.
-          format: int64
-          readOnly: true
-        merchant_id:
-          type: integer
-          description: The ID of the merchant this cancellation relates to.
-          format: int32
-          readOnly: true
-        external_order_id:
-          maxLength: 64
-          minLength: 1
-          type: string
-          description: The ID of the order in the external commerce platform this
-            cancellation relates to.
-          readOnly: true
-        status:
-          type: string
-          description: Status of the bag cancellation.
-          readOnly: true
-          enum:
-          - CANCELED
-          - CANCELLATION_FAILURE
-        originated_by:
-          type: string
-          description: Who is responsible for cancelling the order.
-          readOnly: true
-          enum:
-          - CHANNEL
-          - MERCHANT
-          - VIOLET
-        date_cancelled:
-          type: string
-          description: Date and time that the order was cancelled.
-          format: date-time
-          readOnly: true
-        refund:
-          $ref: '#/components/schemas/Refund'
-        errors:
-          type: array
-          description: "Errors, if any, that occurred when attempting to cancel the\
-            \ external order."
-          nullable: true
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/OrderError'
-      description: Cancellation record for a bag.
-      readOnly: true
-    OrderCancellation:
-      type: object
-      properties:
-        order_id:
-          type: integer
-          description: The ID of the order this cancellation relates to.
-          format: int64
-          readOnly: true
-        app_id:
-          type: integer
-          description: The ID of the app that originated this order.
-          format: int32
-          readOnly: true
-        status:
-          type: string
-          description: Status of the overall cancellation.
-          readOnly: true
-          enum:
-          - CANCELED
-          - PARTIALLY_CANCELED
-          - CANCELLATION_FAILURE
-        cancelled_bags:
-          type: array
-          description: Bags within the order that were cancelled.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/BagCancellation'
-        message:
-          type: string
-          description: Description of the outcome of the order cancellation request.
-          readOnly: true
-      description: Cancellation record for an order.
-    Refund:
-      required:
-      - amount
-      - app_id
-      - gateway_transaction_id
-      - merchant_id
-      - order_id
-      - transaction_id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        order_id:
-          type: integer
-          description: ID of the Order being refunded
-          format: int64
-        bag_id:
-          type: integer
-          description: ID of the Bag being refunded
-          format: int64
-        merchant_id:
-          type: integer
-          description: ID of the merchant making the refund
-          format: int32
-        app_id:
-          type: integer
-          description: ID of the App that created the Order
-          format: int32
-        transaction_id:
-          type: integer
-          description: ID of the Transaction being refunded
-          format: int64
-        gateway_transaction_id:
-          type: string
-          description: ID of the Transaction in the Payment Gateway
-        amount:
-          type: integer
-          description: Amount being refunded. In Cents
-          format: int32
-        merchant_transfer_reversal_amount_usd:
-          type: integer
-          description: Amount being taken back from the associated transfer to the
-            merchant. In Cents
-          format: int32
-        developer_transfer_reversal_amount_usd:
-          type: integer
-          description: Amount being taken back from the associated transfer to the
-            developer. In Cents
-          format: int32
-        reason:
-          type: string
-          description: Reason for refund
-        refund_currency:
-          type: string
-          description: Currency set for this refund by the external ecom platform
-        status:
-          type: string
-          description: Status of the Refund
-          enum:
-          - PROCESSING
-          - COMPLETED
-          - CANCELED
-          - PARTIALLY_COMPLETED
-          - FAILED
-          - EXTERNAL
-        skus:
-          uniqueItems: true
-          type: array
-          description: SKUs the refund applies to
-          items:
-            $ref: '#/components/schemas/RefundOrderSku'
-        date_created:
-          type: string
-          description: Date of creation
-          format: date-time
-        date_last_modified:
-          type: string
-          description: Date of last update
-          format: date-time
-        external_id:
-          type: string
-          description: ID of the refund on the external commerce platform. This value
-            will only be populated if the external commerce platform supports refund
-            ID's.
-        errors:
-          uniqueItems: true
-          type: array
-          description: List of errors associated to this refund during processing.
-            This value will only be populated if there are errors during processing
-          items:
-            $ref: '#/components/schemas/RefundError'
-      description: Order Refund
-    RefundError:
-      required:
-      - error_message
-      - refund_id
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Unique identifier for the object.
-          format: int64
-          readOnly: true
-        error_code:
-          type: integer
-          description: Unique error code corresponding to this error.
-          format: int32
-        error_message:
-          type: string
-          description: Error message describing the issue in the underlying system.
-        refund_id:
-          type: integer
-          description: ID of the Refund this Error is associated to
-          format: int64
-      description: Error associated to a refund
-    RefundOrderSku:
-      required:
-      - order_sku_id
-      - refund_id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        refund_id:
-          type: integer
-          description: Id of the Refund associated with Refund Order Sku
-          format: int64
-        bag_id:
-          type: integer
-          description: ID of the Bag being refunded
-          format: int64
-        quantity_refunded:
-          type: integer
-          description: Quantity of the this item refunded by this refund.
-          format: int32
-        external_id:
-          type: string
-          description: Variant Id in external Ecom platform
-        order_sku_id:
-          type: integer
-          description: Id of the Order Sku associated with Refund Order Sku
-          format: int64
-      description: Refunded Order Sku
     CancelOrderRequest:
       type: object
       properties:
@@ -7016,6 +7572,95 @@ components:
           items:
             $ref: '#/components/schemas/OrderShippingMethod'
       description: Order Shipping Method Wrapper
+    BagCancellation:
+      type: object
+      properties:
+        order_id:
+          type: integer
+          description: The ID of the order this cancellation relates to.
+          format: int64
+          readOnly: true
+        bag_id:
+          type: integer
+          description: The ID of the bag this cancellation relates to.
+          format: int64
+          readOnly: true
+        merchant_id:
+          type: integer
+          description: The ID of the merchant this cancellation relates to.
+          format: int32
+          readOnly: true
+        external_order_id:
+          maxLength: 64
+          minLength: 1
+          type: string
+          description: The ID of the order in the external commerce platform this
+            cancellation relates to.
+          readOnly: true
+        status:
+          type: string
+          description: Status of the bag cancellation.
+          readOnly: true
+          enum:
+          - CANCELED
+          - CANCELLATION_FAILURE
+        originated_by:
+          type: string
+          description: Who is responsible for cancelling the order.
+          readOnly: true
+          enum:
+          - CHANNEL
+          - MERCHANT
+          - VIOLET
+        date_cancelled:
+          type: string
+          description: Date and time that the order was cancelled.
+          format: date-time
+          readOnly: true
+        refund:
+          $ref: '#/components/schemas/Refund'
+        errors:
+          type: array
+          description: "Errors, if any, that occurred when attempting to cancel the\
+            \ external order."
+          nullable: true
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/OrderError'
+      description: Cancellation record for a bag.
+      readOnly: true
+    OrderCancellation:
+      type: object
+      properties:
+        order_id:
+          type: integer
+          description: The ID of the order this cancellation relates to.
+          format: int64
+          readOnly: true
+        app_id:
+          type: integer
+          description: The ID of the app that originated this order.
+          format: int32
+          readOnly: true
+        status:
+          type: string
+          description: Status of the overall cancellation.
+          readOnly: true
+          enum:
+          - CANCELED
+          - PARTIALLY_CANCELED
+          - CANCELLATION_FAILURE
+        cancelled_bags:
+          type: array
+          description: Bags within the order that were cancelled.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/BagCancellation'
+        message:
+          type: string
+          description: Description of the outcome of the order cancellation request.
+          readOnly: true
+      description: Cancellation record for an order.
     VioletPageBag:
       type: object
       properties:
