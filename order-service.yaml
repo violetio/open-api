@@ -4579,6 +4579,38 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PayoutTransfer'
+  /orders/transfer_funds:
+    post:
+      tags:
+      - Order - Transfers
+      summary: Process Transfers for Orders
+      operationId: processTransfersForOrders
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessTransfersRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessTransfersResponse'
 components:
   schemas:
     Bag:
@@ -4814,6 +4846,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -4826,9 +4861,6 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
