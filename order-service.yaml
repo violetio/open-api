@@ -5137,12 +5137,32 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "200":
+          description: Process Transfers for a Bag
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PayoutTransfer'
+              examples:
+                Process Transfers for a Bag:
+                  description: Process Transfers for a Bag
+                  value:
+                    id: 93558
+                    payment_provider_id: tr_1QNJyxKUtPkD6xdUIfdcyt8I
+                    payout_account_id: 1025
+                    amount: 180000
+                    currency: USD
+                    status: SENT
+                    payment_provider: EXTERNAL
+                    related_orders:
+                    - "149394"
+                    related_bags:
+                    - "139862"
+                    date_created: 2024-11-20T19:54:35+0000
+                    date_last_modified: 2024-11-20T19:54:35+0000
+                    errors: []
+                    payment_service: EXTERNAL
+                    external_id: tr_1QNJyxKUtPkD6xdUIfdcyt8I
   /orders/bags/transfer_funds:
     post:
       tags:
@@ -5168,13 +5188,55 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProcessTransfersRequest'
+            examples:
+              Process Transfers Request:
+                description: Process Transfers Request
+                value:
+                  bag_ids:
+                  - 139973
+                  - 139974
       responses:
-        default:
-          description: default response
+        "200":
+          description: Process Transfers for multiple Bags
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProcessTransfersResponse'
+              examples:
+                Process Transfers for Bags:
+                  description: Process Transfers for Bags
+                  value:
+                    successful_transfers:
+                      count: 1
+                      bag_ids:
+                      - 139974
+                      - 139973
+                      transfers:
+                      - id: 93647
+                        payment_provider_id: tr_1QNNtlKUtPkD6xdU9uFqXVa0
+                        payout_account_id: 1025
+                        amount: 360000
+                        currency: USD
+                        status: SENT
+                        payment_provider: STRIPE
+                        related_orders:
+                        - "149486"
+                        - "149487"
+                        related_bags:
+                        - "139973"
+                        - "139974"
+                        related_distributions:
+                        - "89092"
+                        - "89090"
+                        date_created: 2024-11-21T00:05:29+0000
+                        date_last_modified: 2024-11-21T00:05:29+0000
+                        errors: []
+                        payment_service: STRIPE
+                        external_id: tr_1QNNtlKUtPkD6xdU9uFqXVa0
+                    failed_transfers:
+                      count: 0
+                      bag_ids: []
+                      transfers: []
   /orders/{order_id}/transfer_funds:
     post:
       tags:
@@ -5202,14 +5264,56 @@ paths:
           type: integer
           format: int64
       responses:
-        default:
-          description: default response
+        "200":
+          description: Process Transfers for an Order
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PayoutTransfer'
+                type: string
+              examples:
+                Process Transfers for an Order - Successful Transfer:
+                  description: Process Transfers for an Order - Successful Transfer
+                  value:
+                  - id: 93557
+                    payment_provider_id: tr_1QNJxRKUtPkD6xdUyTAqNfEw
+                    payout_account_id: 1025
+                    amount: 180000
+                    currency: USD
+                    status: SENT
+                    payment_provider: EXTERNAL
+                    related_orders:
+                    - "149393"
+                    related_bags:
+                    - "139861"
+                    date_created: 2024-11-20T19:53:01+0000
+                    date_last_modified: 2024-11-20T19:53:01+0000
+                    errors: []
+                    payment_service: EXTERNAL
+                    external_id: tr_1QNJxRKUtPkD6xdUyTAqNfEw
+                Process Transfers for an Order - Failed Transfer:
+                  description: Process Transfers for an Order - Failed Transfer
+                  value:
+                  - id: 93541
+                    payout_account_id: 1024
+                    amount: 180000
+                    currency: USD
+                    status: FAILED
+                    payment_provider: STRIPE
+                    related_orders:
+                    - "149376"
+                    related_bags:
+                    - "139841"
+                    related_distributions:
+                    - "88866"
+                    date_created: 2024-11-20T18:58:45+0000
+                    date_last_modified: 2024-11-20T18:58:45+0000
+                    errors:
+                    - error_code: 9000
+                      error_message: "Your destination account needs to have at least\
+                        \ one of the following capabilities enabled: transfers, crypto_transfers,\
+                        \ legacy_payments; code: insufficient_capabilities_for_transfer;\
+                        \ request-id: req_VzKCOkBxoLLUt4"
+                    payment_service: STRIPE
   /orders/transfer_funds:
     post:
       tags:
@@ -5235,13 +5339,119 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProcessTransfersRequest'
+            examples:
+              Process Transfers Request:
+                description: Process Transfers Request
+                value:
+                  order_ids:
+                  - 149483
+                  - 149484
       responses:
-        default:
-          description: default response
+        "200":
+          description: Process Transfers for multiple Orders
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProcessTransfersResponse'
+              examples:
+                Process Transfers for Orders with only successful Transfers:
+                  description: Process Transfers for Orders with only successful Transfers
+                  value:
+                    successful_transfers:
+                      count: 1
+                      order_count: 2
+                      order_ids:
+                      - 149483
+                      - 149484
+                      bag_ids:
+                      - 139970
+                      - 139971
+                      transfers:
+                      - id: 93645
+                        payment_provider_id: tr_1QNNs5KUtPkD6xdUHFhGa9HH
+                        payout_account_id: 1025
+                        amount: 360000
+                        currency: USD
+                        status: SENT
+                        payment_provider: STRIPE
+                        related_orders:
+                        - "149483"
+                        - "149484"
+                        related_bags:
+                        - "139971"
+                        - "139970"
+                        related_distributions:
+                        - "89086"
+                        - "89084"
+                        date_created: 2024-11-21T00:03:45+0000
+                        date_last_modified: 2024-11-21T00:03:45+0000
+                        errors: []
+                        payment_service: STRIPE
+                        external_id: tr_1QNNs5KUtPkD6xdUHFhGa9HH
+                    failed_transfers:
+                      count: 0
+                      order_count: 0
+                      order_ids: []
+                      bag_ids: []
+                      transfers: []
+                Process Transfers for Orders with some failures:
+                  description: Process Transfers for Orders with some failures
+                  value:
+                    successful_transfers:
+                      count: 1
+                      order_count: 1
+                      order_ids:
+                      - 149466
+                      bag_ids:
+                      - 139950
+                      transfers:
+                      - id: 93631
+                        payment_provider_id: tr_1QNN9AKUtPkD6xdUOwWKizAg
+                        payout_account_id: 1025
+                        amount: 180000
+                        currency: USD
+                        status: SENT
+                        payment_provider: STRIPE
+                        related_orders:
+                        - "149466"
+                        related_bags:
+                        - "139950"
+                        related_distributions:
+                        - "89052"
+                        date_created: 2024-11-20T23:17:20+0000
+                        date_last_modified: 2024-11-20T23:17:20+0000
+                        errors: []
+                        payment_service: STRIPE
+                        external_id: tr_1QNN9AKUtPkD6xdUOwWKizAg
+                    failed_transfers:
+                      count: 1
+                      order_count: 1
+                      order_ids:
+                      - 149467
+                      bag_ids:
+                      - 139951
+                      transfers:
+                      - id: 93630
+                        payout_account_id: 1024
+                        amount: 180000
+                        currency: USD
+                        status: FAILED
+                        payment_provider: STRIPE
+                        related_orders:
+                        - "149467"
+                        related_bags:
+                        - "139950"
+                        related_distributions:
+                        - "89054"
+                        date_created: 2024-11-20T23:17:19+0000
+                        date_last_modified: 2024-11-20T23:17:19+0000
+                        errors:
+                        - error_code: 9000
+                          error_message: "Your destination account needs to have at\
+                            \ least one of the following capabilities enabled: transfers,\
+                            \ crypto_transfers, legacy_payments; code: insufficient_capabilities_for_transfer;\
+                            \ request-id: req_RqlWekVxJrBx8e"
+                        payment_service: STRIPE
 components:
   schemas:
     Bag:
