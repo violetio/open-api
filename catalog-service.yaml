@@ -187,8 +187,8 @@ paths:
           format: int32
       - name: since
         in: query
-        description: A date represented in epoch milliseconds (https://www.epochconverter.com/).
-          Gets offers last modified after the given date.
+        description: Use `date_last_modified:min`.
+        deprecated: true
         schema:
           type: integer
           format: int64
@@ -222,6 +222,24 @@ paths:
           - metadata
           - collections
           - shipping
+      - name: date_last_modified:min
+        in: query
+        description: "Return only the published offers that have been modified after\
+          \ the given date time, using the standard Violet datetime format, ISO 8601.\
+          \ Example: `2017-06-15T01:01:01+0000`"
+        schema:
+          type: string
+          example: 2017-06-15T01:01:01+0000
+        example: 2017-06-15T01:01:01+0000
+      - name: date_last_modified:max
+        in: query
+        description: "Return only the published offers that have been modified before\
+          \ the given date time, using the standard Violet datetime format, ISO 8601.\
+          \ Example: `2017-06-25T01:01:01+0000`"
+        schema:
+          type: string
+          example: 2017-06-25T01:01:01+0000
+        example: 2017-06-25T01:01:01+0000
       responses:
         default:
           description: default response
@@ -258,10 +276,19 @@ paths:
       - name: date_last_modified:min
         in: query
         description: "Count only the offers that have been modified after the given\
-          \ date time, using the standard Violet datetime format (most objects have\
-          \ a date on them using this format)"
+          \ date time, using the standard Violet datetime format, ISO 8601. Example:\
+          \ `2017-06-15T01:01:01+0000`"
         schema:
           type: string
+          example: 2017-06-15T01:01:01+0000
+      - name: date_last_modified:max
+        in: query
+        description: "Count only the published offers that have been modified before\
+          \ the given date time, using the standard Violet datetime format, ISO 8601.\
+          \ Example: `2017-06-25T01:01:01+0000`"
+        schema:
+          type: string
+          example: 2017-06-25T01:01:01+0000
       responses:
         default:
           description: default response
