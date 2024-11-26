@@ -1091,14 +1091,16 @@ components:
           description: The URL to the product page in the merchants store.
         name:
           type: string
-          description: Name of Product in Offer
+          description: Name of the offer.
         description:
+          maxLength: 65000
           type: string
-          description: Product Description
+          description: "Description of the offer. Note: this value may contain HTML\
+            \ elements."
           nullable: true
         source:
           type: string
-          description: Source Platform
+          description: Commerce platform the offer was sourced from.
           enum:
           - OTHER
           - SHOPIFY
@@ -1206,30 +1208,18 @@ components:
             \ there will only be a single album per Offer."
           items:
             $ref: '#/components/schemas/Album'
-        three_d_enabled:
-          type: boolean
-          description: Is the product 3D Enabled
-          nullable: true
-          default: false
-        three_d_resource:
-          type: string
-          description: 3D Resource Object
-          nullable: true
         type:
           type: string
-          description: Product Type
+          description: "Type of product. Note: Offers with a type of `BUNDLED` cannot\
+            \ be purchased through the API at this time due to ecom platform limitations."
           enum:
-          - PHYSICAL
-          - DIGITAL
-          - VIRTUAL
-          - BUNDLED
           - PHYSICAL
           - DIGITAL
           - VIRTUAL
           - BUNDLED
         status:
           type: string
-          description: Status
+          description: Current status of the Offer.
           enum:
           - UNAVAILABLE
           - AVAILABLE
@@ -1245,17 +1235,26 @@ components:
           - PUBLISHED
         date_created:
           type: string
-          description: Date of offer creation
+          description: Date of offer creation in ISO 8601 format.
           format: date-time
         date_last_modified:
           type: string
-          description: Date of last offer update
+          description: Date of last offer update in ISO 8601 format.
           format: date-time
         date_last_consolidated:
           type: string
-          description: Date of last consolidation. This date is jittered for performance
-            reasons and can be in the future
+          description: Date of last consolidation in ISO 8601 format. This date is
+            jittered for performance reasons and can be in the future
           format: date-time
+        three_d_enabled:
+          type: boolean
+          description: Is the product 3D Enabled
+          nullable: true
+          default: false
+        three_d_resource:
+          type: string
+          description: 3D Resource Object
+          nullable: true
         commission_rate:
           type: number
           description: Amount given by merchant
@@ -3684,6 +3683,20 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+        status:
+          type: string
+          enum:
+          - PROCESSING
+          - CAPTURED
+          - CANCELLED
+          - FAILED
+          - BYPASSED
+          - REQUIRES_ACTION
+          - REQUIRES_PAYMENT_METHOD
+          - REQUIRES_AUTHORIZATION
+          - AUTHORIZED
+          - REFUNDED
+          - PARTIALLY_REFUNDED
       description: Payment Transaction
     PaymentTransactionError:
       required:
@@ -3952,10 +3965,6 @@ components:
             platform.
           readOnly: true
           enum:
-          - COUNTRY
-          - PROVINCE
-          - POSTCODE
-          - CONTINENT
           - COUNTRY
           - PROVINCE
           - POSTCODE
