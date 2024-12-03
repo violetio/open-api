@@ -2570,6 +2570,22 @@ paths:
           type: integer
           format: int32
           default: 20
+      - name: date_last_modified:min
+        in: query
+        description: "Query only the orders that have been modified after the given\
+          \ date time, using the standard Violet datetime format, ISO 8601. Example:\
+          \ `2017-06-15T01:01:01+0000`"
+        schema:
+          type: string
+      requestBody:
+        description: "Query only the orders that have been modified before the given\
+          \ date time, using the standard Violet datetime format, ISO 8601. Example:\
+          \ `2017-06-25T01:01:01+0000`"
+        content:
+          application/json:
+            schema:
+              type: string
+              example: 2017-06-25T01:01:01+0000
       responses:
         default:
           description: default response
@@ -7956,26 +7972,50 @@ components:
           description: Order ID in the Channels System
         before_date:
           type: string
-          description: Before date last modified
+          description: Use `date_last_modified:max`.
           format: date-time
+          deprecated: true
         after_date:
           type: string
-          description: After date last modified
+          description: Use `date_last_modified:min`.
           format: date-time
+          deprecated: true
         before_date_created:
           type: string
-          description: Before date last created
+          description: Use `date_created:max`.
           format: date-time
+          deprecated: true
         after_date_created:
           type: string
-          description: After date last created
+          description: Use `date_created:min`.
           format: date-time
+          deprecated: true
         sort_by:
           type: string
           description: Property to sort by in camelCase
         sort_direction:
           type: string
           description: Direction to sort by
+        date_last_modified:min:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include bags modified after this date.
+          format: date-time
+        date_last_modified:max:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include bags modified before this date.
+          format: date-time
+        date_created:min:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include bags created after this date.
+          format: date-time
+        date_created:max:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include bags created before this date.
+          format: date-time
       description: Bag Search Request
     OrderSearchRequest:
       type: object
@@ -8014,15 +8054,37 @@ components:
           format: int32
         before_date:
           type: string
-          description: Before date
+          description: Use `date_created:max`.
           format: date-time
+          deprecated: true
         after_date:
           type: string
-          description: After date
+          description: Use `date_created:min`.
           format: date-time
+          deprecated: true
         app_order_id:
           type: string
           description: Order ID in the Channels System
+        date_last_modified:min:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include orders modified after this date.
+          format: date-time
+        date_last_modified:max:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include orders modified before this date.
+          format: date-time
+        date_created:min:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include orders created after this date.
+          format: date-time
+        date_created:max:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include orders created before this date.
+          format: date-time
       description: Order Search Request
     CartSubmissionRequest:
       type: object
