@@ -200,6 +200,42 @@ paths:
                   custom_tags:
                   - tag1
                   - tag2
+  /merchants/app_relationships/{app_id}/tax_remitter/{tax_remitter}:
+    put:
+      operationId: updateTaxRemitterOnMerchantAppRelationships
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: tax_remitter
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - APP
+          - MERCHANT
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
   /merchants:
     get:
       tags:
