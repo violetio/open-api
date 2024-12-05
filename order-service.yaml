@@ -949,11 +949,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentMethodRequest'
             example:
-              card_number: '4242424242424242'
-              card_cvc: 111
-              card_exp_month: 12
-              card_exp_year: 29
-              card_postal_code: '11211'
+              token: 'tok_amex'
       responses:
         "200":
           description: success
