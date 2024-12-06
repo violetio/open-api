@@ -448,6 +448,8 @@ components:
           $ref: '#/components/schemas/OrdersConfig'
         catalog_config:
           $ref: '#/components/schemas/CatalogConfig'
+        shipping_config:
+          $ref: '#/components/schemas/ShippingConfig'
       description: A Container for Merchant Configuration info
     OrdersConfig:
       type: object
@@ -460,6 +462,32 @@ components:
             type: string
             description: Custom tags to be added to a merchants orders upon submission.
       description: Configurations for the merchants order behaviors.
+    ShippingConfig:
+      type: object
+      properties:
+        fallback_methods:
+          uniqueItems: true
+          type: array
+          description: Fallback methods to be used when the merchant's system provides
+            no shipping methods.
+          items:
+            $ref: '#/components/schemas/ShippingMethod'
+      description: Configurations for the merchants shipping behaviors.
+    ShippingMethod:
+      type: object
+      properties:
+        label:
+          type: string
+        price:
+          type: integer
+          format: int32
+        calculationType:
+          type: string
+          enum:
+          - PER_ORDER
+          - PER_ITEM
+      description: Fallback methods to be used when the merchant's system provides
+        no shipping methods.
     StockRules:
       type: object
       properties:
