@@ -5531,6 +5531,15 @@ components:
           - REFUNDED
           - PARTIALLY_REFUNDED
           - VOIDED
+        dispute_status:
+          type: string
+          description: Dispute status of the Bag.
+          default: UNDISPUTED
+          enum:
+          - UNDISPUTED
+          - IN_DISPUTE
+          - DISPUTE_WON
+          - DISPUTE_LOST
         skus:
           type: array
           description: Sku's (line items) that have been added to the Bag.
