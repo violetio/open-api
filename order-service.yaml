@@ -6501,6 +6501,12 @@ components:
           type: integer
           description: The quantity of this item that has been fulfilled by the merchant.
           format: int32
+        rates:
+          type: array
+          description: "Rates that apply specifically to this Sku such as taxes, fees,\
+            \ or duties."
+          items:
+            $ref: '#/components/schemas/OrderSkuRate'
         line_price:
           type: integer
           description: "Price of the Sku multiplied by the quantity, in Cents"
@@ -6526,6 +6532,44 @@ components:
       example:
       - name: engraving
         value: Happy Birthday!
+    OrderSkuRate:
+      required:
+      - amount
+      - name
+      - order_sku_id
+      - type
+      type: object
+      properties:
+        order_sku_id:
+          type: integer
+          description: ID of the Order SKU the Rate belongs to
+          format: int64
+        amount:
+          type: integer
+          description: Total Tax amount on Bag. In Cents
+          format: int32
+        rate:
+          type: number
+          description: Rate
+          format: double
+        type:
+          type: string
+          description: Rate Type
+          enum:
+          - TAX
+          - SHIPPING
+          - FEE
+          - DUTY
+        name:
+          type: string
+          description: Rate Name
+        decimal_rate:
+          type: number
+          format: double
+        dollar_amount:
+          type: number
+          format: double
+      description: Rates belonging to Order SKUs
     OrderTax:
       required:
       - amount
