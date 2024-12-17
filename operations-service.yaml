@@ -632,6 +632,8 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+        externalId:
+          type: string
         paymentServiceAccountType:
           type: string
           enum:
@@ -646,8 +648,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
         details:
           $ref: '#/components/schemas/PayoutAccountDetails'
       description: Violet Payout Account that stores underlying payment provider account
