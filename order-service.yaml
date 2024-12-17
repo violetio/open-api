@@ -3263,6 +3263,56 @@ paths:
                     message: Order could not be found.
                     error: order_not_found
                     code: 4216
+    post:
+      tags:
+      - Order Refunds
+      summary: Refund Bag
+      operationId: performBagRefund
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: bag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundBagRequest'
+            example:
+              amount_refunded: 999
+              restock_items: true
+              reason: Order not received
+              skus:
+                order_sku_id: 12345
+                quantity: 1
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
   /orders/{order_id}:
     get:
       tags:
@@ -6091,7 +6141,7 @@ components:
           description: City
         state:
           type: string
-          description: State Abbreviation
+          description: State or province abbreviated code.
         country:
           type: string
           description: Country ISO2 Code
@@ -6100,7 +6150,9 @@ components:
           description: Postal/Zip Code
         phone:
           type: string
-          description: Phone Number
+          description: "Phone number related to the address. Note: Some external commerce\
+            \ platforms require this value. For these platforms Violet will use a\
+            \ fake number if no value is provided to ensure that the order succeeds."
         type:
           type: string
           description: Address Type
@@ -7000,6 +7052,15 @@ components:
         reason:
           type: string
           description: Reason for refund
+        reason_code:
+          type: string
+          description: Reason code for refund
+          enum:
+          - OTHER
+          - CUSTOMER
+          - INVENTORY
+          - FRAUD
+          - DECLINED
         refund_currency:
           type: string
           description: Currency set for this refund by the external ecom platform
@@ -7039,6 +7100,14 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/RefundError'
+        shipping:
+          $ref: '#/components/schemas/RefundShipping'
+        tax_amount:
+          minimum: 0
+          type: integer
+          description: Tax amount being refunded. In Cents.
+          format: int32
+          nullable: true
       description: Order Refund
     RefundError:
       required:
@@ -7093,6 +7162,34 @@ components:
           description: Id of the Order Sku associated with Refund Order Sku
           format: int64
       description: Refunded Order Sku
+    RefundShipping:
+      type: object
+      properties:
+        amount:
+          minimum: 0
+          type: integer
+          description: "Shipping amount, inclusive of any taxes, that was refunded\
+            \ in cents. If no value is provided the full shipping amount will be refunded."
+          format: int32
+          nullable: true
+        tax_amount:
+          minimum: 0
+          type: integer
+          description: Tax amount that was refunded in cents.
+          format: int32
+          nullable: true
+        full_refund:
+          type: boolean
+          description: Is the shipping refund a full refund of the total shipping
+            amount.
+          nullable: true
+        discrepancy_reason:
+          type: string
+          description: An optional reason for any discrepancies in the shipping amount
+            that was refunded.
+          nullable: true
+      description: Details of any refunded shipping amounts.
+      nullable: true
     CalculateCartResponse:
       type: object
       properties:
@@ -7936,6 +8033,92 @@ components:
           description: Description of the outcome of the order cancellation request.
           readOnly: true
       description: Cancellation record for an order.
+    RefundBagRequest:
+      type: object
+      properties:
+        reason:
+          maxLength: 255
+          type: string
+          description: Custom reason message for the refund.
+          nullable: true
+        restock_items:
+          type: boolean
+          description: Should the items be restocked. Set to `true` when the order
+            is being returned.
+          nullable: true
+          default: false
+        notify_customer:
+          type: boolean
+          description: Should the customer be notified by the merchants system of
+            the refund. If no value is provided the merchants default system configuration
+            for this feature will be used.
+          nullable: true
+          default: false
+        amount_refunded:
+          minimum: 0
+          type: integer
+          description: Amount that should be refunded in cents. If no value is provided
+            the full bag amount will be refunded.
+          format: int32
+          nullable: true
+        shipping:
+          $ref: '#/components/schemas/RefundRequestShipping'
+        skus:
+          uniqueItems: true
+          type: array
+          description: Sku level refund data. If no Sku's are provided then all Skus
+            will be refunded.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/RefundRequestLineItem'
+      description: Request used to initiate a bag refund.
+    RefundRequestLineItem:
+      required:
+      - order_sku_id
+      type: object
+      properties:
+        order_sku_id:
+          type: integer
+          description: "ID of the Sku within the Order. Please note that this is not\
+            \ the Sku Id, or ID of a catalog Sku, but the ID of the line item in a\
+            \ Bag."
+          format: int64
+        quantityRefunded:
+          type: integer
+          description: Quantity of this item being refunded. If no value is provided
+            then each quantity of this item will be refunded.
+          format: int32
+        amount_refunded:
+          minimum: 0
+          type: integer
+          description: Line item amount that should be refunded in cents. If no value
+            is provided the full line item amount will be refunded.
+          format: int32
+          nullable: true
+      description: Sku level refund data. If no Sku's are provided then all Skus will
+        be refunded.
+      nullable: true
+    RefundRequestShipping:
+      type: object
+      properties:
+        amount:
+          minimum: 0
+          type: integer
+          description: "Shipping amount, inclusive of any taxes, that should be refunded\
+            \ in cents. If no value is provided the full shipping amount will be refunded."
+          format: int32
+          nullable: true
+        full_refund:
+          type: boolean
+          description: Is the shipping refund a full refund of the shipping amount.
+          nullable: true
+        discrepancy_reason:
+          type: string
+          description: An optional reason for any discrepancies in the shipping amount
+            that was refunded.
+          nullable: true
+      description: Details of any shipping refunds.
+      nullable: true
     VioletPageBag:
       type: object
       properties:
