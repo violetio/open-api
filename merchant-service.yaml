@@ -838,7 +838,8 @@ components:
           description: ID of the Merchant on Ecommerce Platform
         distribution_type:
           type: string
-          description: ID of the Merchant on Ecommerce Platform
+          description: Determines if the merchants products are available to all apps
+            or only available to apps of their choosing
           enum:
           - PUBLIC
           - PRIVATE
