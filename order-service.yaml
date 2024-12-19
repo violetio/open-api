@@ -3300,12 +3300,13 @@ paths:
             schema:
               $ref: '#/components/schemas/RefundBagRequest'
             example:
-              amount_refunded: 999
-              restock_items: true
-              reason: Order not received
+              amount_refunded: 1000
+              shipping:
+                amount: 500
               skus:
-                order_sku_id: 12345
-                quantity: 1
+              - order_sku_id: 10000
+                quantity_refunded: 1
+                amount_refunded: 500
       responses:
         default:
           description: default response
@@ -6103,9 +6104,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -6122,6 +6120,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -8083,7 +8084,7 @@ components:
             \ the Sku Id, or ID of a catalog Sku, but the ID of the line item in a\
             \ Bag."
           format: int64
-        quantityRefunded:
+        quantity_refunded:
           type: integer
           description: Quantity of this item being refunded. If no value is provided
             then each quantity of this item will be refunded.
