@@ -403,11 +403,44 @@ paths:
                 $ref: '#/components/schemas/VioletPageMerchantSummary'
 components:
   schemas:
+    AvailabilityConfig:
+      type: object
+      properties:
+        availabilityRules:
+          $ref: '#/components/schemas/AvailabilityRules'
+      description: Configurations for the merchants availability behaviors.
+    AvailabilityRule:
+      type: object
+      properties:
+        available:
+          type: boolean
+      description: Configurations for the merchants inventory behaviors.
+    AvailabilityRules:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AvailabilityRule'
+        categories:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AvailabilityRule'
+        collections:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AvailabilityRule'
+        vendors:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AvailabilityRule'
     CatalogConfig:
       type: object
       properties:
         inventory:
           $ref: '#/components/schemas/InventoryConfig'
+        availability:
+          $ref: '#/components/schemas/AvailabilityConfig'
       description: Configurations for the merchants catalog behaviors.
     InventoryConfig:
       type: object
