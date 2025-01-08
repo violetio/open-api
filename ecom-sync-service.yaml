@@ -3078,7 +3078,9 @@ components:
           description: Country ISO2 Code
         postal_code:
           type: string
-          description: Postal/Zip Code
+          description: "Postal or Zip code to be applied to the address. This value\
+            \ is required for all countries that have postal codes. For countries\
+            \ that do not have postal codes, this value is optional."
         phone:
           type: string
           description: "Phone number related to the address. Note: Some external commerce\
@@ -3098,7 +3100,7 @@ components:
           description: First line of the Address
         address_2:
           type: string
-          description: Second line of the Address
+          description: Second line of the address
         first_name:
           type: string
         last_name:
