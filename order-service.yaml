@@ -5759,6 +5759,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -5771,9 +5774,6 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -6148,7 +6148,9 @@ components:
           description: Country ISO2 Code
         postal_code:
           type: string
-          description: Postal/Zip Code
+          description: "Postal or Zip code to be applied to the address. This value\
+            \ is required for all countries that have postal codes. For countries\
+            \ that do not have postal codes, this value is optional."
         phone:
           type: string
           description: "Phone number related to the address. Note: Some external commerce\
@@ -6168,7 +6170,7 @@ components:
           description: First line of the Address
         address_2:
           type: string
-          description: Second line of the Address
+          description: Second line of the address
         first_name:
           type: string
         last_name:
@@ -8442,6 +8444,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -8451,8 +8455,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
