@@ -6109,9 +6109,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -6128,6 +6125,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -8305,6 +8305,36 @@ components:
         app_order_id:
           type: string
           description: Order ID in the Channels System
+        customer_name:
+          type: string
+          description: Full customer name to search by - case insensitive.
+        customer_email:
+          type: string
+          description: Customer email to search by - case insensitive.
+        sku_name:
+          type: string
+          description: Name of an Sku present in the order - case insensitive.
+        total:
+          type: integer
+          description: Exact total to search.
+          format: int32
+        status:
+          type: string
+          description: Order status to search.
+          enum:
+          - IN_PROGRESS
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REQUIRES_ACTION
+        sort_by:
+          type: string
+          description: Order property to sort by in camel case.
+        sort_direction:
+          type: string
+          description: Direction to sort results by.
         date_last_modified:min:
           pattern: yyyy-MM-dd'T'HH:mm:ssZ
           type: string
