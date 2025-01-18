@@ -3773,6 +3773,19 @@ components:
         error_message:
           type: string
           description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
         payment_transaction_id:
           type: integer
           description: Identifier of the PaymentTransaction entity that this error
