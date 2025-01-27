@@ -563,6 +563,16 @@ components:
           description: Identifier of the account entity in Violet. This is either
             the Violet developer or merchant identifier.
           format: int32
+        app_id:
+          type: integer
+          description: Identifier of the app entity in Violet that this Payout Account
+            is associated with.
+          format: int32
+        is_active:
+          type: boolean
+          description: Field that denotes whether or not this Payout Account is active
+            and being used for transactions. Only one Payout Account may be active
+            for a merchant-app combination at a given point in time.
         status:
           type: string
           description: Current status of this payout account. This status reflects
@@ -624,6 +634,18 @@ components:
             payment provider.
         payment_provider_account:
           type: object
+        date_deactivated:
+          type: string
+          description: Time at which this payout account was deactivated. In ISO-8601
+            format.
+          format: date-time
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated with this payout account. Not all
+            errors block transacting on this payout account.
+          items:
+            $ref: '#/components/schemas/PayoutAccountError'
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
@@ -632,6 +654,8 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+        externalId:
+          type: string
         paymentServiceAccountType:
           type: string
           enum:
@@ -646,8 +670,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
         details:
           $ref: '#/components/schemas/PayoutAccountDetails'
       description: Violet Payout Account that stores underlying payment provider account
@@ -743,6 +765,43 @@ components:
         legal_entity_address_line_2:
           type: string
           description: Legal Entity Address Line Two
+    PayoutAccountError:
+      required:
+      - error_message
+      - payout_account_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        payout_account_id:
+          type: integer
+          description: Unique identifier of the Payout Account that this Error is
+            associated to.
+          format: int32
+      description: Error associated to a Payout Account
     PayoutAccountStatus:
       type: object
       properties:
