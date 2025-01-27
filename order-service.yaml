@@ -6109,6 +6109,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -6125,9 +6128,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -6848,6 +6848,19 @@ components:
         error_message:
           type: string
           description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
         payment_transaction_id:
           type: integer
           description: Identifier of the PaymentTransaction entity that this error
@@ -7057,6 +7070,16 @@ components:
           description: Amount being taken back from the associated transfer to the
             developer. In Cents
           format: int32
+        merchant_transfer_reversal_amount_platform_currency:
+          type: integer
+          description: "Amount in fractional currency unit (e.g. cents) being taken\
+            \ back from the associated transfer to the merchant, in platform currency."
+          format: int32
+        developer_transfer_reversal_amount_platform_currency:
+          type: integer
+          description: "Amount in fractional currency unit (e.g. cents) being taken\
+            \ back from the associated transfer to the developer, in platform currency."
+          format: int32
         reason:
           type: string
           description: Reason for refund
@@ -7072,6 +7095,10 @@ components:
         refund_currency:
           type: string
           description: Currency set for this refund by the external ecom platform
+        platform_currency:
+          type: string
+          description: Currency used by the platform account for the payment provider
+            that processed this Refund
         status:
           type: string
           description: Status of the Refund
@@ -7135,6 +7162,19 @@ components:
         error_message:
           type: string
           description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
         refund_id:
           type: integer
           description: ID of the Refund this Error is associated to
@@ -7265,14 +7305,13 @@ components:
           type: integer
           description: ID of the Violet Sku.
           format: int64
-        name:
-          type: string
-          description: Name of the Sku
-          readOnly: true
         price:
           type: integer
           description: "Price of the individual Sku, in cents."
           format: int32
+        name:
+          type: string
+          description: Name of the Sku
           readOnly: true
         merchant_id:
           type: integer
@@ -7505,6 +7544,11 @@ components:
           - ZAR
           - ZMW
           - BTN
+        totals_in_base_currency:
+          type: boolean
+          description: Are the returned totals in the base currency.
+          readOnly: true
+          default: false
         sub_total:
           minimum: 0
           type: integer
@@ -7620,6 +7664,10 @@ components:
           type: integer
           description: ID of the Violet Sku.
           format: int64
+        price:
+          type: integer
+          description: "Price of the individual Sku, in cents."
+          format: int32
       description: A list of one or more Violet Sku's. Sku's from the same merchant
         will be grouped and calculated together.
     CalculateCartRequest:
@@ -8479,6 +8527,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -8488,8 +8538,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
@@ -8509,6 +8557,19 @@ components:
         error_message:
           type: string
           description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
         payout_transfer_id:
           type: integer
           description: ID of the Payout Transfer this Error is associated to
