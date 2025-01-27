@@ -494,6 +494,14 @@ components:
           items:
             type: string
             description: Custom tags to be added to a merchants orders upon submission.
+        prohibit_order_cancellations:
+          type: boolean
+          description: Does this merchants prohibit order cancellations.
+          default: false
+        prohibit_order_refunds:
+          type: boolean
+          description: Does this merchants prohibit order refunds.
+          default: false
       description: Configurations for the merchants order behaviors.
     ShippingConfig:
       type: object
