@@ -408,6 +408,11 @@ paths:
         schema:
           type: string
           default: sku_dimensions
+      - name: use_presentment_currency
+        in: query
+        schema:
+          type: boolean
+          default: false
       responses:
         default:
           description: default response
@@ -2140,6 +2145,8 @@ components:
     Error:
       type: object
       properties:
+        id:
+          type: object
         message:
           type: string
         error:
@@ -2147,8 +2154,6 @@ components:
         code:
           type: integer
           format: int32
-        id:
-          type: object
         ids:
           type: array
           items:
