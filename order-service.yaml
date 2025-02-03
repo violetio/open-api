@@ -2634,7 +2634,6 @@ paths:
                       - sku_id: 80455
                         price: 100000
                     shipping_method:
-                      carrier: OTHER
                       label: Teleportation
                       price: 10000
                     tax_total: 10000
@@ -5699,6 +5698,7 @@ components:
           - SNAPCHAT
           - PINTEREST
         app_order_id:
+          maxLength: 64
           type: string
           description: Optional ID of the Order in the channels system. Automatically
             obtained through the app_order_id applied to the Order.
@@ -7904,12 +7904,369 @@ components:
           default: false
       description: Optional data to initialize the cart with upon creation.
     CreateOrderRequest:
+      required:
+      - order
       type: object
       properties:
-        order:
-          $ref: '#/components/schemas/Order'
         payment_method:
-          $ref: '#/components/schemas/PaymentMethodRequest'
+          $ref: '#/components/schemas/PaymentMethodRequestDTO'
+        order:
+          $ref: '#/components/schemas/OrderDTO'
+    AddressDTO:
+      title: billing_address
+      required:
+      - address_1
+      - city
+      - country
+      - state
+      type: object
+      properties:
+        address_1:
+          type: string
+          description: First line of the address.
+        address_2:
+          type: string
+          description: Second line of the address.
+        city:
+          type: string
+          description: City of the address.
+          example: Seattle
+        state:
+          type: string
+          description: The ISO2 (Alpha 2) code for the state or province.
+          example: WA
+        country:
+          type: string
+          description: The ISO2 (Alpha 2) code for the country.
+          example: US
+        postal_code:
+          type: string
+          description: "Postal or Zip code to be applied to the address. This value\
+            \ is required for all countries that have postal codes. **For countries\
+            \ that do not have postal codes, this value is optional.**"
+      description: "Billing address for the order. **Note: When not provided the provided\
+        \ shipping address will be used.**"
+    BagDTO:
+      required:
+      - shipping_method
+      - skus
+      - tax_total
+      type: object
+      properties:
+        skus:
+          type: array
+          description: SKUs being purchased in this bag.
+          items:
+            $ref: '#/components/schemas/SkuDTO'
+        shipping_method:
+          $ref: '#/components/schemas/ShippingMethodDTO'
+        tax_total:
+          type: integer
+          description: "The sum of all the taxes applied to the Bag. In the Order\
+            \ currency. In Cents. **Note: this value is not required when the merchant\
+            \ is the tax remitter.** Learn more about [tax remittance](/checkout/guides/tax-remittance)."
+          format: int32
+        sub_total:
+          type: integer
+          description: The sum of the line item totals for all Sku's in the Bag. In
+            the Order currency. In Cents.
+          format: int32
+        shipping_total:
+          type: integer
+          description: The amount for the shipping method applied to the Bag. In the
+            Order currency. In Cents.
+          format: int32
+      description: Bags of items being purchased.
+    CustomerDTO:
+      required:
+      - email
+      - first_name
+      - last_name
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: First name of the customer.
+          example: Super
+        last_name:
+          type: string
+          description: Last name of the customer.
+          example: Mario
+        email:
+          type: string
+          description: Email address of the customer.
+          example: super@mar.io
+      description: Customer information for the order.
+    OrderDTO:
+      required:
+      - app_order_id
+      - bags
+      - currency
+      - customer
+      - shipping_address
+      type: object
+      properties:
+        app_order_id:
+          type: string
+          description: Unique identifier for the order in the apps system.
+          example: 5b6cc3e2-cefd-452f-8acc-faac6a27e311
+        customer:
+          $ref: '#/components/schemas/CustomerDTO'
+        bags:
+          type: array
+          description: Bags of items being purchased.
+          items:
+            $ref: '#/components/schemas/BagDTO'
+        shipping_address:
+          $ref: '#/components/schemas/shipping_address'
+        billing_address:
+          $ref: '#/components/schemas/AddressDTO'
+        currency:
+          type: string
+          description: The currency you are writing the order in. This value is used
+            to tell the receiving ecommerce platform what currency the order is in.
+          example: USD
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
+      description: Constructed Order for direct submission to merchant store.
+    PaymentMethodRequestDTO:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of payment method being used.
+          enum:
+          - SINGLE_USE_CARD_TOKEN
+          - MULTI_USE_CARD_TOKEN
+          - BANK_TOKEN
+          - PAYMENT_INTENT
+          - VIOLET_PAYMENT_METHOD_ID
+        payment_provider:
+          type: string
+          description: Payment provider that will process the payment.
+          example: Stripe
+        token:
+          type: string
+          description: Token representing the payment method.
+      description: Payment method that will be charged for this Order.
+    ShippingMethodDTO:
+      required:
+      - label
+      - price
+      type: object
+      properties:
+        label:
+          maxLength: 255
+          minLength: 1
+          type: string
+          description: Label for the shipping method.
+          example: Free Shipping
+        price:
+          minimum: 0
+          type: integer
+          description: Price of the shipping method. In the Order currency. In Cents.
+          format: int32
+          example: 500
+      description: "Shipping method for the bag. **Note: this value is not required\
+        \ when all items in the order are digital.**"
+    SkuDTO:
+      required:
+      - price
+      - sku_id
+      type: object
+      properties:
+        sku_id:
+          type: integer
+          description: "ID of the referenced Sku from the Violet catalog, this is\
+            \ the item being purchased."
+          format: int64
+          example: 987654321
+        price:
+          type: integer
+          description: Price of the SKU being purchased. In the Order currency. In
+            cents.
+          format: int32
+          example: 9999
+        quantity:
+          maximum: 1000
+          type: integer
+          description: Quantity of the Sku being purchased. Quantities over 1000 will
+            default to 1000. If a value is not provided will be defaulted to 1.
+          format: int32
+          example: 1
+      description: SKUs being purchased in this bag.
+    shipping_address:
+      title: shipping_address
+      required:
+      - address_1
+      - city
+      - country
+      - state
+      type: object
+      properties:
+        address_1:
+          type: string
+          description: First line of the address.
+        address_2:
+          type: string
+          description: Second line of the address.
+        city:
+          type: string
+          description: City of the address.
+          example: Seattle
+        state:
+          type: string
+          description: The ISO2 (Alpha 2) code for the state or province.
+          example: WA
+        country:
+          type: string
+          description: The ISO2 (Alpha 2) code for the country.
+          example: US
+        postal_code:
+          type: string
+          description: "Postal or Zip code to be applied to the address. This value\
+            \ is required for all countries that have postal codes. **For countries\
+            \ that do not have postal codes, this value is optional.**"
+      description: "Shipping address for the order. **Note: this value is not required\
+        \ when all items in the order are digital.**"
     VioletPageOrder:
       type: object
       properties:
