@@ -1163,7 +1163,9 @@ components:
       properties:
         id:
           type: integer
+          description: Unique ID of the Offer.
           format: int64
+          readOnly: true
         product_id:
           type: string
           description: "The parent/container product ID. Note: this is a legacy property\
@@ -1174,7 +1176,9 @@ components:
           description: The ID of the product in the merchants external store.
         external_url:
           type: string
-          description: The URL to the product page in the merchants store.
+          description: "The URL to the product page in the merchants store. Note:\
+            \ if the value for `visible` is `false` this URL will likely result in\
+            \ a 404."
         name:
           type: string
           description: Name of the offer.
@@ -1230,37 +1234,41 @@ components:
           - CUSTOM
         seller:
           type: string
-          description: Name of merchant selling product.
+          description: Name of the merchant selling product.
           nullable: true
           example: Foot Locker
         vendor:
           type: string
-          description: Name of source vendor or brand.
+          description: Name of the source vendor or brand.
           nullable: true
           example: Nike
         merchant_id:
           type: integer
-          description: Merchant ID
+          description: ID of the merchant who sourced this Offer.
           format: int32
         available:
           type: boolean
-          description: Is the product available for purchase.
+          description: Is the product currently available for purchase in the merchants
+            system.
         visible:
           type: boolean
-          description: "Is the product hidden in the merchants store. Note: a product\
-            \ can be hidden while still being available for purchase."
+          description: "Is the product visible or hidden in the merchants storefront.\
+            \ Note: a product can be hidden while still being available for purchase."
         min_price:
           type: integer
-          description: Minimum Price the Offer sells for.
+          description: Minimum price the Offer sells for. This is the lowest of the
+            Sku sale prices.
           format: int32
         max_price:
           type: integer
-          description: Maximum Price the Offer sells for.
+          description: Maximum price the Offer sells for. This is the highest of the
+            Sku sale prices.
           format: int32
         currency:
           type: string
-          description: Base Currency of Offer. Intended for reference only. The currency
-            property of the SKU is the currency source of truth.
+          description: The currency of the Offer. By default this value will be the
+            merchants currency but can be changed by the API user using a `base_currency`
+            parameter.
         source_category_name:
           type: string
           description: Original Category on Source Platform
@@ -1329,8 +1337,10 @@ components:
           format: date-time
         date_last_consolidated:
           type: string
-          description: Date of last consolidation in ISO 8601 format. This date is
-            jittered for performance reasons and can be in the future
+          description: Date of last consolidation in ISO 8601 format. Consolidation
+            is the process of querying the merchants store to see if this product
+            still exists. This date is jittered for performance reasons and can be
+            in the future.
           format: date-time
         three_d_enabled:
           type: boolean
@@ -1365,7 +1375,9 @@ components:
           - SUBSCRIBED
         external_data:
           type: object
-          description: The raw external product data from the external commerce platform
+          description: The raw external product data from the external commerce platform.
+            This data is not pre-processed by Violet and is only provided for reference
+            when using using the Violet Relay API.
         collections:
           uniqueItems: true
           type: array
@@ -1801,13 +1813,14 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/Method'
-      description: "[ALPHA] - Shipping data for the Offer."
+      description: "[BETA] - Shipping data for the Offer."
       nullable: true
       readOnly: true
     Sku:
       required:
       - currency
       - merchant_id
+      - name
       - offer_id
       - sale_price
       - type
@@ -1815,6 +1828,7 @@ components:
       properties:
         id:
           type: integer
+          description: The unique ID of the Sku.
           format: int64
           readOnly: true
         offer_id:
@@ -1830,7 +1844,8 @@ components:
           description: The ID of the Sku in the merchants external store.
         name:
           type: string
-          description: Sku Name
+          description: Name of the Sku. This often a combination of the Offer name
+            and the Variant Values unique to this Sku.
         asin:
           type: string
           description: Amazon Standard Identification Number
@@ -1869,8 +1884,8 @@ components:
           format: int32
         retail_price:
           type: integer
-          description: Retail Price of the Sku. This is the recommended or common
-            price of the Sku and is typically not what the customer will be charged..
+          description: Retail Price of the Sku. This is often a "Compare-To" or "MSRP"
+            type price and is typically not what the customer will be charged.
           format: int32
         currency:
           type: string
@@ -2145,8 +2160,6 @@ components:
     Error:
       type: object
       properties:
-        id:
-          type: object
         message:
           type: string
         error:
@@ -2154,6 +2167,8 @@ components:
         code:
           type: integer
           format: int32
+        id:
+          type: object
         ids:
           type: array
           items:
