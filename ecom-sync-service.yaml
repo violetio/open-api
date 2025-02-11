@@ -3137,26 +3137,18 @@ components:
       - last_name
       type: object
       properties:
-        user_id:
-          type: integer
-          description: Reference ID of the customer placing the order.
-          format: int64
-          nullable: true
-          readOnly: true
-          deprecated: true
         first_name:
+          maxLength: 32
           type: string
           description: Customer's first name.
         last_name:
+          maxLength: 32
           type: string
           description: Customer's last name.
         email:
+          maxLength: 64
           type: string
           description: Customer's valid email address.
-        external_id:
-          type: string
-          description: ID of the Customer on the External Platform
-          nullable: true
         shipping_address:
           $ref: '#/components/schemas/OrderAddress'
         billing_address:
@@ -3388,7 +3380,9 @@ components:
           format: int32
         tracking_number:
           type: string
-          description: Carrier Tracking Number
+          description: "Carrier Tracking Number. Deprecated: Use `fulfillments` on\
+            \ the Bag object instead."
+          deprecated: true
       description: Shipping Methods belonging to an Order
       nullable: true
     OrderSku:
@@ -3571,10 +3565,10 @@ components:
         name:
           type: string
           description: Rate Name
-        dollar_amount:
+        decimal_rate:
           type: number
           format: double
-        decimal_rate:
+        dollar_amount:
           type: number
           format: double
       description: Rates belonging to Order SKUs
