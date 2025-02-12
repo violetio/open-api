@@ -5771,6 +5771,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -5783,9 +5786,6 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -8885,6 +8885,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -8894,8 +8896,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
