@@ -447,6 +447,8 @@ components:
           $ref: '#/components/schemas/InventoryConfig'
         availability:
           $ref: '#/components/schemas/AvailabilityConfig'
+        syncPolicy:
+          $ref: '#/components/schemas/SyncPolicy'
       description: Configurations for the merchants catalog behaviors.
     InventoryConfig:
       type: object
@@ -493,6 +495,10 @@ components:
     OrdersConfig:
       type: object
       properties:
+        commerce_disabled:
+          type: boolean
+          description: "Is order creation, or cart submission, disabled for this merchant."
+          default: false
         custom_tags:
           uniqueItems: true
           type: array
@@ -508,6 +514,8 @@ components:
           type: boolean
           description: Does this merchants prohibit order refunds.
           default: false
+        sync_policy:
+          $ref: '#/components/schemas/SyncPolicy'
       description: Configurations for the merchants order behaviors.
     ShippingConfig:
       type: object
@@ -756,6 +764,22 @@ components:
           type: string
           description: Base Media URL of the media from a merchant's store.
       description: Configurations for the merchants store.
+    SyncPolicy:
+      type: object
+      properties:
+        syncType:
+          type: string
+          enum:
+          - POLLING
+          - HYBRID
+          - NO_SYNC
+        syncFrequencyMinutes:
+          type: integer
+          format: int32
+        consolidationFrequencyMinutes:
+          type: integer
+          format: int32
+      description: Policies for syncing this merchants catalog.
     GenericToggleSettingRequest:
       type: object
       properties:
