@@ -2464,7 +2464,6 @@ components:
           $ref: '#/components/schemas/VioletSort'
     Bag:
       required:
-      - app_id
       - merchant_id
       - order_id
       type: object
@@ -2487,6 +2486,7 @@ components:
           description: ID of the App responsible for the creation and submission of
             this Order.
           format: int32
+          readOnly: true
         external_id:
           type: string
           description: ID of the Order on the external commerce platform. This value
@@ -2502,6 +2502,7 @@ components:
         status:
           type: string
           description: Overall status of the Bag.
+          readOnly: true
           enum:
           - IN_PROGRESS
           - SUBMITTED
@@ -2515,6 +2516,7 @@ components:
         fulfillment_status:
           type: string
           description: Fulfillment status of the Bag.
+          readOnly: true
           enum:
           - PROCESSING
           - SHIPPED
@@ -2525,6 +2527,7 @@ components:
         financial_status:
           type: string
           description: Financial status of the Bag.
+          readOnly: true
           enum:
           - UNPAID
           - AUTHORIZED
@@ -2590,6 +2593,7 @@ components:
           type: boolean
           description: If the Bag is attached to an external cart in the commerce
             platform.
+          readOnly: true
           default: true
         commission_rate:
           type: number
@@ -2597,37 +2601,57 @@ components:
             Bag.
           format: double
         date_created:
+          maxLength: 24
           type: string
           description: Date the Bag was created in Violet.
           format: date-time
+          readOnly: true
         date_last_modified:
+          maxLength: 24
           type: string
           description: Date the Bag was last modified in Violet.
           format: date-time
+          readOnly: true
         date_last_consolidated:
+          maxLength: 24
           type: string
           description: Date the Bag was last checked for updates. This is a part of
             Order Parity and is used to discover missed or unsent webhooks from the
             external commerce platforms.
           format: date-time
+          nullable: true
+          readOnly: true
+        date_submitted:
+          maxLength: 24
+          type: string
+          description: Date the Bag was submitted to the external commerce platform.
+          format: date-time
+          nullable: true
+          readOnly: true
         remorse_period_ends:
+          maxLength: 24
           type: string
           description: Date when the Bag can no longer be refunded.
           format: date-time
+          nullable: true
+          readOnly: true
         currency:
           type: string
           description: Base currency of the Bag.
         external_currency:
           type: string
-          description: Currency of the equivalent cart on external commerce platform.
+          description: Currency of the equivalent cart in the external commerce platform.
+          readOnly: true
         currency_exchange_rate:
           type: number
           description: "Exchange rate of currency and external currency, if different,\
             \ at the time the Bag was last priced."
           nullable: true
+          readOnly: true
         channel:
           type: string
           description: The type of Channel that originated this Bag.
+          readOnly: true
           enum:
           - APP
           - MARKETPLACE
@@ -2730,6 +2754,7 @@ components:
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
+          readOnly: true
       description: Per Merchant Bag in Order
     BagDiscount:
       type: object
@@ -3017,6 +3042,15 @@ components:
           description: Date of last order update
           format: date-time
           readOnly: true
+        date_submitted:
+          maxLength: 24
+          type: string
+          description: Date the Order was last submitted in Violet. This value is
+            captured immediately after the Order is successfully validated and before
+            the nested Bag(s) are submitted to the external commerce platforms.
+          format: date-time
+          nullable: true
+          readOnly: true
         priced:
           type: boolean
           description: Is the cart priced
@@ -3057,6 +3091,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -3073,9 +3110,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
