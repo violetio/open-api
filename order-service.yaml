@@ -6150,9 +6150,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -6169,6 +6166,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -8696,6 +8696,16 @@ components:
           type: string
           description: Only include bags created before this date.
           format: date-time
+        date_submitted:min:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include bags submitted after this date.
+          format: date-time
+        date_submitted:max:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include bags submitted before this date.
+          format: date-time
       description: Bag Search Request
     OrderSearchRequest:
       type: object
@@ -8794,6 +8804,16 @@ components:
           pattern: yyyy-MM-dd'T'HH:mm:ssZ
           type: string
           description: Only include orders created before this date.
+          format: date-time
+        date_submitted:min:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include orders submitted after this date.
+          format: date-time
+        date_submitted:max:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include orders submitted before this date.
           format: date-time
       description: Order Search Request
     CartSubmissionRequest:
