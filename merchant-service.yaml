@@ -527,6 +527,12 @@ components:
             no shipping methods.
           items:
             $ref: '#/components/schemas/ShippingMethod'
+        exclude_external_free_shipping:
+          type: boolean
+          description: Should external free shipping methods be excluded.
+        exclude_external_methods:
+          type: boolean
+          description: Should all external shipping methods be excluded.
       description: Configurations for the merchants shipping behaviors.
     ShippingMethod:
       type: object
