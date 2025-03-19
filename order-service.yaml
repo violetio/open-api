@@ -7362,6 +7362,8 @@ components:
           description: Is the Sku available in the external commerce platform and
             included in the calculation.
           readOnly: true
+        inventory:
+          $ref: '#/components/schemas/Inventory'
         requires_shipping:
           type: boolean
           description: Does the Sku require shipping.
@@ -7640,6 +7642,23 @@ components:
             description: Error messages from the external commerce platform.
             readOnly: true
       description: Calculate Cart Response
+      readOnly: true
+    Inventory:
+      type: object
+      properties:
+        sufficient_inventory:
+          type: boolean
+          description: Is there sufficient inventory to purchase the desired quantity.
+          nullable: true
+          readOnly: true
+        available_inventory:
+          type: integer
+          description: The total quantity of available inventory for this Sku.
+          format: int32
+          nullable: true
+          readOnly: true
+      description: "BETA: Details regarding the available inventory for this Sku."
+      nullable: true
       readOnly: true
     BaseAddress:
       required:
@@ -8939,6 +8958,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -8948,8 +8969,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
