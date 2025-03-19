@@ -450,6 +450,50 @@ components:
         syncPolicy:
           $ref: '#/components/schemas/SyncPolicy'
       description: Configurations for the merchants catalog behaviors.
+    Conditions:
+      type: object
+      properties:
+        applicable_countries:
+          uniqueItems: true
+          type: array
+          description: A set of Alpha-2 country codes where the shipping method can
+            be applied.
+          nullable: true
+          items:
+            type: string
+            description: A set of Alpha-2 country codes where the shipping method
+              can be applied.
+            nullable: true
+        inapplicable_countries:
+          uniqueItems: true
+          type: array
+          description: A set of Alpha-2 country codes where the shipping method cannot
+            be applied.
+          nullable: true
+          items:
+            type: string
+            description: A set of Alpha-2 country codes where the shipping method
+              cannot be applied.
+            nullable: true
+        min_order_amount:
+          type: integer
+          description: "The inclusive minimum order amount, if any, required for this\
+            \ shipping method to be applicable."
+          format: int32
+          nullable: true
+        max_order_amount:
+          type: integer
+          description: "The inclusive maximum order amount, if any, that if reached\
+            \ will make this shipping method inapplicable."
+          format: int32
+          nullable: true
+        min_weight:
+          $ref: '#/components/schemas/WeightUnit'
+        max_weight:
+          $ref: '#/components/schemas/WeightUnit'
+      description: Any conditions that determine if a shipping method is applicable
+        to the order.
+      nullable: true
     InventoryConfig:
       type: object
       properties:
@@ -539,14 +583,162 @@ components:
       properties:
         label:
           type: string
+          description: The name of the shipping method.
         price:
           type: integer
+          description: The price of the shipping method in cents.
           format: int32
-        calculationType:
+        currency:
           type: string
+          description: The currency of the shipping method.
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
+        calculation_type:
+          type: string
+          description: Whether the price is calculated per the entire order or per
+            item.
+          nullable: true
           enum:
           - PER_ORDER
           - PER_ITEM
+        conditions:
+          $ref: '#/components/schemas/Conditions'
       description: Fallback methods to be used when the merchant's system provides
         no shipping methods.
     StockRules:
@@ -786,6 +978,21 @@ components:
           type: integer
           format: int32
       description: Policies for syncing this merchants catalog.
+    WeightUnit:
+      type: object
+      properties:
+        value:
+          type: number
+          format: double
+        unit:
+          type: string
+          enum:
+          - KG
+          - LB
+          - OZ
+      description: "The inclusive maximum weight of the order, if any, that if reached\
+        \ will make this shipping method inapplicable."
+      nullable: true
     GenericToggleSettingRequest:
       type: object
       properties:
