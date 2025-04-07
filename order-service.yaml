@@ -6783,6 +6783,7 @@ components:
           enum:
           - AUTOMATIC
           - CUSTOM
+          - DISABLED
           - EXTERNAL
         transfer_status:
           type: string
@@ -6803,6 +6804,7 @@ components:
           enum:
           - AUTOMATIC
           - CUSTOM
+          - DISABLED
           - EXTERNAL
         metadata:
           type: object
