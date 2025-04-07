@@ -148,12 +148,71 @@ paths:
             schema:
               $ref: '#/components/schemas/ConnectionHealthRequest'
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConnectionHealth'
+              examples:
+                Get Connection Health for Merchant:
+                  description: Get Connection Health for Merchant
+                  value:
+                    merchantId: 12030
+                    merchantName: Space Drinks
+                    merchantStatus: ACTIVE
+                    platform: SHOPIFY
+                    storeUrl: ishan-guru-test-store.myshopify.com
+                    payoutAccount:
+                      status: COMPLETE
+                      results:
+                        id: 13197
+                        accountType: MERCHANT
+                        accountId: 12030
+                        appId: 11026
+                        isActive: true
+                        status: COMPLETE
+                        kycStatus: COMPLETE
+                        payoutsEnabled: true
+                        countryCode: CA
+                        paymentProvider: STRIPE
+                        paymentProviderAccountId: acct_1Q33PsGaTELgZzqx
+                        paymentProviderAccountType: EXPRESS
+                        paymentProviderMetadata:
+                          stripeAccountId: acct_1Q33PsGaTELgZzqx
+                          stripeAccountType: EXPRESS
+                          stripeBankingCurrency: cad
+                        paymentProviderAccount:
+                          accountId: acct_1Q33PsGaTELgZzqx
+                          accountType: EXPRESS
+                          bankingCountry: CA
+                          bankingCurrency: cad
+                          chargesEnabled: true
+                          payoutsEnabled: true
+                          requirements:
+                            alternatives: []
+                            currentlyDue: []
+                            errors: []
+                            eventuallyDue: []
+                            pastDue: []
+                            pendingVerification: []
+                          dateCreated: 2024-11-15T01:10:34+0000
+                          dateLastModified: 2024-11-15T01:10:34+0000
+                        errors: []
+                        dateCreated: 2024-09-25T22:10:38+0000
+                        dateLastModified: 2025-01-28T02:47:53+0000
+                        paymentServiceAccountType: EXPRESS
+                        paymentService: STRIPE
+                        externalId: acct_1Q33PsGaTELgZzqx
+                        details:
+                          tosAccepted: false
+                          payoutsEnabled: true
+                          paymentsEnabled: true
+                          hasPayoutAccount: true
+                          currentlyDue: []
+                          eventuallyDue: []
+                          pastDue: []
+                          pendingVerification: []
   /operations/connection_health/search:
     post:
       tags:
@@ -205,12 +264,709 @@ paths:
             schema:
               $ref: '#/components/schemas/ConnectionHealthSearchRequest'
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageConnectionHealth'
+              examples:
+                Search Connection Health:
+                  description: Search Connection Health
+                  value:
+                    content:
+                    - merchantId: 12434
+                      merchantName: andy-chin-test-store-7
+                      merchantEmail: a****************t@violet.io
+                      merchantStatus: ACTIVE
+                      platform: SHOPIFY
+                      storeUrl: andy-chin-test-store-6.myshopify.com
+                      connection:
+                        status: COMPLETE
+                        results:
+                          isConnected: true
+                          hasActivePlatformPlan: true
+                          hasShippingMethods: true
+                          connected: true
+                      scopeValidation:
+                        status: COMPLETE
+                        results:
+                          valid: true
+                          missingScopes: []
+                      syncStatus:
+                        status: COMPLETE
+                        results:
+                          id: 329
+                          merchantId: 12434
+                          status: COMPLETED
+                          abort: false
+                          totalProducts: 2
+                          totalProductsSynced: 0
+                          resyncRequired: false
+                          dateLastSynced: 2025-03-06T01:01:43+0000
+                          taxonomySynced: false
+                          webhooksCreated: true
+                      invalidProducts:
+                        status: COMPLETE
+                        results: {}
+                      offersPublished:
+                        status: COMPLETE
+                        results:
+                          syncComplete: true
+                          count: 2
+                      payoutAccount:
+                        status: INCOMPLETE
+                        results:
+                          id: 13486
+                          accountType: MERCHANT
+                          accountId: 12434
+                          appId: 11026
+                          isActive: true
+                          status: INCOMPLETE
+                          kycStatus: INCOMPLETE
+                          payoutsEnabled: false
+                          countryCode: US
+                          paymentProvider: STRIPE
+                          paymentProviderAccountId: acct_1Qw7h6Gj95CDE1is
+                          paymentProviderAccountType: STANDARD
+                          paymentProviderMetadata:
+                            stripeAccountId: acct_1Qw7h6Gj95CDE1is
+                            stripeAccountType: STANDARD
+                            stripeBankingCurrency: usd
+                          paymentProviderAccount:
+                            accountId: acct_1Qw7h6Gj95CDE1is
+                            accountType: STANDARD
+                            dateCreated: 2025-02-24T19:52:04+0000
+                            requirements:
+                              errors: []
+                              pastDue: []
+                              alternatives: []
+                              currentlyDue:
+                              - business_profile.product_description
+                              - business_profile.support_phone
+                              - business_profile.url
+                              - external_account
+                              - tos_acceptance.date
+                              - tos_acceptance.ip
+                              eventuallyDue:
+                              - business_profile.product_description
+                              - business_profile.support_phone
+                              - business_profile.url
+                              - external_account
+                              - tos_acceptance.date
+                              - tos_acceptance.ip
+                              disabledReason: requirements.past_due
+                              pendingVerification: []
+                            bankingCountry: US
+                            chargesEnabled: false
+                            payoutsEnabled: false
+                            bankingCurrency: usd
+                            dateLastModified: 2025-02-24T19:52:04+0000
+                          errors: []
+                          dateCreated: 2025-02-24T19:52:04+0000
+                          dateLastModified: 2025-02-24T19:52:05+0000
+                          paymentServiceAccountType: STANDARD
+                          paymentService: STRIPE
+                          externalId: acct_1Qw7h6Gj95CDE1is
+                          details:
+                            tosAccepted: false
+                            payoutsEnabled: false
+                            paymentsEnabled: false
+                            hasPayoutAccount: false
+                            disabledReason: requirements.past_due
+                            currentlyDue:
+                            - business_profile.product_description
+                            - business_profile.support_phone
+                            - business_profile.url
+                            - external_account
+                            - tos_acceptance.date
+                            - tos_acceptance.ip
+                            eventuallyDue:
+                            - business_profile.product_description
+                            - business_profile.support_phone
+                            - business_profile.url
+                            - external_account
+                            - tos_acceptance.date
+                            - tos_acceptance.ip
+                            pastDue: []
+                            pendingVerification: []
+                      payoutAccountsByAppId:
+                        "10004":
+                          status: ERROR
+                          error:
+                            message: "An unknown error has occurred. Caused by: The\
+                              \ provided key 'sk_live_z7******************CsKH' does\
+                              \ not have access to account 'acct_1MF5CjGgYzh8tmxc'\
+                              \ (or that account does not exist). Application access\
+                              \ may have been revoked.; code: account_invalid."
+                            error: unknown_error
+                            code: 9000
+                        "10367":
+                          status: ERROR
+                          error:
+                            message: "An unknown error has occurred. Caused by: The\
+                              \ provided key 'sk_live_z7******************CsKH' does\
+                              \ not have access to account 'acct_1MF5CjGgYzh8tmxc'\
+                              \ (or that account does not exist). Application access\
+                              \ may have been revoked.; code: account_invalid."
+                            error: unknown_error
+                            code: 9000
+                        "11026":
+                          status: INCOMPLETE
+                          results:
+                            id: 13486
+                            accountType: MERCHANT
+                            accountId: 12434
+                            appId: 11026
+                            isActive: true
+                            status: INCOMPLETE
+                            kycStatus: INCOMPLETE
+                            payoutsEnabled: false
+                            countryCode: US
+                            paymentProvider: STRIPE
+                            paymentProviderAccountId: acct_1Qw7h6Gj95CDE1is
+                            paymentProviderAccountType: STANDARD
+                            paymentProviderMetadata:
+                              stripeAccountId: acct_1Qw7h6Gj95CDE1is
+                              stripeAccountType: STANDARD
+                              stripeBankingCurrency: usd
+                            paymentProviderAccount:
+                              accountId: acct_1Qw7h6Gj95CDE1is
+                              accountType: STANDARD
+                              dateCreated: 2025-02-24T19:52:04+0000
+                              requirements:
+                                errors: []
+                                pastDue: []
+                                alternatives: []
+                                currentlyDue:
+                                - business_profile.product_description
+                                - business_profile.support_phone
+                                - business_profile.url
+                                - external_account
+                                - tos_acceptance.date
+                                - tos_acceptance.ip
+                                eventuallyDue:
+                                - business_profile.product_description
+                                - business_profile.support_phone
+                                - business_profile.url
+                                - external_account
+                                - tos_acceptance.date
+                                - tos_acceptance.ip
+                                disabledReason: requirements.past_due
+                                pendingVerification: []
+                              bankingCountry: US
+                              chargesEnabled: false
+                              payoutsEnabled: false
+                              bankingCurrency: usd
+                              dateLastModified: 2025-02-24T19:52:04+0000
+                            errors: []
+                            dateCreated: 2025-02-24T19:52:04+0000
+                            dateLastModified: 2025-02-24T19:52:05+0000
+                            paymentServiceAccountType: STANDARD
+                            paymentService: STRIPE
+                            externalId: acct_1Qw7h6Gj95CDE1is
+                            details:
+                              tosAccepted: false
+                              payoutsEnabled: false
+                              paymentsEnabled: false
+                              hasPayoutAccount: false
+                              disabledReason: requirements.past_due
+                              currentlyDue:
+                              - business_profile.product_description
+                              - business_profile.support_phone
+                              - business_profile.url
+                              - external_account
+                              - tos_acceptance.date
+                              - tos_acceptance.ip
+                              eventuallyDue:
+                              - business_profile.product_description
+                              - business_profile.support_phone
+                              - business_profile.url
+                              - external_account
+                              - tos_acceptance.date
+                              - tos_acceptance.ip
+                              pastDue: []
+                              pendingVerification: []
+                      migrationPayoutAccountsByAppId: {}
+                      commissionRate:
+                        status: NEEDS_ATTENTION
+                        defaultRate: 20
+                        overrides:
+                        - status: NEEDS_ATTENTION
+                          appId: 11026
+                          rate: 0
+                          commissionLocked: false
+                    - merchantId: 15444
+                      merchantName: The Violet Garden
+                      merchantEmail: i**************************n@violet.io
+                      merchantStatus: ACTIVE
+                      platform: SHOPIFY
+                      storeUrl: the-violet-garden.myshopify.com
+                      connection:
+                        status: COMPLETE
+                        results:
+                          isConnected: true
+                          hasActivePlatformPlan: true
+                          hasShippingMethods: true
+                          connected: true
+                      scopeValidation:
+                        status: COMPLETE
+                        results:
+                          valid: true
+                          missingScopes: []
+                      syncStatus:
+                        status: COMPLETE
+                        results:
+                          id: 2609
+                          merchantId: 15444
+                          status: COMPLETED
+                          abort: false
+                          totalProducts: 10
+                          totalProductsSynced: 0
+                          resyncRequired: false
+                          dateLastSynced: 2025-03-06T02:34:05+0000
+                          taxonomySynced: false
+                          webhooksCreated: true
+                      invalidProducts:
+                        status: COMPLETE
+                        results: {}
+                      offersPublished:
+                        status: COMPLETE
+                        results:
+                          syncComplete: true
+                          count: 10
+                      payoutAccount:
+                        status: COMPLETE
+                        results:
+                          id: 13196
+                          accountType: MERCHANT
+                          accountId: 15444
+                          appId: 11026
+                          isActive: true
+                          status: COMPLETE
+                          kycStatus: COMPLETE
+                          payoutsEnabled: true
+                          countryCode: US
+                          paymentProvider: STRIPE
+                          paymentProviderAccountId: acct_1Q33I1Gbk9yK4xfK
+                          paymentProviderAccountType: EXPRESS
+                          paymentProviderMetadata:
+                            stripeAccountId: acct_1Q33I1Gbk9yK4xfK
+                            stripeAccountType: EXPRESS
+                            stripeBankingCurrency: usd
+                          paymentProviderAccount:
+                            accountId: acct_1Q33I1Gbk9yK4xfK
+                            accountType: EXPRESS
+                            dateCreated: 2024-11-15T02:34:31+0000
+                            requirements:
+                              errors: []
+                              pastDue: []
+                              alternatives: []
+                              currentlyDue: []
+                              eventuallyDue: []
+                              pendingVerification: []
+                            bankingCountry: US
+                            chargesEnabled: true
+                            payoutsEnabled: true
+                            bankingCurrency: usd
+                            dateLastModified: 2024-11-15T02:34:31+0000
+                          errors: []
+                          dateCreated: 2024-09-25T22:02:32+0000
+                          dateLastModified: 2025-01-28T02:47:53+0000
+                          paymentServiceAccountType: EXPRESS
+                          paymentService: STRIPE
+                          externalId: acct_1Q33I1Gbk9yK4xfK
+                          details:
+                            tosAccepted: false
+                            websiteUrl: the-violet-garden.myshopify.com
+                            payoutsEnabled: true
+                            paymentsEnabled: true
+                            hasPayoutAccount: true
+                            currentlyDue: []
+                            eventuallyDue: []
+                            pastDue: []
+                            pendingVerification: []
+                      payoutAccountsByAppId:
+                        "11026":
+                          status: COMPLETE
+                          results:
+                            id: 13196
+                            accountType: MERCHANT
+                            accountId: 15444
+                            appId: 11026
+                            isActive: true
+                            status: COMPLETE
+                            kycStatus: COMPLETE
+                            payoutsEnabled: true
+                            countryCode: US
+                            paymentProvider: STRIPE
+                            paymentProviderAccountId: acct_1Q33I1Gbk9yK4xfK
+                            paymentProviderAccountType: EXPRESS
+                            paymentProviderMetadata:
+                              stripeAccountId: acct_1Q33I1Gbk9yK4xfK
+                              stripeAccountType: EXPRESS
+                              stripeBankingCurrency: usd
+                            paymentProviderAccount:
+                              accountId: acct_1Q33I1Gbk9yK4xfK
+                              accountType: EXPRESS
+                              dateCreated: 2024-11-15T02:34:31+0000
+                              requirements:
+                                errors: []
+                                pastDue: []
+                                alternatives: []
+                                currentlyDue: []
+                                eventuallyDue: []
+                                pendingVerification: []
+                              bankingCountry: US
+                              chargesEnabled: true
+                              payoutsEnabled: true
+                              bankingCurrency: usd
+                              dateLastModified: 2024-11-15T02:34:31+0000
+                            errors: []
+                            dateCreated: 2024-09-25T22:02:32+0000
+                            dateLastModified: 2025-01-28T02:47:53+0000
+                            paymentServiceAccountType: EXPRESS
+                            paymentService: STRIPE
+                            externalId: acct_1Q33I1Gbk9yK4xfK
+                            details:
+                              tosAccepted: false
+                              websiteUrl: the-violet-garden.myshopify.com
+                              payoutsEnabled: true
+                              paymentsEnabled: true
+                              hasPayoutAccount: true
+                              currentlyDue: []
+                              eventuallyDue: []
+                              pastDue: []
+                              pendingVerification: []
+                      migrationPayoutAccountsByAppId: {}
+                      commissionRate:
+                        status: COMPLETE
+                        defaultRate: 0
+                        overrides:
+                        - status: COMPLETE
+                          appId: 11026
+                          rate: 20
+                          commissionLocked: false
+                    - merchantId: 12030
+                      merchantName: Space Drinks
+                      merchantEmail: i*****************t@violet.io
+                      merchantStatus: ACTIVE
+                      platform: SHOPIFY
+                      storeUrl: ishan-guru-test-store.myshopify.com
+                      connection:
+                        status: COMPLETE
+                        results:
+                          isConnected: true
+                          hasActivePlatformPlan: true
+                          hasShippingMethods: true
+                          connected: true
+                      scopeValidation:
+                        status: COMPLETE
+                        results:
+                          valid: true
+                          missingScopes: []
+                      syncStatus:
+                        status: COMPLETE
+                        results:
+                          id: 118
+                          merchantId: 12030
+                          status: COMPLETED
+                          abort: false
+                          totalProducts: 7
+                          totalProductsSynced: 1
+                          resyncRequired: false
+                          dateLastSynced: 2025-03-06T01:01:28+0000
+                          taxonomySynced: false
+                          webhooksCreated: true
+                      invalidProducts:
+                        status: COMPLETE
+                        results: {}
+                      offersPublished:
+                        status: COMPLETE
+                        results:
+                          syncComplete: true
+                          count: 7
+                      payoutAccount:
+                        status: COMPLETE
+                        results:
+                          id: 13197
+                          accountType: MERCHANT
+                          accountId: 12030
+                          appId: 11026
+                          isActive: true
+                          status: COMPLETE
+                          kycStatus: COMPLETE
+                          payoutsEnabled: true
+                          countryCode: CA
+                          paymentProvider: STRIPE
+                          paymentProviderAccountId: acct_1Q33PsGaTELgZzqx
+                          paymentProviderAccountType: EXPRESS
+                          paymentProviderMetadata:
+                            stripeAccountId: acct_1Q33PsGaTELgZzqx
+                            stripeAccountType: EXPRESS
+                            stripeBankingCurrency: cad
+                          paymentProviderAccount:
+                            accountId: acct_1Q33PsGaTELgZzqx
+                            accountType: EXPRESS
+                            dateCreated: 2024-11-15T01:10:34+0000
+                            requirements:
+                              errors: []
+                              pastDue: []
+                              alternatives: []
+                              currentlyDue: []
+                              eventuallyDue: []
+                              pendingVerification: []
+                            bankingCountry: CA
+                            chargesEnabled: true
+                            payoutsEnabled: true
+                            bankingCurrency: cad
+                            dateLastModified: 2024-11-15T01:10:34+0000
+                          errors: []
+                          dateCreated: 2024-09-25T22:10:38+0000
+                          dateLastModified: 2025-01-28T02:47:53+0000
+                          paymentServiceAccountType: EXPRESS
+                          paymentService: STRIPE
+                          externalId: acct_1Q33PsGaTELgZzqx
+                          details:
+                            tosAccepted: false
+                            payoutsEnabled: true
+                            paymentsEnabled: true
+                            hasPayoutAccount: true
+                            currentlyDue: []
+                            eventuallyDue: []
+                            pastDue: []
+                            pendingVerification: []
+                      payoutAccountsByAppId:
+                        "11026":
+                          status: COMPLETE
+                          results:
+                            id: 13197
+                            accountType: MERCHANT
+                            accountId: 12030
+                            appId: 11026
+                            isActive: true
+                            status: COMPLETE
+                            kycStatus: COMPLETE
+                            payoutsEnabled: true
+                            countryCode: CA
+                            paymentProvider: STRIPE
+                            paymentProviderAccountId: acct_1Q33PsGaTELgZzqx
+                            paymentProviderAccountType: EXPRESS
+                            paymentProviderMetadata:
+                              stripeAccountId: acct_1Q33PsGaTELgZzqx
+                              stripeAccountType: EXPRESS
+                              stripeBankingCurrency: cad
+                            paymentProviderAccount:
+                              accountId: acct_1Q33PsGaTELgZzqx
+                              accountType: EXPRESS
+                              dateCreated: 2024-11-15T01:10:34+0000
+                              requirements:
+                                errors: []
+                                pastDue: []
+                                alternatives: []
+                                currentlyDue: []
+                                eventuallyDue: []
+                                pendingVerification: []
+                              bankingCountry: CA
+                              chargesEnabled: true
+                              payoutsEnabled: true
+                              bankingCurrency: cad
+                              dateLastModified: 2024-11-15T01:10:34+0000
+                            errors: []
+                            dateCreated: 2024-09-25T22:10:38+0000
+                            dateLastModified: 2025-01-28T02:47:53+0000
+                            paymentServiceAccountType: EXPRESS
+                            paymentService: STRIPE
+                            externalId: acct_1Q33PsGaTELgZzqx
+                            details:
+                              tosAccepted: false
+                              payoutsEnabled: true
+                              paymentsEnabled: true
+                              hasPayoutAccount: true
+                              currentlyDue: []
+                              eventuallyDue: []
+                              pastDue: []
+                              pendingVerification: []
+                      migrationPayoutAccountsByAppId: {}
+                      commissionRate:
+                        status: COMPLETE
+                        defaultRate: 0
+                        overrides:
+                        - status: COMPLETE
+                          appId: 11026
+                          rate: 10
+                          commissionLocked: false
+                    - merchantId: 15574
+                      merchantName: Anime Icons
+                      merchantEmail: i*********************t@violet.io
+                      merchantStatus: ACTIVE
+                      platform: SHOPIFY
+                      storeUrl: ishan-guru-jpy-store.myshopify.com
+                      connection:
+                        status: COMPLETE
+                        results:
+                          isConnected: true
+                          hasActivePlatformPlan: true
+                          hasShippingMethods: true
+                          connected: true
+                      scopeValidation:
+                        status: COMPLETE
+                        results:
+                          valid: true
+                          missingScopes: []
+                      syncStatus:
+                        status: COMPLETE
+                        results:
+                          id: 2709
+                          merchantId: 15574
+                          status: COMPLETED
+                          abort: false
+                          totalProducts: 4
+                          totalProductsSynced: 0
+                          resyncRequired: false
+                          dateLastSynced: 2025-03-06T02:45:34+0000
+                          taxonomySynced: false
+                          webhooksCreated: false
+                      invalidProducts:
+                        status: COMPLETE
+                        results: {}
+                      offersPublished:
+                        status: COMPLETE
+                        results:
+                          syncComplete: true
+                          count: 4
+                      payoutAccount:
+                        status: COMPLETE
+                        results:
+                          id: 13286
+                          accountType: MERCHANT
+                          accountId: 15574
+                          appId: 11026
+                          isActive: true
+                          status: COMPLETE
+                          kycStatus: COMPLETE
+                          payoutsEnabled: true
+                          countryCode: JP
+                          paymentProvider: STRIPE
+                          paymentProviderAccountId: acct_1QKRau2eXfKPKBUK
+                          paymentProviderAccountType: EXPRESS
+                          paymentProviderMetadata:
+                            stripeAccountId: acct_1QKRau2eXfKPKBUK
+                            stripeAccountType: EXPRESS
+                            stripeBankingCurrency: jpy
+                          paymentProviderAccount:
+                            accountId: acct_1QKRau2eXfKPKBUK
+                            accountType: EXPRESS
+                            dateCreated: 2024-11-15T02:38:27+0000
+                            requirements:
+                              errors: []
+                              pastDue: []
+                              alternatives: []
+                              currentlyDue: []
+                              eventuallyDue: []
+                              pendingVerification: []
+                            bankingCountry: JP
+                            chargesEnabled: true
+                            payoutsEnabled: true
+                            bankingCurrency: jpy
+                            dateLastModified: 2024-11-15T02:38:27+0000
+                          errors: []
+                          dateCreated: 2024-11-12T21:25:54+0000
+                          dateLastModified: 2025-01-28T02:53:04+0000
+                          paymentServiceAccountType: EXPRESS
+                          paymentService: STRIPE
+                          externalId: acct_1QKRau2eXfKPKBUK
+                          details:
+                            tosAccepted: false
+                            payoutsEnabled: true
+                            paymentsEnabled: true
+                            hasPayoutAccount: true
+                            currentlyDue: []
+                            eventuallyDue: []
+                            pastDue: []
+                            pendingVerification: []
+                      payoutAccountsByAppId:
+                        "11026":
+                          status: COMPLETE
+                          results:
+                            id: 13286
+                            accountType: MERCHANT
+                            accountId: 15574
+                            appId: 11026
+                            isActive: true
+                            status: COMPLETE
+                            kycStatus: COMPLETE
+                            payoutsEnabled: true
+                            countryCode: JP
+                            paymentProvider: STRIPE
+                            paymentProviderAccountId: acct_1QKRau2eXfKPKBUK
+                            paymentProviderAccountType: EXPRESS
+                            paymentProviderMetadata:
+                              stripeAccountId: acct_1QKRau2eXfKPKBUK
+                              stripeAccountType: EXPRESS
+                              stripeBankingCurrency: jpy
+                            paymentProviderAccount:
+                              accountId: acct_1QKRau2eXfKPKBUK
+                              accountType: EXPRESS
+                              dateCreated: 2024-11-15T02:38:27+0000
+                              requirements:
+                                errors: []
+                                pastDue: []
+                                alternatives: []
+                                currentlyDue: []
+                                eventuallyDue: []
+                                pendingVerification: []
+                              bankingCountry: JP
+                              chargesEnabled: true
+                              payoutsEnabled: true
+                              bankingCurrency: jpy
+                              dateLastModified: 2024-11-15T02:38:27+0000
+                            errors: []
+                            dateCreated: 2024-11-12T21:25:54+0000
+                            dateLastModified: 2025-01-28T02:53:04+0000
+                            paymentServiceAccountType: EXPRESS
+                            paymentService: STRIPE
+                            externalId: acct_1QKRau2eXfKPKBUK
+                            details:
+                              tosAccepted: false
+                              payoutsEnabled: true
+                              paymentsEnabled: true
+                              hasPayoutAccount: true
+                              currentlyDue: []
+                              eventuallyDue: []
+                              pastDue: []
+                              pendingVerification: []
+                      migrationPayoutAccountsByAppId: {}
+                      commissionRate:
+                        status: COMPLETE
+                        defaultRate: 0
+                        overrides:
+                        - status: COMPLETE
+                          appId: 11026
+                          rate: 25
+                          commissionLocked: false
+                    last: false
+                    totalPages: 1
+                    totalElements: 4
+                    first: true
+                    numberOfElements: 4
+                    size: 20
+                    number: 1
+                    empty: false
+                    pageable:
+                      pageNumber: 1
+                      pageSize: 20
+                      sort:
+                        unsorted: true
+                        sorted: false
+                        empty: false
+                      offset: 20
+                      paged: true
+                      unpaged: false
+                    sort:
+                      unsorted: true
+                      sorted: false
+                      empty: false
 components:
   schemas:
     ChannelCommissionRate:
