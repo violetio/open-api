@@ -1869,7 +1869,7 @@ components:
         in_stock:
           type: boolean
           description: Is the Sku in stock in the merchants external store.
-        quantity_available:
+        qty_available:
           type: integer
           description: The total quantity of this Sku available for purchase.
           format: int32
