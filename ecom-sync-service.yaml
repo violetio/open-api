@@ -68,6 +68,11 @@ paths:
           type: integer
           format: int32
           default: 6
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
       responses:
         default:
           description: default response
