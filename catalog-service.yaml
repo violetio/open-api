@@ -200,7 +200,10 @@ paths:
           default: 1
       - name: size
         in: query
+        description: The total number of desired results. Any value over `100` will
+          default to `100`.
         schema:
+          maximum: 100
           type: integer
           format: int32
           default: 20
