@@ -8962,8 +8962,6 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         externalId:
           type: string
-        payoutExternalId:
-          type: string
         paymentService:
           type: string
           enum:
@@ -8971,6 +8969,8 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        payoutExternalId:
+          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
