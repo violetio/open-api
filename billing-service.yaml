@@ -1,0 +1,926 @@
+openapi: 3.0.1
+info:
+  title: Payments-Service
+  description: Payments Service API
+  contact:
+    name: Violet.io
+    url: https://violet.io
+  version: v1
+servers:
+- url: https://sandbox-api.violet.io/v1
+tags:
+- name: Payments - Addresses
+- name: Payments - Payment Capture
+- name: Payments - Payment Integration Health
+- name: Payments - Payout Accounts
+- name: Payments - Payout Methods
+- name: Payments - Transfers
+- name: Payments - Payouts
+- name: Payments - Distributions
+- name: Payments - Payment Transactions
+- name: Payments - Payment Transfers
+- name: Payments - Payout Account Migrations
+- name: Payments - Refunds
+- name: Payments - Subscriptions
+- name: Payments - Maintenance
+- name: Payments - Supported Country Codes
+- name: Payments - Webhooks
+paths:
+  /payments/{account_type}/{account_id}/distributions:
+    get:
+      tags:
+      - Payments - Distributions
+      summary: Get Distributions
+      operationId: getDistributions
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: include_merchants
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - name: include_channels
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDistribution'
+  /payments/{account_type}/{account_id}/distributions/search:
+    post:
+      tags:
+      - Payments - Distributions
+      summary: Search Distributions
+      operationId: searchDistributions
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: include_merchants
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - name: include_channels
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DistributionSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDistribution'
+  /payments/transfers/pending:
+    get:
+      tags:
+      - Payments - Transfers
+      summary: Get Pending Transfers
+      operationId: getPendingTransfers
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PendingTransferResponse'
+  /payments/transfers/register:
+    post:
+      tags:
+      - Payments - Transfers
+      summary: Register a External Transfer made External to Violet
+      operationId: registerExternalTransfer
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterExternalTransferRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterExternalTransferResponse'
+  /payments/{account_type}/{account_id}/payout_account:
+    get:
+      tags:
+      - Payments - Payout Accounts
+      summary: Get Payout Account
+      operationId: getPayoutAccount
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: extended
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: fetch_migrated_account
+        in: query
+        description: Indicate whether to fetch the analogous in-progress migration
+          account instead
+        schema:
+          type: boolean
+          default: false
+      - name: app_id
+        in: query
+        description: App ID used to target the target payout account for merchant
+          account types
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutAccount'
+  /payments/payout_account/{payout_account_id}:
+    get:
+      tags:
+      - Payments - Payout Accounts
+      summary: Get Payout Account by ID
+      operationId: getPayoutAccountById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: payout_account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: extended
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutAccount'
+components:
+  schemas:
+    Distribution:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int32
+        type:
+          type: string
+          description: "Type of this Distribution record. Can be either {PAYMENT}\
+            \ or {REFUND}."
+          enum:
+          - PAYMENT
+          - REFUND
+        payout_account_id:
+          type: integer
+          description: Unique identifier of the Violet Payout Account that this Distribution
+            is sent to.
+          format: int32
+        payout_account_type:
+          type: string
+          description: "Entity type of the Violet Payout Account associated with this\
+            \ Distribution. Can be either {DEVELOPER} or {MERCHANT}"
+          enum:
+          - MERCHANT
+          - DEVELOPER
+        currency:
+          type: string
+          description: Main currency (e.g. USD) of this Distribution.
+        amount:
+          type: integer
+          description: "Net amount, in fractional currency unit (e.g. cents), of this\
+            \ Distribution."
+          format: int32
+        net_distribution_amount:
+          type: integer
+          description: "The final amount to be distributed, in fractional currency\
+            \ unit (e.g. cents), after all fees, commissions, and discounts are applied."
+          format: int32
+        distribution_amount:
+          type: integer
+          description: "The initial distribution amount, in fractional currency unit\
+            \ (e.g. cents), before any deductions."
+          format: int32
+        tax_amount:
+          type: integer
+          description: The total tax amount included in the distribution.
+          format: int32
+        shipping_amount:
+          type: integer
+          description: The total shipping charges included in the distribution.
+          format: int32
+        commission:
+          type: integer
+          description: Amount of commission earned by channels. In fractional currency
+            unit (e.g. cents).
+          format: int32
+        payment_provider_total_fee:
+          type: integer
+          description: Total fee charged by the payment provider for this transaction.
+          format: int32
+        payment_provider_volume_fee:
+          type: integer
+          description: Volume based fee charged by the payment provider for this transaction.
+          format: int32
+        payment_provider_fixed_fee:
+          type: integer
+          description: Fixed fee charged by the payment provider for this transaction.
+          format: int32
+        app_id:
+          type: integer
+          description: Unique identifier of the Violet application associated with
+            this Distribution.
+          format: int32
+        app_name:
+          type: string
+          description: Name of the Violet application associated with this Distribution.
+        merchant_id:
+          type: integer
+          description: Unique identifier of the merchant associated with this Distribution.
+          format: int32
+        merchant_name:
+          type: string
+          description: Name of the merchant associated with this Distribution.
+        merchant_commission_rate:
+          type: number
+          description: Commission Rate of the merchant associated with this Distribution.
+          format: double
+        payment_provider_transaction_id:
+          type: string
+          description: Unique identifier of the payment transaction in the payment
+            service.
+        payment_provider:
+          type: string
+          description: Payment service that processed this payment transaction.
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        status:
+          type: string
+          description: Current status of the distribution record.
+          enum:
+          - SENT
+          - REVERSED
+          - PARTIALLY_REVERSED
+          - PENDING
+          - FAILED
+          - BYPASSED
+        bag_id:
+          type: integer
+          description: Unique identifier of the Bag associated with this Distribution.
+          format: int64
+        bag_sub_total:
+          type: integer
+          description: "The price of the Bag in the base currency prior to discounts,\
+            \ shipping, duties, taxes, and tips. In fractional currency unit (e.g.\
+            \ cents)."
+          format: int32
+        bag_commissionable_amount:
+          type: integer
+          description: "The amount that is eligible for commission calculations. This\
+            \ is the bag total minus shipping, tax, and discounts."
+          format: int32
+        bag_shipping_total:
+          type: integer
+          description: The sum of all shipping methods applied to the Bag in the base
+            currency. In fractional currency unit (e.g. cents).
+          format: int32
+        bag_tax_total:
+          type: integer
+          description: The sum of all the taxes applied to the Bag in the base currency.
+            In fractional currency unit (e.g. cents).
+          format: int32
+        bag_discount_total:
+          type: integer
+          description: The total discounts applied to the price of the Bag in the
+            base currency. In fractional currency unit (e.g. cents).
+          format: int32
+        bag_total:
+          type: integer
+          description: "The sum of all item prices, discounts, shipping, and taxes\
+            \ applied to the Bag in the base currency. In fractional currency unit\
+            \ (e.g. cents)."
+          format: int32
+        external_order_id:
+          type: string
+          description: Unique identifier of the Order in the external ecommerce platform
+            (e.g. Shopify) that this Distribution is associated with.
+        order_id:
+          type: integer
+          description: Unique identifier of the Order in Violet associated with this
+            Distribution.
+          format: int64
+        order_total:
+          type: integer
+          description: Total amount of the Violet Order. In fractional currency unit
+            (e.g. cents).
+          format: int32
+        payout_id:
+          type: integer
+          description: Unique identifier of the Payout associated with this Distribution.
+          format: int32
+        payout_amount:
+          type: integer
+          description: Total amount of the payout this Distribution is a part of.
+          format: int64
+        payout_date:
+          type: string
+          description: Time at which the Payout was created. In ISO-8601 format.
+          format: date-time
+        date_payout_created:
+          type: string
+          description: Time at which the Payout associated with this distribution
+            was created. In ISO-8601 format.
+          format: date-time
+        date_payout_settled:
+          type: string
+          description: "Time at which the Payout associated with this distribution\
+            \ settles in your bank account. If this date is in the future, this is\
+            \ a tentative date of settlement and subject to change. In ISO-8601 format."
+          format: date-time
+        payout_transfer_id:
+          type: integer
+          description: Unique identifier of the Transfer associated with this Distribution.
+          format: int64
+        refund_id:
+          type: integer
+          description: "Unique identifier of the Refund associated with this Distribution,\
+            \ if any."
+          format: int64
+        refund_discrepancy:
+          type: integer
+          description: "Discrepancy amount, if any, associated with this Refund. In\
+            \ fractional currency unit (e.g. cents). Refund discrepancies are present\
+            \ if the merchant does not provide sufficient line items when creating\
+            \ the refund in their ecommerce platform."
+          format: int32
+        tax_remitter:
+          type: string
+          description: "Tax Remittance setting used to generate this Distribution.\
+            \ One of {APP} or {MERCHANT}."
+          enum:
+          - APP
+          - MERCHANT
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        paymentServiceTotalFee:
+          type: integer
+          format: int32
+        paymentServiceVolumeFee:
+          type: integer
+          format: int32
+        paymentServiceFixedFee:
+          type: integer
+          format: int32
+        externalTransactionId:
+          type: string
+      description: "Records detailing the financial transactions and distributions\
+        \ for a specific Bag, which includes a breakdown of fund allocations and payment\
+        \ gateway fees for Merchants and Channels."
+    PageDistribution:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Distribution'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    Pageable:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+    Sort:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    DistributionSearchRequest:
+      type: object
+      properties:
+        bag_id:
+          type: integer
+          description: ID of the bag associated to this Distribution.
+          format: int64
+        order_id:
+          type: integer
+          description: ID of the order associated to this Distribution.
+          format: int64
+        external_order_id:
+          type: string
+          description: ID of the order on the external ecommerce platform.
+        merchant_id:
+          type: integer
+          description: ID of the merchant associated to this Distribution.
+          format: int32
+        payout_id:
+          type: integer
+          description: ID of the payout associated to this Distribution.
+          format: int32
+        before_date:
+          type: string
+          description: Before date
+          format: date-time
+        after_date:
+          type: string
+          description: After date
+          format: date-time
+      description: Search Request for Distributions.
+    PendingTransferResponse:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          description: Unique identifier of the merchant associated with this pending
+            transfer response.
+          format: int32
+        amount:
+          type: integer
+          description: Total amount in fractional currency unit (e.g. cents) that
+            needs to be sent to the associated merchant.
+          format: int64
+        currency:
+          type: string
+          description: Main currency (e.g. USD) associated with this pending transfer
+            response.
+        related_distributions:
+          type: array
+          description: List of Distribution IDs associated with this pending transfer
+            response. The total pending transfer amount equals the sum of all related
+            pending distributions.
+          items:
+            type: integer
+            description: List of Distribution IDs associated with this pending transfer
+              response. The total pending transfer amount equals the sum of all related
+              pending distributions.
+            format: int32
+    ErrorDetails:
+      type: object
+      properties:
+        distribution_id:
+          type: integer
+          description: Unique identifier of the Violet Distribution that this error
+            is associated with.
+          format: int32
+        reason:
+          type: string
+          description: Details about why the funds associated with this Distribution
+            were not included in the external transfer.
+      description: Details of any errors that occurred while registering the external
+        transfer.
+    RegisterExternalTransferResponse:
+      type: object
+      properties:
+        transfer_id:
+          type: integer
+          description: Unique identifier of Violet Transfer associated with this External
+            Transfer.
+          format: int64
+        merchant_id:
+          type: integer
+          description: Unique identifier of the merchant associated with this external
+            transfer.
+          format: int32
+        payment_provider:
+          type: string
+          description: "Name of the payment provider (e.g. STRIPE, PAYPAL) associated\
+            \ with this external transfer."
+        payment_provider_id:
+          type: string
+          description: Unique identifier of transfer to the merchant in the payment
+            provider system.
+        successful_distributions:
+          type: array
+          description: List of Distribution IDs that were successfully processed in
+            this external transfer. The total pending transfer amount equals the sum
+            of all related pending distributions.
+          items:
+            type: integer
+            description: List of Distribution IDs that were successfully processed
+              in this external transfer. The total pending transfer amount equals
+              the sum of all related pending distributions.
+            format: int32
+        failed_distributions:
+          type: array
+          description: List of failed Distribution IDs associated with this pending
+            transfer response. The total pending transfer amount equals the sum of
+            all related pending distributions.
+          items:
+            type: integer
+            description: List of failed Distribution IDs associated with this pending
+              transfer response. The total pending transfer amount equals the sum
+              of all related pending distributions.
+            format: int32
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Key-value pairs of additional information associated with
+              this external transfer. These will returned in the ExternalTransfer
+              entity returned by Violet.
+          description: Key-value pairs of additional information associated with this
+            external transfer. These will returned in the ExternalTransfer entity
+            returned by Violet.
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        error_details:
+          type: array
+          description: Details of any errors that occurred while registering the external
+            transfer.
+          items:
+            $ref: '#/components/schemas/ErrorDetails'
+    RegisterExternalTransferRequest:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          description: Unique identifier of the merchant associated with this external
+            transfer.
+          format: int32
+        payment_provider:
+          type: string
+          description: "Name of the payment provider (e.g. STRIPE, PAYPAL) associated\
+            \ with this external transfer."
+        payment_provider_id:
+          type: string
+          description: Unique identifier of transfer to the merchant in the payment
+            provider system.
+        related_distributions:
+          type: array
+          description: List of Distribution IDs associated with this pending transfer
+            response. The total pending transfer amount equals the sum of all related
+            pending distributions.
+          items:
+            type: integer
+            description: List of Distribution IDs associated with this pending transfer
+              response. The total pending transfer amount equals the sum of all related
+              pending distributions.
+            format: int32
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Key-value pairs of additional information associated with
+              this external transfer. These will returned in the ExternalTransfer
+              entity returned by Violet.
+          description: Key-value pairs of additional information associated with this
+            external transfer. These will returned in the ExternalTransfer entity
+            returned by Violet.
+    PayoutAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object
+          format: int32
+        account_type:
+          type: string
+          description: Type of the account entity in Violet. This is either DEVELOPER
+            or MERCHANT.
+          enum:
+          - MERCHANT
+          - DEVELOPER
+          - DEVELOPER
+          - MERCHANT
+        account_id:
+          type: integer
+          description: Identifier of the account entity in Violet. This is either
+            the Violet developer or merchant identifier.
+          format: int32
+        merchant_id:
+          type: integer
+          description: Identifier of the merchant entity in Violet.
+          format: int32
+        app_id:
+          type: integer
+          description: Identifier of the app entity in Violet that this Payout Account
+            is associated with.
+          format: int32
+        is_active:
+          type: boolean
+          description: Field that denotes whether or not this Payout Account is active
+            and being used for transactions. Only one Payout Account may be active
+            for a merchant-app combination at a given point in time.
+        country_code:
+          type: string
+          description: Two-letter country code of the bank that this Payout Account
+            is associated to.
+        payment_provider:
+          type: string
+          description: Payment Provider that the underlying payout account was created
+            in. This is the provider that handles payment and payout processing for
+            this entity.
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        payment_provider_account_id:
+          type: string
+          description: Identifier of the payout account in the payment provider system.
+        payment_provider_account_type:
+          type: string
+          description: Type of account in the external payment provider. This field
+            may not be present if the underlying payment provider does not have multiple
+            account types.
+          enum:
+          - EXPRESS
+          - CUSTOM
+          - STANDARD
+          - PLATFORM
+        payment_provider_metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Metadata from the payment provider associated to this payout
+              account.
+          description: Metadata from the payment provider associated to this payout
+            account.
+        payment_provider_account:
+          type: object
+          description: Details about the underlying payout account in the payment
+            provider.
+        date_deactivated:
+          type: string
+          description: Time at which this payout account was deactivated. In ISO-8601
+            format.
+          format: date-time
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated with this payout account. Not all
+            errors block transacting on this payout account.
+          items:
+            $ref: '#/components/schemas/PayoutAccountError'
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+      description: Violet Payout Account that stores underlying payment provider account
+        information to be used for disbursing funds during Order processing.
+    PayoutAccountError:
+      required:
+      - error_message
+      - payout_account_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        payout_account_id:
+          type: integer
+          description: Unique identifier of the Payout Account that this Error is
+            associated to.
+          format: int32
+      description: Error associated to a Payout Account
