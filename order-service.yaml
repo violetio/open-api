@@ -8314,6 +8314,11 @@ components:
           description: "Postal or Zip code to be applied to the address. This value\
             \ is required for all countries that have postal codes. **For countries\
             \ that do not have postal codes, this value is optional.**"
+        phone:
+          type: string
+          description: "Phone number related to the address. **Note: Some external\
+            \ commerce platforms require this value. For these platforms Violet will\
+            \ use a faux number if no value is provided to ensure that the order succeeds.**"
       description: "Shipping address for the order. **Note: this value is not required\
         \ when all items in the order are digital.**"
     VioletPageOrder:
@@ -8960,7 +8965,7 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
+        payoutExternalId:
           type: string
         paymentService:
           type: string
@@ -8969,7 +8974,7 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        payoutExternalId:
+        externalId:
           type: string
       description: Record of Payout Transfer
     PayoutTransferError:
