@@ -568,6 +568,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -580,15 +582,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     Pageable:
