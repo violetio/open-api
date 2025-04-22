@@ -80,6 +80,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageInvalidProduct'
+  /sync/merchants/{merchant_id}/invalid_products/search:
+    post:
+      tags:
+      - Invalid Products
+      summary: Search InvalidProduct Records By Merchant Id
+      operationId: searchMerchantInvalidProducts
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchInvalidProductsRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageInvalidProduct'
   /sync/offers/{offer_id}:
     post:
       tags:
@@ -830,6 +885,13 @@ components:
           type: boolean
           description: Boolean indicating if the result set is empty
       description: Violet Wrapper for springframework sort
+    SearchInvalidProductsRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        externalId:
+          type: string
     Album:
       required:
       - parent_id
