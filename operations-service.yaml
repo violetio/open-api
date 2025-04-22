@@ -1319,6 +1319,10 @@ components:
           description: Identifier of the account entity in Violet. This is either
             the Violet developer or merchant identifier.
           format: int32
+        merchant_id:
+          type: integer
+          description: Identifier of the merchant entity in Violet.
+          format: int32
         app_id:
           type: integer
           description: Identifier of the app entity in Violet that this Payout Account
@@ -1329,26 +1333,6 @@ components:
           description: Field that denotes whether or not this Payout Account is active
             and being used for transactions. Only one Payout Account may be active
             for a merchant-app combination at a given point in time.
-        status:
-          type: string
-          description: Current status of this payout account. This status reflects
-            whether or not funds can be transferred to the connected payout account.
-          enum:
-          - INCOMPLETE
-          - COMPLETE
-          - REQUIRES_UPDATES
-        kyc_status:
-          type: string
-          description: Whether or not know-your-customer requirements have been fulfilled
-            for the underlying payment provider payout account.
-          enum:
-          - INCOMPLETE
-          - COMPLETE
-          - REQUIRES_UPDATES
-        payouts_enabled:
-          type: boolean
-          description: Whether or not transfers are being sent by Violet to the connected
-            payment provider account for transactions.
         country_code:
           type: string
           description: Two-letter country code of the bank that this Payout Account
@@ -1384,12 +1368,10 @@ components:
               account.
           description: Metadata from the payment provider associated to this payout
             account.
-        verified:
-          type: boolean
-          description: Verification status of the payout account connected to the
-            payment provider.
         payment_provider_account:
           type: object
+          description: Details about the underlying payout account in the payment
+            provider.
         date_deactivated:
           type: string
           description: Time at which this payout account was deactivated. In ISO-8601
@@ -1410,117 +1392,8 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        externalId:
-          type: string
-        paymentServiceAccountType:
-          type: string
-          enum:
-          - EXPRESS
-          - CUSTOM
-          - STANDARD
-          - PLATFORM
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
-        details:
-          $ref: '#/components/schemas/PayoutAccountDetails'
       description: Violet Payout Account that stores underlying payment provider account
         information to be used for disbursing funds during Order processing.
-    PayoutAccountDetails:
-      type: object
-      properties:
-        legal_entity_address_city:
-          type: string
-          description: Legal Entity Address City
-        legal_entity_address_state:
-          type: string
-          description: Legal Entity Address State
-        legal_entity_address_country:
-          type: string
-          description: Legal Entity Address Country
-        legal_entity_address_postal_code:
-          type: string
-          description: Legal Entity Address Postal/Zip Code
-        legal_entity_date_of_birth:
-          type: string
-          description: Legal Entity Date of Birth
-          format: date-time
-        legal_entity_business_name:
-          type: string
-          description: Legal Entity Business Name
-        account_holder_name:
-          type: string
-          description: Account Holder Name
-        legal_entity_business_tax_id:
-          type: string
-          description: Legal Entity Business Tax ID
-        legal_entity_first_name:
-          type: string
-          description: Legal Entity First Name
-        legal_entity_last_name:
-          type: string
-          description: Legal Entity Last Name
-        legal_entity_ssn_last_four:
-          type: string
-          description: Legal Entity SSN Last Four
-        legal_entity_type:
-          type: string
-          description: Legal Entity Type
-        ssn_last_4_provided:
-          type: boolean
-          description: Has SSN Last 4 been provided
-        tosAccepted:
-          type: boolean
-          description: Have the TOS been accepted
-        legal_entity_currency:
-          type: string
-          description: Desired Currency of the Legal Entity
-        statement_descriptor:
-          type: string
-          description: The merchants desired statement descriptor
-        website_url:
-          type: string
-          description: The merchants website
-        email:
-          type: string
-          description: The merchants email
-        phone:
-          type: string
-          description: The merchants phone number
-        payoutsEnabled:
-          type: boolean
-        paymentsEnabled:
-          type: boolean
-        hasPayoutAccount:
-          type: boolean
-        disabledReason:
-          type: string
-        currentlyDue:
-          type: array
-          items:
-            type: string
-        eventuallyDue:
-          type: array
-          items:
-            type: string
-        pastDue:
-          type: array
-          items:
-            type: string
-        pendingVerification:
-          type: array
-          items:
-            type: string
-        legal_entity_address_line_1:
-          type: string
-          description: Legal Entity Address Line One
-        legal_entity_address_line_2:
-          type: string
-          description: Legal Entity Address Line Two
     PayoutAccountError:
       required:
       - error_message
