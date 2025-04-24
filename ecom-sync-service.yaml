@@ -1250,6 +1250,10 @@ components:
           description: The currency of the Offer. By default this value will be the
             merchants currency but can be changed by the API user using a `base_currency`
             parameter.
+        external_currency:
+          type: string
+          description: The external currency of the Offer. This value is the associated
+            merchants default currency.
         source_category_name:
           type: string
           description: Original Category on Source Platform
@@ -1799,7 +1803,6 @@ components:
       readOnly: true
     Sku:
       required:
-      - currency
       - merchant_id
       - name
       - offer_id
@@ -1871,6 +1874,10 @@ components:
         currency:
           type: string
           description: The base currency of this Sku.
+        external_currency:
+          type: string
+          description: The external currency of the Offer. This value is the associated
+            merchants default currency.
         presented_currency:
           type: string
           description: The presented currency of this Sku.
@@ -3225,9 +3232,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        first_name:
-          type: string
         last_name:
+          type: string
+        first_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
