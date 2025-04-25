@@ -1956,6 +1956,15 @@ components:
           $ref: '#/components/schemas/SkuDimensions'
         shipping_dimensions:
           $ref: '#/components/schemas/SkuDimensions'
+        metadata:
+          uniqueItems: true
+          type: array
+          description: "Additional Meta Data of the Sku. When activated, this data\
+            \ can be included by providing the `?include=sku_metadata` query param\
+            \ when querying Offer data."
+          nullable: true
+          items:
+            $ref: '#/components/schemas/MetaObject'
         display_order:
           type: integer
           description: The order that the merchant has chosen to display this Sku
