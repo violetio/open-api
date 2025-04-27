@@ -225,6 +225,7 @@ paths:
           - metadata
           - collections
           - shipping
+          - sku_metadata
       - name: date_last_modified:min
         in: query
         description: "Return only the published offers that have been modified after\
@@ -348,6 +349,7 @@ paths:
           - metadata
           - collections
           - shipping
+          - sku_metadata
       responses:
         "200":
           description: successful operation
@@ -408,14 +410,13 @@ paths:
           default: USD
       - name: include
         in: query
+        description: Comma-separated list of extra data to be included.
         schema:
           type: string
           default: sku_dimensions
-      - name: use_presentment_currency
-        in: query
-        schema:
-          type: boolean
-          default: false
+          enum:
+          - sku_dimensions
+          - sku_metadata
       responses:
         default:
           description: default response
