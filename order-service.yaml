@@ -3022,12 +3022,67 @@ paths:
             schema:
               $ref: '#/components/schemas/CalculateCartRequest'
       responses:
-        default:
-          description: default response
+        "200":
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CalculateCartResponse'
+                $ref: '#/components/schemas/Refund'
+              examples:
+                Estimated Order:
+                  description: Estimated Order
+                  value:
+                    estimated_carts:
+                    - merchant_id: 10000
+                      platform: SHOPIFY
+                      base_currency: USD
+                      sub_total: 19998
+                      shipping_total: 0
+                      tax_total: 2119
+                      total: 22117
+                      skus:
+                      - quantity: 2
+                        sku_id: 10000
+                        name: Nintendo Entertainment System
+                        price: 9999
+                        merchant_id: 11111
+                        external_id: "31516807528534"
+                        available: true
+                        requires_shipping: true
+                        product_type: PHYSICAL
+                        line_price: 19998
+                      available_shipping_methods:
+                      - label: Free Shipping
+                        carrier: OTHER
+                        price: 0
+                        shipping_method_id: 18ff5c0a16d83cb8ba46848e48e06532
+                      - label: Ground Advantage
+                        carrier: USPS
+                        price: 712
+                        shipping_method_id: 468c823c817c753e850ff6658ef1480f
+                      - label: Priority Mail
+                        carrier: USPS
+                        price: 934
+                        shipping_method_id: 02ef65ebff687faa10c71830d41144b2
+                      - label: Standard
+                        carrier: OTHER
+                        price: 1990
+                        shipping_method_id: 7a4763e6b861a281511834b449e0c574
+                      has_shipping_methods: true
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Blocked Address:
+                  description: Blocked Address
+                  value:
+                    message: The provided address has been blocked due to a history
+                      of being used for fraudulent orders.
+                    error: blocked_address
+                    code: 4236
   /checkout/cart/{cart_id}/shipping/available:
     get:
       tags:
@@ -6150,6 +6205,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -6166,9 +6224,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -8965,6 +9020,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -8974,8 +9031,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
