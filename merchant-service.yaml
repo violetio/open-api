@@ -140,6 +140,7 @@ paths:
                 global_feature_flags:
                   sync_metadata: false
                   sync_collections: true
+                  sync_sku_metadata: true
                 platform_feature_flags:
                   filter_by_collections: false
                   use_custom_shipping_rates: true
