@@ -322,6 +322,65 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PayoutAccount'
+  /payments/{account_type}/{account_id}/payout_accounts:
+    get:
+      tags:
+      - Payments - Payout Accounts
+      summary: Retrieve all payout accounts linked to a specific merchant.
+      operationId: getPayoutAccounts
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: extended
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: fetch_migrated_accounts
+        in: query
+        description: Indicate whether to fetch the analogous in-progress migration
+          accounts instead
+        schema:
+          type: boolean
+          default: false
+      - name: app_id
+        in: query
+        description: App ID used to target the target payout account for merchant
+          account types
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MerchantPayoutAccountWrapper'
 components:
   schemas:
     Distribution:
@@ -924,3 +983,25 @@ components:
             associated to.
           format: int32
       description: Error associated to a Payout Account
+    MerchantPayoutAccountWrapper:
+      type: object
+      properties:
+        app_id:
+          type: integer
+          description: Identifier of the application that this merchant payout account
+            is associated with.
+          format: int32
+        app_name:
+          type: string
+          description: Name of the application that this merchant payout account is
+            associated with.
+        payout_account:
+          $ref: '#/components/schemas/PayoutAccount'
+        is_migration_origin:
+          type: boolean
+          description: Indicates if this payout account is the account from which
+            an active migration is taking place.
+        is_migration_target:
+          type: boolean
+          description: Indicates if this payout account is the target account in an
+            ongoing migration process.
