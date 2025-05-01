@@ -5850,9 +5850,6 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -5865,6 +5862,9 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -6483,10 +6483,10 @@ components:
           - POSTNORD
         label:
           type: string
-          description: Shipping Method Label
+          description: Shipping method label. This is the name of the shipping method.
         price:
           type: integer
-          description: Total cost of the Shipping Method. In Cents
+          description: Total cost of the Shipping Method. In Cents.
           format: int32
         custom:
           type: boolean
