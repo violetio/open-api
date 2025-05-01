@@ -408,6 +408,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageMerchantSummary'
+  /merchants/{merchant_id}/violet_connect_urls:
+    get:
+      tags:
+      - Merchants - Onboarding
+      summary: Get pre-formatted links for Violet Connect onboarding for a given merchant
+      operationId: getVioletConnectUrls
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: step
+        in: query
+        schema:
+          type: string
+      - name: state
+        in: query
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OnboardingStep'
 components:
   schemas:
     AvailabilityConfig:
@@ -1437,3 +1480,16 @@ components:
           type: string
           description: Direction to sort by
       description: Merchant Explore Request
+    OnboardingStep:
+      type: object
+      properties:
+        step:
+          type: string
+          description: The type of onboarding step.
+          enum:
+          - PAYOUTS
+          - COMMISSION_RATE
+          - CREATE_STRIPE_EXPRESS_ACCOUNT
+        url:
+          type: string
+          description: The URL to redirect the user to for this step.
