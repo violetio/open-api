@@ -1934,6 +1934,15 @@ components:
           $ref: '#/components/schemas/SkuDimensions'
         shipping_dimensions:
           $ref: '#/components/schemas/SkuDimensions'
+        metadata:
+          uniqueItems: true
+          type: array
+          description: "Additional Meta Data of the Sku. When activated, this data\
+            \ can be included by providing the `?include=sku_metadata` query param\
+            \ when querying Offer data."
+          nullable: true
+          items:
+            $ref: '#/components/schemas/MetaObject'
         display_order:
           type: integer
           description: The order that the merchant has chosen to display this Sku
@@ -3443,10 +3452,10 @@ components:
           - POSTNORD
         label:
           type: string
-          description: Shipping Method Label
+          description: Shipping method label. This is the name of the shipping method.
         price:
           type: integer
-          description: Total cost of the Shipping Method. In Cents
+          description: Total cost of the Shipping Method. In Cents.
           format: int32
         custom:
           type: boolean
