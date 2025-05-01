@@ -422,13 +422,13 @@ components:
           $ref: '#/components/schemas/Sort'
         first:
           type: boolean
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     Pageable:
