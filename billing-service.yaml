@@ -227,6 +227,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterExternalTransferResponse'
+  /payments/payout_accounts/{payout_account_id}:
+    delete:
+      tags:
+      - Payments - Payout Accounts
+      summary: Delete Payout Account
+      operationId: deletePayoutAccount
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: payout_account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
   /payments/{account_type}/{account_id}/payout_account:
     get:
       tags:
