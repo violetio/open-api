@@ -1045,6 +1045,7 @@ components:
           - COLLECTION_SYNC_FAILED
           - MERCHANT_PAYOUT_ACCOUNT_CREATED
           - MERCHANT_PAYOUT_ACCOUNT_REQUIREMENTS_UPDATED
+          - MERCHANT_PAYOUT_ACCOUNT_DELETED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook event was sent.
@@ -1163,6 +1164,7 @@ components:
             - COLLECTION_SYNC_FAILED
             - MERCHANT_PAYOUT_ACCOUNT_CREATED
             - MERCHANT_PAYOUT_ACCOUNT_REQUIREMENTS_UPDATED
+            - MERCHANT_PAYOUT_ACCOUNT_DELETED
         entity_ids:
           uniqueItems: true
           type: array
@@ -1261,6 +1263,7 @@ components:
           - COLLECTION_SYNC_FAILED
           - MERCHANT_PAYOUT_ACCOUNT_CREATED
           - MERCHANT_PAYOUT_ACCOUNT_REQUIREMENTS_UPDATED
+          - MERCHANT_PAYOUT_ACCOUNT_DELETED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook posts against.
