@@ -1046,6 +1046,8 @@ components:
           - MERCHANT_PAYOUT_ACCOUNT_CREATED
           - MERCHANT_PAYOUT_ACCOUNT_REQUIREMENTS_UPDATED
           - MERCHANT_PAYOUT_ACCOUNT_DELETED
+          - MERCHANT_PAYOUT_ACCOUNT_ACTIVATED
+          - MERCHANT_PAYOUT_ACCOUNT_DEACTIVATED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook event was sent.
@@ -1165,6 +1167,8 @@ components:
             - MERCHANT_PAYOUT_ACCOUNT_CREATED
             - MERCHANT_PAYOUT_ACCOUNT_REQUIREMENTS_UPDATED
             - MERCHANT_PAYOUT_ACCOUNT_DELETED
+            - MERCHANT_PAYOUT_ACCOUNT_ACTIVATED
+            - MERCHANT_PAYOUT_ACCOUNT_DEACTIVATED
         entity_ids:
           uniqueItems: true
           type: array
@@ -1264,6 +1268,8 @@ components:
           - MERCHANT_PAYOUT_ACCOUNT_CREATED
           - MERCHANT_PAYOUT_ACCOUNT_REQUIREMENTS_UPDATED
           - MERCHANT_PAYOUT_ACCOUNT_DELETED
+          - MERCHANT_PAYOUT_ACCOUNT_ACTIVATED
+          - MERCHANT_PAYOUT_ACCOUNT_DEACTIVATED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook posts against.
