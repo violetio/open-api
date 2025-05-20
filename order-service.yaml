@@ -1663,7 +1663,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Refund'
+                $ref: '#/components/schemas/CalculateCartResponse'
               examples:
                 Estimated Cart:
                   description: Estimated Cart
@@ -3027,7 +3027,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Refund'
+                $ref: '#/components/schemas/CalculateCartResponse'
               examples:
                 Estimated Order:
                   description: Estimated Order
@@ -5850,9 +5850,6 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -5865,6 +5862,9 @@ components:
           - REJECTED
           - CANCELED
           - BACKORDERED
+        bag_id:
+          type: integer
+          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -7111,225 +7111,6 @@ components:
           description: Is the shipping method custom. True when the price has been
             overridden.
       description: Shipping Method applied to a Bag
-    Refund:
-      required:
-      - amount
-      - app_id
-      - gateway_transaction_id
-      - merchant_id
-      - order_id
-      - transaction_id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        order_id:
-          type: integer
-          description: ID of the Order being refunded
-          format: int64
-        bag_id:
-          type: integer
-          description: ID of the Bag being refunded
-          format: int64
-        merchant_id:
-          type: integer
-          description: ID of the merchant making the refund
-          format: int32
-        app_id:
-          type: integer
-          description: ID of the App that created the Order
-          format: int32
-        transaction_id:
-          type: integer
-          description: ID of the Transaction being refunded
-          format: int64
-        gateway_transaction_id:
-          type: string
-          description: ID of the Transaction in the Payment Gateway
-        amount:
-          type: integer
-          description: Amount being refunded. In Cents
-          format: int32
-        merchant_transfer_reversal_amount_usd:
-          type: integer
-          description: Amount being taken back from the associated transfer to the
-            merchant. In Cents
-          format: int32
-        developer_transfer_reversal_amount_usd:
-          type: integer
-          description: Amount being taken back from the associated transfer to the
-            developer. In Cents
-          format: int32
-        merchant_transfer_reversal_amount_platform_currency:
-          type: integer
-          description: "Amount in fractional currency unit (e.g. cents) being taken\
-            \ back from the associated transfer to the merchant, in platform currency."
-          format: int32
-        developer_transfer_reversal_amount_platform_currency:
-          type: integer
-          description: "Amount in fractional currency unit (e.g. cents) being taken\
-            \ back from the associated transfer to the developer, in platform currency."
-          format: int32
-        reason:
-          type: string
-          description: Reason for refund
-        reason_code:
-          type: string
-          description: Reason code for refund
-          enum:
-          - OTHER
-          - CUSTOMER
-          - INVENTORY
-          - FRAUD
-          - DECLINED
-        refund_currency:
-          type: string
-          description: Currency set for this refund by the external ecom platform
-        platform_currency:
-          type: string
-          description: Currency used by the platform account for the payment provider
-            that processed this Refund
-        status:
-          type: string
-          description: Status of the Refund
-          enum:
-          - PROCESSING
-          - COMPLETED
-          - CANCELED
-          - PARTIALLY_COMPLETED
-          - FAILED
-          - EXTERNAL
-        skus:
-          uniqueItems: true
-          type: array
-          description: SKUs the refund applies to
-          items:
-            $ref: '#/components/schemas/RefundOrderSku'
-        date_created:
-          type: string
-          description: Date of creation
-          format: date-time
-        date_last_modified:
-          type: string
-          description: Date of last update
-          format: date-time
-        external_id:
-          type: string
-          description: ID of the refund on the external commerce platform. This value
-            will only be populated if the external commerce platform supports refund
-            ID's.
-        errors:
-          uniqueItems: true
-          type: array
-          description: List of errors associated to this refund during processing.
-            This value will only be populated if there are errors during processing
-          items:
-            $ref: '#/components/schemas/RefundError'
-        shipping:
-          $ref: '#/components/schemas/RefundShipping'
-        tax_amount:
-          minimum: 0
-          type: integer
-          description: Tax amount being refunded. In Cents.
-          format: int32
-          nullable: true
-      description: Order Refund
-    RefundError:
-      required:
-      - error_message
-      - refund_id
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Unique identifier for the object.
-          format: int64
-          readOnly: true
-        error_code:
-          type: integer
-          description: Unique error code corresponding to this error.
-          format: int32
-        error_message:
-          type: string
-          description: Error message describing the issue in the underlying system.
-        resolved:
-          type: boolean
-          description: Indicates whether the error has been resolved. Defaults to
-            false.
-        date_resolved:
-          type: string
-          description: "Time at which this error was resolved. In ISO-8601 format.\
-            \ By default, this value is null and only applies to "
-          format: date-time
-        date_created:
-          type: string
-          description: Time at which the object was created. In ISO-8601 format.
-          format: date-time
-        refund_id:
-          type: integer
-          description: ID of the Refund this Error is associated to
-          format: int64
-      description: Error associated to a refund
-    RefundOrderSku:
-      required:
-      - order_sku_id
-      - refund_id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        refund_id:
-          type: integer
-          description: Id of the Refund associated with Refund Order Sku
-          format: int64
-        bag_id:
-          type: integer
-          description: ID of the Bag being refunded
-          format: int64
-        quantity_refunded:
-          type: integer
-          description: Quantity of the this item refunded by this refund.
-          format: int32
-        external_id:
-          type: string
-          description: Variant Id in external Ecom platform
-        order_sku_id:
-          type: integer
-          description: Id of the Order Sku associated with Refund Order Sku
-          format: int64
-      description: Refunded Order Sku
-    RefundShipping:
-      type: object
-      properties:
-        amount:
-          minimum: 0
-          type: integer
-          description: "Shipping amount, inclusive of any taxes, that was refunded\
-            \ in cents. If no value is provided the full shipping amount will be refunded."
-          format: int32
-          nullable: true
-        tax_amount:
-          minimum: 0
-          type: integer
-          description: Tax amount that was refunded in cents.
-          format: int32
-          nullable: true
-        full_refund:
-          type: boolean
-          description: Is the shipping refund a full refund of the total shipping
-            amount.
-          nullable: true
-        discrepancy_reason:
-          type: string
-          description: An optional reason for any discrepancies in the shipping amount
-            that was refunded.
-          nullable: true
-      description: Details of any refunded shipping amounts.
-      nullable: true
     CalculateCartResponse:
       type: object
       properties:
@@ -7940,6 +7721,239 @@ components:
         shipping_address:
           $ref: '#/components/schemas/BaseAddress'
       description: Calculate Cart Request
+    Refund:
+      required:
+      - amount
+      - app_id
+      - gateway_transaction_id
+      - merchant_id
+      - order_id
+      - payment_transaction_id
+      - transaction_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        order_id:
+          type: integer
+          description: ID of the Order being refunded
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the Bag being refunded
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the merchant making the refund
+          format: int32
+        app_id:
+          type: integer
+          description: ID of the App that created the Order
+          format: int32
+        transaction_id:
+          type: integer
+          description: ID of the Transaction being refunded
+          format: int64
+        payment_transaction_id:
+          type: integer
+          description: ID of the Payment Transaction in Violet
+          format: int64
+        gateway_transaction_id:
+          type: string
+          description: ID of the Transaction in the Payment Gateway
+        amount:
+          type: integer
+          description: Amount being refunded. In Cents
+          format: int32
+        merchant_transfer_reversal_amount_usd:
+          type: integer
+          description: Amount being taken back from the associated transfer to the
+            merchant. In Cents
+          format: int32
+        developer_transfer_reversal_amount_usd:
+          type: integer
+          description: Amount being taken back from the associated transfer to the
+            developer. In Cents
+          format: int32
+        merchant_transfer_reversal_amount_platform_currency:
+          type: integer
+          description: "Amount in fractional currency unit (e.g. cents) being taken\
+            \ back from the associated transfer to the merchant, in platform currency."
+          format: int32
+        developer_transfer_reversal_amount_platform_currency:
+          type: integer
+          description: "Amount in fractional currency unit (e.g. cents) being taken\
+            \ back from the associated transfer to the developer, in platform currency."
+          format: int32
+        reason:
+          type: string
+          description: Reason for refund
+        reason_code:
+          type: string
+          description: Reason code for refund
+          enum:
+          - OTHER
+          - CUSTOMER
+          - INVENTORY
+          - FRAUD
+          - DECLINED
+        refund_currency:
+          type: string
+          description: Currency set for this refund by the external ecom platform
+        platform_currency:
+          type: string
+          description: Currency used by the platform account for the payment provider
+            that processed this Refund
+        status:
+          type: string
+          description: Status of the Refund
+          enum:
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_COMPLETED
+          - FAILED
+          - EXTERNAL
+        skus:
+          uniqueItems: true
+          type: array
+          description: SKUs the refund applies to
+          items:
+            $ref: '#/components/schemas/RefundOrderSku'
+        transfer_reversals:
+          uniqueItems: true
+          type: array
+          description: Unique identifiers of the Transfer Reversal objects in Violet
+            that are associated with this transfer.
+          items:
+            type: string
+            description: Unique identifiers of the Transfer Reversal objects in Violet
+              that are associated with this transfer.
+        date_created:
+          type: string
+          description: Date of creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last update
+          format: date-time
+        external_id:
+          type: string
+          description: ID of the refund on the external commerce platform. This value
+            will only be populated if the external commerce platform supports refund
+            ID's.
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this refund during processing.
+            This value will only be populated if there are errors during processing
+          items:
+            $ref: '#/components/schemas/RefundError'
+        shipping:
+          $ref: '#/components/schemas/RefundShipping'
+        tax_amount:
+          minimum: 0
+          type: integer
+          description: Tax amount being refunded. In Cents.
+          format: int32
+          nullable: true
+      description: Order Refund
+    RefundError:
+      required:
+      - error_message
+      - refund_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        refund_id:
+          type: integer
+          description: ID of the Refund this Error is associated to
+          format: int64
+      description: Error associated to a refund
+    RefundOrderSku:
+      required:
+      - order_sku_id
+      - refund_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        refund_id:
+          type: integer
+          description: Id of the Refund associated with Refund Order Sku
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the Bag being refunded
+          format: int64
+        quantity_refunded:
+          type: integer
+          description: Quantity of the this item refunded by this refund.
+          format: int32
+        external_id:
+          type: string
+          description: Variant Id in external Ecom platform
+        order_sku_id:
+          type: integer
+          description: Id of the Order Sku associated with Refund Order Sku
+          format: int64
+      description: Refunded Order Sku
+    RefundShipping:
+      type: object
+      properties:
+        amount:
+          minimum: 0
+          type: integer
+          description: "Shipping amount, inclusive of any taxes, that was refunded\
+            \ in cents. If no value is provided the full shipping amount will be refunded."
+          format: int32
+          nullable: true
+        tax_amount:
+          minimum: 0
+          type: integer
+          description: Tax amount that was refunded in cents.
+          format: int32
+          nullable: true
+        full_refund:
+          type: boolean
+          description: Is the shipping refund a full refund of the total shipping
+            amount.
+          nullable: true
+        discrepancy_reason:
+          type: string
+          description: An optional reason for any discrepancies in the shipping amount
+            that was refunded.
+          nullable: true
+      description: Details of any refunded shipping amounts.
+      nullable: true
     CancelOrderRequest:
       type: object
       properties:
@@ -8928,6 +8942,11 @@ components:
           type: integer
           format: int64
           readOnly: true
+        payment_transaction:
+          type: integer
+          description: Unique identifier of the Payment Transaction that this Transfer
+            is associated with.
+          format: int64
         payout_id:
           type: integer
           description: "ID of the Payout, if any, this Transfer is associated to"
@@ -9005,6 +9024,15 @@ components:
             description: Identifiers of the Distributions in Violet that are associated
               with this transfer. The amount of this Transfer is directly computed
               as the sum of all Distributions related to it.
+        transfer_reversals:
+          uniqueItems: true
+          type: array
+          description: Unique identifiers of the Transfer Reversal objects in Violet
+            that are associated with this transfer.
+          items:
+            type: string
+            description: Unique identifiers of the Transfer Reversal objects in Violet
+              that are associated with this transfer.
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
@@ -9020,8 +9048,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -9031,6 +9057,8 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        externalId:
+          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
