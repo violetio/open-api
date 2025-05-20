@@ -91,6 +91,173 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageDistribution'
+  /payments/transfers/{transfer_id}:
+    get:
+      tags:
+      - Payments - Transfers
+      summary: Get Payout Transfer
+      operationId: getTransfer
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: transfer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutTransfer'
+  /payments/transfers/external/{external_transfer_id}:
+    get:
+      tags:
+      - Payments - Transfers
+      summary: Get Transfer by External Id
+      operationId: getTransferByExternalId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: external_transfer_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutTransfer'
+  /payments/transfers/reversals/{transfer_reversal_id}:
+    get:
+      tags:
+      - Payments - Transfer Reversals
+      summary: Get Transfer Reversal
+      operationId: getTransferReversal
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: transfer_reversal_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferReversal'
+  /payments/transfers/external/{paypro_transfer_id}/reversals:
+    get:
+      tags:
+      - Payments - Transfers Reversals
+      summary: Get Transfer Reversal by Payment Provider Transfer Id
+      operationId: getTransferReversalsByPayproTransferId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: paypro_transfer_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransferReversal'
+  /payments/transfers/{transfer_id}/reversals:
+    get:
+      tags:
+      - Payments - Transfer Reversals
+      summary: Get Transfer Reversals by Transfer ID
+      operationId: getTransferReversalsByTransferId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: transfer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransferReversal'
   /payments/{account_type}/{account_id}/distributions/search:
     post:
       tags:
@@ -156,6 +323,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageDistribution'
+  /payments/transfers/reversals:
+    post:
+      tags:
+      - Payments - Transfer Reversals
+      summary: Search Transfer Reversals
+      operationId: searchTransferReversal
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchTransfersReversalsRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTransferReversal'
+  /payments/transfers:
+    post:
+      tags:
+      - Payments - Transfers
+      summary: Search Transfers
+      operationId: searchTransfers
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchTransfersRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePayoutTransfer'
   /payments/transfers/pending:
     get:
       tags:
@@ -658,6 +923,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -670,8 +937,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -708,6 +973,267 @@ components:
           type: boolean
         unsorted:
           type: boolean
+    PayoutTransfer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        payment_transaction:
+          type: integer
+          description: Unique identifier of the Payment Transaction that this Transfer
+            is associated with.
+          format: int64
+        payout_id:
+          type: integer
+          description: "ID of the Payout, if any, this Transfer is associated to"
+          format: int32
+        payment_provider_id:
+          type: string
+          description: ID of the transfer record in Stripe
+        payment_provider_payout_id:
+          type: string
+          description: External ID of the payout record
+        payout_account_id:
+          type: integer
+          description: ID of the Payout Account this Transfer belongs to.
+          format: int32
+        bag_amount:
+          type: integer
+          description: Total value for the bag associated to this transfer
+          format: int32
+        bag_currency:
+          type: string
+          description: Original currency that this bag was processed in.
+        amount:
+          type: integer
+          description: Total amount in fractional currency unit (e.g. cents) for this
+            transfer.
+          format: int32
+        currency:
+          type: string
+          description: Currency that this transfer was processed in.
+        status:
+          type: string
+          description: Status of the transfer.
+          enum:
+          - SENT
+          - REVERSED
+          - PARTIALLY_REVERSED
+          - PENDING
+          - FAILED
+          - BYPASSED
+        payment_provider:
+          type: string
+          description: Payment Provider that this transfer is executed with. This
+            is the provider that handles transfer processing for this payout account.
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        related_orders:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Orders in Violet that are associated with
+            this transfer.
+          items:
+            type: string
+            description: Identifiers of the Orders in Violet that are associated with
+              this transfer.
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Bags in Violet that are associated with
+            this transfer.
+          items:
+            type: string
+            description: Identifiers of the Bags in Violet that are associated with
+              this transfer.
+        related_distributions:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Distributions in Violet that are associated
+            with this transfer. The amount of this Transfer is directly computed as
+            the sum of all Distributions related to it.
+          items:
+            type: string
+            description: Identifiers of the Distributions in Violet that are associated
+              with this transfer. The amount of this Transfer is directly computed
+              as the sum of all Distributions related to it.
+        transfer_reversals:
+          uniqueItems: true
+          type: array
+          description: Unique identifiers of the Transfer Reversal objects in Violet
+            that are associated with this transfer.
+          items:
+            type: string
+            description: Unique identifiers of the Transfer Reversal objects in Violet
+              that are associated with this transfer.
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this payout transfer during processing..
+            This value will only be populated if there are errors during processing
+          items:
+            $ref: '#/components/schemas/PayoutTransferError'
+        payoutExternalId:
+          type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        externalId:
+          type: string
+      description: Record of Payout Transfer
+    PayoutTransferError:
+      required:
+      - error_message
+      - payout_transfer_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        payout_transfer_id:
+          type: integer
+          description: ID of the Payout Transfer this Error is associated to
+          format: int64
+      description: Error associated to a payout transfer
+    TransferReversal:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        object:
+          type: string
+          description: Name of the object that this object represents. This value
+            will always be `transfer_reversal`.
+        transfer:
+          type: integer
+          description: Unique identifier for the transfer object that was reversed.
+          format: int64
+        status:
+          type: string
+          description: Status of the transfer.
+          enum:
+          - PENDING
+          - COMPLETE
+          - FAILED
+        amount:
+          type: integer
+          description: "Amount, in fractional currency unit (e.g. cents), that was\
+            \ reversed."
+          format: int64
+        currency:
+          type: string
+          description: Main currency (e.g. USD) of this transfer reversal.
+        paypro:
+          type: string
+          description: Payment provider that processed this transfer reversal.
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        paypro_data:
+          type: object
+          additionalProperties:
+            type: object
+            description: Additional data about this transfer reversal directly from
+              the payment provider.
+          description: Additional data about this transfer reversal directly from
+            the payment provider.
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this transfer reversal. This value
+            will only be populated if there are errors during processing.
+          items:
+            $ref: '#/components/schemas/TransferReversalError'
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+      description: "Represents details of a reversal applied to a previously initiated\
+        \ transfer, including status, amount, and reason for the reversal."
+    TransferReversalError:
+      required:
+      - error_message
+      - transfer_reversal_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        transfer_reversal_id:
+          type: integer
+          description: Unique identifier of the TransferReversal this Error is associated
+            with.
+          format: int64
+      description: Error associated to a transfer reversal.
     DistributionSearchRequest:
       type: object
       properties:
@@ -739,6 +1265,161 @@ components:
           description: After date
           format: date-time
       description: Search Request for Distributions.
+    PageTransferReversal:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferReversal'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    SearchTransfersReversalsRequest:
+      type: object
+      properties:
+        transfer_id:
+          type: integer
+          description: Filter reversals related to a specific transfer.
+          format: int64
+        order_id:
+          type: integer
+          description: Filter reversals for transfers associated with a specific order.
+          format: int64
+        bag_id:
+          type: integer
+          description: Filter reversals for transfers associated with a specific bag.
+          format: int64
+        merchant_id:
+          type: integer
+          description: Filter reversals for transfers related to a specific merchant.
+          format: int32
+        payout_account_id:
+          type: integer
+          description: Filter reversals for transfers directed to a specific payout
+            account.
+          format: int32
+        status:
+          type: string
+          description: Filter reversals based on the current transfer status.
+          enum:
+          - PENDING
+          - COMPLETE
+          - FAILED
+        created_after:
+          type: string
+          description: Return reversals for transfers created on or after this timestamp
+            (inclusive).
+          format: date-time
+        created_before:
+          type: string
+          description: Return reversals for transfers created before this timestamp
+            (exclusive).
+          format: date-time
+      description: "Parameters used to filter and retrieve transfer reversals based\
+        \ on criteria such as transfer ID, merchant, status, and creation date."
+    PagePayoutTransfer:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayoutTransfer'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    SearchTransfersRequest:
+      type: object
+      properties:
+        order_id:
+          type: integer
+          description: Filter transfers associated with a specific order.
+          format: int64
+        bag_id:
+          type: integer
+          description: Filter transfers associated with a specific bag.
+          format: int64
+        merchant_id:
+          type: integer
+          description: Filter transfers related to a specific merchant.
+          format: int32
+        payout_account_id:
+          type: integer
+          description: Filter transfers directed to a specific payout account.
+          format: int32
+        payout_id:
+          type: integer
+          description: Filter transfers associated with a specific payout.
+          format: int64
+        paypro_transfer_id:
+          type: integer
+          description: Filter transfers with a sepcific payment provider transfer
+            Id.
+          format: int32
+        status:
+          type: string
+          description: Filter transfers based on their current status.
+          enum:
+          - SENT
+          - REVERSED
+          - PARTIALLY_REVERSED
+          - PENDING
+          - FAILED
+          - BYPASSED
+        created_after:
+          type: string
+          description: Return transfers created on or after this timestamp (inclusive).
+          format: date-time
+        created_before:
+          type: string
+          description: Return transfers created before this timestamp (exclusive).
+          format: date-time
+      description: "Parameters used to filter and retrieve payout transfers based\
+        \ on criteria such as order, merchant, status, and creation date."
     PendingTransferResponse:
       type: object
       properties:
