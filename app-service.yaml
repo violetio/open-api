@@ -23,7 +23,7 @@ paths:
     post:
       tags:
       - Apps - Merchant Install
-      summary: App Request Merchant App Uninstall
+      summary: Merchant App Uninstall
       description: Send a request to uninstall (disconnect) a Merchant from the given
         App
       operationId: requestMerchantAppUninstall
@@ -63,7 +63,7 @@ paths:
     post:
       tags:
       - Apps - Merchant Install
-      summary: App Request Bulk Merchant App Uninstall
+      summary: Bulk Merchant App Uninstall
       description: Send a request to disconnect multiple merchants from the given
         App
       operationId: requestMerchantAppUninstallBulk
@@ -93,12 +93,16 @@ paths:
             schema:
               $ref: '#/components/schemas/BulkMerchantDisconnectRequest'
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantAppUninstallFailure'
+              example:
+                errors:
+                - merchant_id: 10064
+                  message: App install could not be found.
+                - merchant_id: 10065
+                  message: Merchant could not be found.
   /apps/{app_id}/webhooks/{webhook_id}/simulate:
     post:
       tags:
