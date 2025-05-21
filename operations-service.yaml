@@ -1162,6 +1162,14 @@ components:
     ErrorData:
       type: object
       properties:
+        cause:
+          type: string
+          enum:
+          - ORDER_ERROR
+          - SKU_ERROR
+          - CUSTOMER_ERROR
+          - ADDRESS_ERROR
+          - MERCHANT_ERROR
         skus:
           type: array
           items:
