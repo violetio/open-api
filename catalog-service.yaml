@@ -2187,12 +2187,45 @@ components:
         code:
           type: integer
           format: int32
+        data:
+          $ref: '#/components/schemas/ErrorData'
         id:
           type: object
         ids:
           type: array
           items:
             type: object
+    ErrorData:
+      type: object
+      properties:
+        cause:
+          type: string
+          enum:
+          - ORDER_ERROR
+          - SKU_ERROR
+          - CUSTOMER_ERROR
+          - ADDRESS_ERROR
+          - MERCHANT_ERROR
+        skus:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkuError'
+    SkuError:
+      type: object
+      properties:
+        message:
+          type: string
+        name:
+          type: string
+        skuId:
+          type: integer
+          format: int64
+        orderSkuId:
+          type: integer
+          format: int64
+        bagId:
+          type: integer
+          format: int64
     ScoredCategory:
       required:
       - depth
