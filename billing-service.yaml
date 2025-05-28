@@ -893,13 +893,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -911,6 +904,13 @@ components:
           format: int32
         externalTransactionId:
           type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
       description: "Records detailing the financial transactions and distributions\
         \ for a specific Bag, which includes a breakdown of fund allocations and payment\
         \ gateway fees for Merchants and Channels."
@@ -923,6 +923,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -935,8 +937,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -1274,6 +1274,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1286,8 +1288,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -1349,6 +1349,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1361,8 +1363,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
