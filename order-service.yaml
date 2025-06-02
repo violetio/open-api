@@ -31,14 +31,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -231,14 +234,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -595,14 +601,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -728,14 +737,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -926,14 +938,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -1133,14 +1148,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -1266,14 +1284,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -1587,14 +1608,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -1625,14 +1649,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -1728,14 +1755,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -1884,14 +1914,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -2034,14 +2067,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -2548,14 +2584,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -2602,14 +2641,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -2792,14 +2834,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -2945,14 +2990,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3005,14 +3053,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3092,14 +3143,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3174,14 +3228,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3330,14 +3387,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3382,14 +3442,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3424,14 +3487,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3519,14 +3585,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3634,14 +3703,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3785,14 +3857,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -3990,14 +4065,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -4174,14 +4252,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -4358,14 +4439,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -4523,14 +4607,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -4634,14 +4721,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -4688,14 +4778,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -4746,14 +4839,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -5035,14 +5131,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -5235,14 +5334,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -5294,14 +5396,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -5368,14 +5473,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
@@ -5445,14 +5553,17 @@ paths:
       parameters:
       - name: X-Violet-Token
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        required: true
         schema:
           type: integer
           format: int32
