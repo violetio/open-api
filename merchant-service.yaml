@@ -570,6 +570,11 @@ components:
       properties:
         safetyStockRules:
           $ref: '#/components/schemas/StockRules'
+        enforce_zero_as_out_of_stock:
+          type: boolean
+          description: "If true, then a stock level of zero will be treated as out\
+            \ of stock, regardless of any other external inventory rules."
+          default: false
       description: Configurations for the merchants inventory behaviors.
     InventoryStockRule:
       type: object
