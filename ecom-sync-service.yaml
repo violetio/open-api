@@ -2634,7 +2634,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-          - BACKORDERED
         fulfillment_status:
           type: string
           description: Fulfillment status of the Bag.
@@ -2872,7 +2871,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-          - BACKORDERED
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -3280,9 +3278,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
