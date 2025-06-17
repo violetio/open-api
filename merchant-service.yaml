@@ -432,6 +432,276 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageMerchantSummary'
+  /merchants/onboard:
+    get:
+      tags:
+      - Merchants - Onboarding
+      summary: Retrieve all merchant onboarding records.
+      operationId: getMerchantOnboardingRecords
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Merchant Onboarding Record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+              examples:
+                Merchant Onboarding Record Page:
+                  description: Merchant Onboarding Record Page
+                  value:
+                    content:
+                    - merchant_onboarding_id: 10000
+                      channel_merchant_id: ISHAN123456789
+                      app_id: 11661
+                      payout_details:
+                        payment_provider: STRIPE
+                        payment_provider_account_id: acc_123456789
+                        payment_provider_metadata:
+                          stripe_account_id: acc_123456789
+                      date_created: 2025-06-16T17:15:35.000+00:00
+                      date_last_modified: 2025-06-16T17:15:35.000+00:00
+                    - merchant_onboarding_id: 10001
+                      channel_merchant_id: ISHAN222222222
+                      app_id: 11661
+                      payout_details:
+                        payment_provider: STRIPE
+                        payment_provider_account_id: acc_222222222
+                        payment_provider_metadata:
+                          stripe_account_id: acc_222222222
+                      date_created: 2025-06-16T17:15:47.000+00:00
+                      date_last_modified: 2025-06-16T17:15:47.000+00:00
+                    pageable:
+                      page_number: 0
+                      page_size: 2
+                      sort:
+                        unsorted: false
+                        sorted: true
+                        empty: false
+                      offset: 0
+                      unpaged: false
+                      paged: true
+                    total_elements: 5
+                    total_pages: 3
+                    last: false
+                    first: true
+                    number_of_elements: 2
+                    size: 2
+                    number: 0
+                    sort:
+                      unsorted: false
+                      sorted: true
+                      empty: false
+                    empty: false
+    post:
+      tags:
+      - Merchants - Onboarding
+      summary: Onboard Merchant details from the channel systems for Violet to consume
+        during Violet Merchant onboarding
+      operationId: createMerchantOnboarding
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantOnboardingRequest'
+            examples:
+              Create Onboarding Record:
+                description: Create Onboarding Record
+                value:
+                  channel_merchant_id: chnl-test-01
+                  payout_details:
+                    payment_provider: STRIPE
+                    payment_provider_metadata:
+                      stripe_account_id: acct_123456789
+      responses:
+        "200":
+          description: Merchant Onboarding Record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantOnboardingRecord'
+              examples:
+                Merchant Onboarding Record:
+                  description: Merchant Onboarding Record
+                  value:
+                    merchant_onboarding_id: 10006
+                    channel_merchant_id: chnl-test-01
+                    app_id: 11026
+                    payout_details:
+                      payment_provider: STRIPE
+                      payment_provider_account_id: acct_123456789
+                      payment_provider_metadata:
+                        stripe_account_id: acct_1RafLoGaeMLpjAlB
+                    date_created: 2025-06-17T06:46:35.307+00:00
+                    date_last_modified: 2025-06-17T06:46:35.307+00:00
+  /merchants/onboard/{merchant_onboarding_id}:
+    get:
+      tags:
+      - Merchants - Onboarding
+      summary: Retrieve a Merchant Onboarding Record given a specific merchant onboarding
+        ID
+      operationId: getMerchantOnboarding
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_onboarding_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Merchant Onboarding Record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantOnboardingRecord'
+              examples:
+                Merchant Onboarding Record:
+                  description: Merchant Onboarding Record
+                  value:
+                    merchant_onboarding_id: 10006
+                    channel_merchant_id: chnl-test-01
+                    app_id: 11026
+                    payout_details:
+                      payment_provider: STRIPE
+                      payment_provider_account_id: acct_123456789
+                      payment_provider_metadata:
+                        stripe_account_id: acct_1RafLoGaeMLpjAlB
+                    date_created: 2025-06-17T06:46:35.307+00:00
+                    date_last_modified: 2025-06-17T06:46:35.307+00:00
+    put:
+      tags:
+      - Merchants - Onboarding
+      summary: Update an existing Merchant Onboarding Record
+      operationId: updateMerchantOnboarding
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_onboarding_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantOnboardingRequest'
+            examples:
+              Create Onboarding Record:
+                description: Create Onboarding Record
+                value:
+                  merchant_onboarding_id: 10003
+                  channel_merchant_id: inttest-01
+                  app_id: 11661
+                  payout_details:
+                    payment_provider: STRIPE
+                    payment_provider_metadata:
+                      stripe_account_id: acct_123456789
+                  date_created: 2025-06-17T01:54:03.446+00:00
+                  date_last_modified: 2025-06-17T01:54:03.446+00:00
+      responses:
+        "200":
+          description: Merchant Onboarding Record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantOnboardingRecord'
+              examples:
+                Merchant Onboarding Record:
+                  description: Merchant Onboarding Record
+                  value:
+                    merchant_onboarding_id: 10006
+                    channel_merchant_id: chnl-test-01
+                    app_id: 11026
+                    payout_details:
+                      payment_provider: STRIPE
+                      payment_provider_account_id: acct_123456789
+                      payment_provider_metadata:
+                        stripe_account_id: acct_1RafLoGaeMLpjAlB
+                    date_created: 2025-06-17T06:46:35.307+00:00
+                    date_last_modified: 2025-06-17T06:46:35.307+00:00
   /merchants/{merchant_id}/violet_connect_urls:
     get:
       tags:
@@ -1512,6 +1782,183 @@ components:
           type: string
           description: Direction to sort by
       description: Merchant Explore Request
+    CommissionRateDetails:
+      type: object
+      properties:
+        commission_rate:
+          type: number
+          format: double
+        commission_rate_locked:
+          type: boolean
+    MerchantOnboardingRecord:
+      type: object
+      properties:
+        merchant_onboarding_id:
+          type: integer
+          description: Unique identifier for this merchant onboarding record.
+          format: int64
+        channel_merchant_id:
+          type: string
+          description: Unique identifier of this merchant in the channel’s systems.
+        app_id:
+          type: integer
+          description: Identifier of the App in Violet that this external payout account
+            is associated to.
+          format: int32
+        payout_details:
+          $ref: '#/components/schemas/PayoutDetails'
+        commission_details:
+          $ref: '#/components/schemas/CommissionRateDetails'
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+    PayoutDetails:
+      type: object
+      properties:
+        payment_provider:
+          type: string
+          description: Payment Provider that this payout account is associated to.
+            This is the underlying provider that handles payouts for this External
+            Payout Account.
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        payment_provider_account_id:
+          type: string
+          description: Identifier of the account in the external payment provider.
+        payment_provider_metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Metadata from the payment provider associated to this payout
+              account.
+          description: Metadata from the payment provider associated to this payout
+            account.
+      description: Payout details associated to this Merchant Onboarding record that
+        will be used when creating a Violet Payout Account.
+    MerchantOnboardingRequest:
+      type: object
+      properties:
+        channelMerchantId:
+          type: string
+        payoutAccountDetails:
+          $ref: '#/components/schemas/PayoutAccountOnboardingRequest'
+        commissionRateDetails:
+          $ref: '#/components/schemas/CommissionRateDetails'
+    PayoutAccountOnboardingRequest:
+      type: object
+      properties:
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+        payment_provider:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        set_primary:
+          type: boolean
+    Page:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            type: object
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    Pageable:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+    Sort:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    PageMerchantOnboardingRecord:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantOnboardingRecord'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
     OnboardingStep:
       type: object
       properties:
