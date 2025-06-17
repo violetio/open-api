@@ -938,13 +938,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -956,6 +949,13 @@ components:
           format: int32
         externalTransactionId:
           type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
       description: "Records detailing the financial transactions and distributions\
         \ for a specific Bag, which includes a breakdown of fund allocations and payment\
         \ gateway fees for Merchants and Channels."
@@ -968,8 +968,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -982,11 +980,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
+        first:
+          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -1131,8 +1131,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -1142,6 +1140,8 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        externalId:
+          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
@@ -1319,8 +1319,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -1333,11 +1331,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
+        first:
+          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -1394,8 +1394,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -1408,11 +1406,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
+        first:
+          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
