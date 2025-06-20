@@ -5737,7 +5737,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-          - BACKORDERED
         fulfillment_status:
           type: string
           description: Fulfillment status of the Bag.
@@ -5972,7 +5971,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-          - BACKORDERED
         bag_id:
           type: integer
           format: int64
@@ -8852,7 +8850,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-          - BACKORDERED
         app_order_id:
           type: string
           description: Order ID in the Channels System
@@ -8943,7 +8940,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-          - BACKORDERED
         merchant_id:
           type: integer
           description: Merchant ID
@@ -9159,8 +9155,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -9170,6 +9164,8 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        externalId:
+          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
