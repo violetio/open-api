@@ -3278,9 +3278,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        first_name:
-          type: string
         last_name:
+          type: string
+        first_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
