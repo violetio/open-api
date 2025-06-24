@@ -598,13 +598,6 @@ paths:
         schema:
           type: boolean
           default: false
-      - name: fetch_migrated_account
-        in: query
-        description: Indicate whether to fetch the analogous in-progress migration
-          account instead
-        schema:
-          type: boolean
-          default: false
       - name: app_id
         in: query
         description: App ID used to target the target payout account for merchant
@@ -696,13 +689,6 @@ paths:
           format: int32
       - name: extended
         in: query
-        schema:
-          type: boolean
-          default: false
-      - name: fetch_migrated_accounts
-        in: query
-        description: Indicate whether to fetch the analogous in-progress migration
-          accounts instead
         schema:
           type: boolean
           default: false
@@ -938,6 +924,13 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -949,13 +942,6 @@ components:
           format: int32
         externalTransactionId:
           type: string
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
       description: "Records detailing the financial transactions and distributions\
         \ for a specific Bag, which includes a breakdown of fund allocations and payment\
         \ gateway fees for Merchants and Channels."
@@ -968,6 +954,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -980,8 +968,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -1319,6 +1305,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1331,8 +1319,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -1394,6 +1380,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1406,8 +1394,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
