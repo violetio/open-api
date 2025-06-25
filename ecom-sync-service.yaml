@@ -1228,6 +1228,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -1251,7 +1252,6 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
         seller:
           type: string
           description: Name of the merchant selling product.
@@ -2809,6 +2809,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -2832,7 +2833,6 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
         fulfillments:
           uniqueItems: true
           type: array
@@ -3403,6 +3403,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -3426,7 +3427,6 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
       description: Order Error
       nullable: true
     OrderPaymentMethod:
