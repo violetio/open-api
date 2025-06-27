@@ -5912,6 +5912,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -5935,7 +5936,6 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
         fulfillments:
           uniqueItems: true
           type: array
@@ -5960,6 +5960,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -5971,9 +5974,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -6506,6 +6506,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -6529,7 +6530,6 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
       description: Order Error
       nullable: true
     OrderPaymentMethod:
@@ -6960,6 +6960,7 @@ components:
           - PENDING
           - FAILED
           - BYPASSED
+          - PARTIALLY_SENT
         transfer_method:
           type: string
           description: Underlying status of the payment in the payment provider system
@@ -7359,6 +7360,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -7382,7 +7384,6 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
         base_currency:
           maxLength: 3
           minLength: 3
@@ -9093,6 +9094,7 @@ components:
           - PENDING
           - FAILED
           - BYPASSED
+          - PARTIALLY_SENT
         payment_provider:
           type: string
           description: Payment Provider that this transfer is executed with. This
@@ -9140,6 +9142,10 @@ components:
             type: string
             description: Unique identifiers of the Transfer Reversal objects in Violet
               that are associated with this transfer.
+        idempotency_key:
+          type: string
+          description: Unique key to prevent duplicate transfers. This is generated
+            by the Violet and unique for each transfer being processed.
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
