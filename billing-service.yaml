@@ -820,6 +820,7 @@ components:
           - PENDING
           - FAILED
           - BYPASSED
+          - PARTIALLY_SENT
         bag_id:
           type: integer
           description: Unique identifier of the Bag associated with this Distribution.
@@ -909,6 +910,10 @@ components:
             \ if the merchant does not provide sufficient line items when creating\
             \ the refund in their ecommerce platform."
           format: int32
+        idempotency_key:
+          type: string
+          description: Unique key to prevent duplicate distributions. This is generated
+            by the Violet and unique for each distribution being processed.
         tax_remitter:
           type: string
           description: "Tax Remittance setting used to generate this Distribution.\
@@ -1055,6 +1060,7 @@ components:
           - PENDING
           - FAILED
           - BYPASSED
+          - PARTIALLY_SENT
         payment_provider:
           type: string
           description: Payment Provider that this transfer is executed with. This
@@ -1102,6 +1108,10 @@ components:
             type: string
             description: Unique identifiers of the Transfer Reversal objects in Violet
               that are associated with this transfer.
+        idempotency_key:
+          type: string
+          description: Unique key to prevent duplicate transfers. This is generated
+            by the Violet and unique for each transfer being processed.
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
@@ -1441,6 +1451,7 @@ components:
           - PENDING
           - FAILED
           - BYPASSED
+          - PARTIALLY_SENT
         created_after:
           type: string
           description: Return transfers created on or after this timestamp (inclusive).
