@@ -1101,6 +1101,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -1124,7 +1125,6 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
         store_url:
           type: string
           description: The URL Of the Store
@@ -1759,6 +1759,7 @@ components:
             - THREEDCART
             - SYLIUS
             - WIX
+            - CUSTOM
             - SWELL
             - MIVA
             - WEBSPHERE
@@ -1782,7 +1783,6 @@ components:
             - SQUARE
             - AMAZON
             - BIGCARTEL
-            - CUSTOM
         status:
           type: string
           description: Filter by ConnectionHealth Status
