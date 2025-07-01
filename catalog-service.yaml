@@ -1260,6 +1260,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -1283,7 +1284,6 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
         seller:
           type: string
           description: Name of the merchant selling product.
