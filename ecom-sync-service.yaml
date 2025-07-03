@@ -3159,7 +3159,10 @@ components:
           readOnly: true
         date_last_modified:
           type: string
-          description: Date of last order update
+          description: "Indicates when the order was last modified. This timestamp\
+            \ is updated only when a property on the Order entity itself changes.\
+            \ Modifications to related entities (e.g., Bags) will not update this\
+            \ timestamp unless the change also triggers an update to the Order entity."
           format: date-time
           readOnly: true
         date_submitted:
