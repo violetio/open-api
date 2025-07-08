@@ -16,8 +16,8 @@ tags:
   description: Merchant/App Install Configuration Entities
 - name: Developers - Metadata
   description: Developer metadata entities
-- name: Apps - Merchant Install - Commission Rate
-  description: Merchant/App Install commission rate entities
+- name: Merchant App - Commission Rate
+  description: Merchant/App commission rate entities
 paths:
   /apps/{app_id}/merchants/uninstall:
     post:
@@ -246,9 +246,9 @@ paths:
   /apps/commission_rate/change_log:
     get:
       tags:
-      - Apps - Merchant Install - Commission Rate
+      - Merchant App - Commission Rate
       summary: Search All Commission Rates Change Log
-      operationId: getAllMerchantAppInstallCommissionRateChangeLog
+      operationId: getAllMerchantAppCommissionRateChangeLog
       parameters:
       - name: X-Violet-Token
         in: header
@@ -294,7 +294,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageMerchantAppInstallCommissionRateChangeWithAppNameAndMerchantName'
+                $ref: '#/components/schemas/PageMerchantAppCommissionRateChangeWithAppNameAndMerchantName'
 components:
   schemas:
     MerchantAppInstall:
@@ -421,7 +421,7 @@ components:
           type: boolean
           description: Indicates if the commission rate is locked or not. Commission
             rates can only be locked or unlocked by a Channel.
-    MerchantAppInstallCommissionRateChange:
+    MerchantAppCommissionRateChange:
       type: object
       properties:
         commission_rate:
@@ -434,13 +434,11 @@ components:
             rates can only be locked or unlocked by a Channel.
         user_id:
           type: integer
-          description: The user id that updated the merchant app install commission
-            rate
+          description: The user id that updated the commission rate
           format: int64
         user_type:
           type: string
-          description: The user type that updated the merchant app install commission
-            rate
+          description: The user type that updated the commission rate
           enum:
           - SUPER_ADMIN
           - ADMIN
@@ -450,27 +448,31 @@ components:
           - INFLUENCER
           - HYBRID
           - OTHER
+        user_first_name:
+          type: string
+          description: The first name of the user that updated the commission rate.
+            Present only for reporting purposes.
+        user_last_name:
+          type: string
+          description: The last name of the user that updated the commission rate.
+            Present only for reporting purposes.
+        user_email:
+          type: string
+          description: The email of the user that updated the commission rate. Present
+            only for reporting purposes.
         date_created:
           type: string
           description: Date of creation
           format: date-time
-      description: Merchant app install commission rate change log
-    MerchantAppInstallCommissionRateChangeWithAppNameAndMerchantName:
+      description: Merchant app commission rate change log
+    MerchantAppCommissionRateChangeWithAppNameAndMerchantName:
       type: object
       properties:
         MerchantAppInstallCommissionRateChange:
-          $ref: '#/components/schemas/MerchantAppInstallCommissionRateChange'
-        appId:
-          type: integer
-          description: The app id tied to the merchant app install record
-          format: int32
+          $ref: '#/components/schemas/MerchantAppCommissionRateChange'
         appName:
           type: string
           description: Name of the app tied to the merchant app install record
-        merchantId:
-          type: integer
-          description: The merchant id tied to the merchant app install record
-          format: int32
         merchantName:
           type: string
           description: Name of the merchant tied to the merchant app install record
@@ -479,9 +481,9 @@ components:
           description: The previous commission rate value applied to the merchant
             app install
           format: double
-      description: A MerchantAppInstallCommissionRateChange with the relevant app
-        and merchant identification
-    PageMerchantAppInstallCommissionRateChangeWithAppNameAndMerchantName:
+      description: A MerchantAppCommissionRateChange with the relevant app and merchant
+        identification
+    PageMerchantAppCommissionRateChangeWithAppNameAndMerchantName:
       type: object
       properties:
         totalPages:
@@ -498,19 +500,19 @@ components:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/MerchantAppInstallCommissionRateChangeWithAppNameAndMerchantName'
+            $ref: '#/components/schemas/MerchantAppCommissionRateChangeWithAppNameAndMerchantName'
         number:
           type: integer
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        numberOfElements:
+          type: integer
+          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
-        numberOfElements:
-          type: integer
-          format: int32
         empty:
           type: boolean
     Pageable:
