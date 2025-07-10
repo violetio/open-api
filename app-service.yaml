@@ -422,8 +422,19 @@ components:
           description: Indicates if the commission rate is locked or not. Commission
             rates can only be locked or unlocked by a Channel.
     MerchantAppCommissionRateChange:
+      required:
+      - app_id
+      - merchant_id
       type: object
       properties:
+        app_id:
+          type: integer
+          description: The Id of the app the commission rate change relates to
+          format: int32
+        merchant_id:
+          type: integer
+          description: The Id of the merchant the commission rate change relates to
+          format: int32
         commission_rate:
           type: number
           description: The commission rate of the merchant app install
@@ -468,18 +479,18 @@ components:
     MerchantAppCommissionRateChangeWithAppNameAndMerchantName:
       type: object
       properties:
-        MerchantAppInstallCommissionRateChange:
+        MerchantAppCommissionRateChange:
           $ref: '#/components/schemas/MerchantAppCommissionRateChange'
         appName:
           type: string
-          description: Name of the app tied to the merchant app install record
+          description: Name of the app tied to the merchant app relation
         merchantName:
           type: string
-          description: Name of the merchant tied to the merchant app install record
+          description: Name of the merchant tied to the merchant app relation
         prevRate:
           type: number
           description: The previous commission rate value applied to the merchant
-            app install
+            app relation
           format: double
       description: A MerchantAppCommissionRateChange with the relevant app and merchant
         identification
