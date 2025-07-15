@@ -533,11 +533,13 @@ paths:
           default: 20
       - name: exclude_public
         in: query
+        deprecated: true
         schema:
           type: boolean
           default: true
       - name: exclude_hidden
         in: query
+        deprecated: true
         schema:
           type: boolean
           default: true
