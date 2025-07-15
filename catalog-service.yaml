@@ -1284,6 +1284,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
+          - RITHUM
         seller:
           type: string
           description: Name of the merchant selling product.
