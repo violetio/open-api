@@ -5945,6 +5945,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
+          - RITHUM
         fulfillments:
           uniqueItems: true
           type: array
@@ -6271,7 +6272,10 @@ components:
           readOnly: true
         date_last_modified:
           type: string
-          description: Date of last order update
+          description: "Indicates when the order was last modified. This timestamp\
+            \ is updated only when a property on the Order entity itself changes.\
+            \ Modifications to related entities (e.g., Bags) will not update this\
+            \ timestamp unless the change also triggers an update to the Order entity."
           format: date-time
           readOnly: true
         date_submitted:
@@ -6539,6 +6543,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
+          - RITHUM
       description: Order Error
       nullable: true
     OrderPaymentMethod:
@@ -7230,6 +7235,47 @@ components:
           description: Is the shipping method custom. True when the price has been
             overridden.
       description: Shipping Method applied to a Bag
+    BaseAddress:
+      required:
+      - address_1
+      - city
+      - country
+      - postal_code
+      - state
+      type: object
+      properties:
+        city:
+          title: City or Subdivision
+          type: string
+          example: Seattle
+        state:
+          title: State/Province
+          type: string
+          description: The state/province of the address. Abbreviations are recommended
+            but not required. Violet will attempt to abbreviate these values when
+            abbreviations are required by the external commerce platform.
+          example: WA
+        postal_code:
+          title: Postal Code
+          maxLength: 10
+          minLength: 4
+          type: string
+          description: The postal/zip code of the address.
+        country:
+          title: Country
+          maxLength: 2
+          minLength: 2
+          type: string
+          description: The ISO2 country code.
+          example: US
+        address_1:
+          title: Address Line 1
+          type: string
+        address_2:
+          title: Address Line 2
+          type: string
+          nullable: true
+      description: The address the items in the cart should be shipped to.
     CalculateCartResponse:
       type: object
       properties:
@@ -7393,6 +7439,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
+          - RITHUM
         base_currency:
           maxLength: 3
           minLength: 3
@@ -7586,6 +7633,8 @@ components:
           readOnly: true
           items:
             $ref: '#/components/schemas/CalculatedCartShippingMethod'
+        shipping_address:
+          $ref: '#/components/schemas/BaseAddress'
         has_shipping_methods:
           type: boolean
           description: Does the calculated cart have available shipping methods.
@@ -7617,47 +7666,6 @@ components:
       description: "BETA: Details regarding the available inventory for this Sku."
       nullable: true
       readOnly: true
-    BaseAddress:
-      required:
-      - address_1
-      - city
-      - country
-      - postal_code
-      - state
-      type: object
-      properties:
-        city:
-          title: City or Subdivision
-          type: string
-          example: Seattle
-        state:
-          title: State/Province
-          type: string
-          description: The state/province of the address. Abbreviations are recommended
-            but not required. Violet will attempt to abbreviate these values when
-            abbreviations are required by the external commerce platform.
-          example: WA
-        postal_code:
-          title: Postal Code
-          maxLength: 10
-          minLength: 4
-          type: string
-          description: The postal/zip code of the address.
-        country:
-          title: Country
-          maxLength: 2
-          minLength: 2
-          type: string
-          description: The ISO2 country code.
-          example: US
-        address_1:
-          title: Address Line 1
-          type: string
-        address_2:
-          title: Address Line 2
-          type: string
-          nullable: true
-      description: The address the items in the cart should be shipped to.
     BaseSku:
       required:
       - sku_id
@@ -9104,6 +9112,12 @@ components:
           - FAILED
           - BYPASSED
           - PARTIALLY_SENT
+        type:
+          type: string
+          description: Account type of the Transfer recipient.
+          enum:
+          - MERCHANT
+          - DEVELOPER
         payment_provider:
           type: string
           description: Payment Provider that this transfer is executed with. This
