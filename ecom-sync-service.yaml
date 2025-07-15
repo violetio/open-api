@@ -1252,6 +1252,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
+          - RITHUM
         seller:
           type: string
           description: Name of the merchant selling product.
@@ -2833,6 +2834,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
+          - RITHUM
         fulfillments:
           uniqueItems: true
           type: array
@@ -3430,6 +3432,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
+          - RITHUM
       description: Order Error
       nullable: true
     OrderPaymentMethod:
