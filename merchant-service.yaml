@@ -1387,6 +1387,7 @@ components:
           - THREEDCART
           - SYLIUS
           - WIX
+          - CUSTOM
           - SWELL
           - MIVA
           - WEBSPHERE
@@ -1410,7 +1411,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
-          - CUSTOM
+          - RITHUM
         platform_plan:
           type: string
           description: The eCommerce platform plan of the store
@@ -1877,6 +1878,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1889,8 +1892,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -1936,6 +1937,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1948,8 +1951,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
