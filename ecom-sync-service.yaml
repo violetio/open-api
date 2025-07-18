@@ -3725,10 +3725,10 @@ components:
         name:
           type: string
           description: Rate Name
-        dollar_amount:
+        decimal_rate:
           type: number
           format: double
-        decimal_rate:
+        dollar_amount:
           type: number
           format: double
       description: Rates belonging to Order SKUs
