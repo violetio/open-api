@@ -6088,6 +6088,7 @@ components:
           - ROYAL_MAIL
           - SENDLE
           - POSTNORD
+          - YUN_EXPRESS
         raw_carrier:
           type: string
           description: Raw name of carrier from the external commerce platform.
@@ -6604,6 +6605,7 @@ components:
           - ROYAL_MAIL
           - SENDLE
           - POSTNORD
+          - YUN_EXPRESS
         label:
           type: string
           description: Shipping method label. This is the name of the shipping method.
@@ -7310,6 +7312,7 @@ components:
           - ROYAL_MAIL
           - SENDLE
           - POSTNORD
+          - YUN_EXPRESS
         raw_carrier:
           type: string
           description: The raw name of the carrier provided by the merchant in the
