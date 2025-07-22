@@ -3284,9 +3284,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
@@ -3727,10 +3727,10 @@ components:
         name:
           type: string
           description: Rate Name
-        dollar_amount:
+        decimal_rate:
           type: number
           format: double
-        decimal_rate:
+        dollar_amount:
           type: number
           format: double
       description: Rates belonging to Order SKUs
