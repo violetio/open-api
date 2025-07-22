@@ -1125,6 +1125,7 @@ components:
           - SQUARE
           - AMAZON
           - BIGCARTEL
+          - RITHUM
         store_url:
           type: string
           description: The URL Of the Store
@@ -1783,6 +1784,7 @@ components:
             - SQUARE
             - AMAZON
             - BIGCARTEL
+            - RITHUM
         status:
           type: string
           description: Filter by ConnectionHealth Status
