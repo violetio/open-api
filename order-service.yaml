@@ -5334,6 +5334,162 @@ paths:
                     message: Order could not be found.
                     error: order_not_found
                     code: 4216
+  /orders/{order_id}/bags/{bag_id}/transfer_group:
+    get:
+      tags:
+      - Bag - Transfer Groups
+      summary: Get transfer group for a bag
+      operationId: getBagTransferGroup
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: bag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Transfer group for bag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BagTransferGroup'
+  /orders/bags/transfer_groups:
+    get:
+      tags:
+      - Bag - Transfer Groups
+      summary: Get transfer groups for bags
+      operationId: getBagTransferGroups
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: is_complete
+        in: query
+        schema:
+          type: boolean
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: List of bag transfer groups
+          content:
+            application/json:
+              schema:
+                type: string
+  /orders/{order_id}/transfer_group:
+    get:
+      tags:
+      - Order - Transfer Groups
+      summary: Get transfer group for an order
+      operationId: getOrderTransferGroup
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Transfer group for order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderTransferGroup'
+  /orders/transfer_groups:
+    get:
+      tags:
+      - Order - Transfer Groups
+      summary: Get transfer groups for orders
+      operationId: getOrderTransferGroups
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: is_complete
+        in: query
+        schema:
+          type: boolean
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: List of order transfer groups
+          content:
+            application/json:
+              schema:
+                type: string
   /orders/{order_id}/bags/{bag_id}/transfer_funds:
     post:
       tags:
@@ -6328,9 +6484,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -6347,6 +6500,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -9063,6 +9219,27 @@ components:
         order_customer:
           $ref: '#/components/schemas/OrderCustomer'
       description: Properties for cart submission.
+    BagTransferGroup:
+      type: object
+      properties:
+        bag_id:
+          type: integer
+          description: ID of the bag these transfers are associated with
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the merchant receiving funds in these transfers
+          format: int32
+        is_complete:
+          type: boolean
+          description: Whether all transfers for this bag have been successfully sent
+        transfers:
+          type: array
+          description: "List of all transfer attempts for this bag, ordered by finality\
+            \ and recency"
+          items:
+            $ref: '#/components/schemas/PayoutTransfer'
+      description: All transfer attempts for a single bag and merchant combination
     PayoutTransfer:
       type: object
       properties:
@@ -9187,6 +9364,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -9196,8 +9375,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
@@ -9235,6 +9412,34 @@ components:
           description: ID of the Payout Transfer this Error is associated to
           format: int64
       description: Error associated to a payout transfer
+    OrderTransferGroup:
+      type: object
+      properties:
+        order_id:
+          type: integer
+          description: ID of the order these transfers are associated with
+          format: int64
+        is_complete:
+          type: boolean
+          description: Whether all expected transfers for this order have been successfully
+            sent
+        group:
+          type: array
+          description: List of BagTransferGroup for bags within this order
+          items:
+            $ref: '#/components/schemas/BagTransferGroup'
+        date_created:
+          type: string
+          description: Time at which the earliest transfer in this group was created.
+            In ISO-8601 format
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the latest transfer in this group was last modified.
+            In ISO-8601 format
+          format: date-time
+      description: "Complete set of money movement attempts for a single order, organized\
+        \ by merchant and bag"
     ProcessTransfersResponse:
       type: object
       properties:
