@@ -448,6 +448,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PagePayoutTransfer'
+  /payments/payment_transactions/search:
+    post:
+      tags:
+      - Payments - Payment Transactions
+      summary: Advanced Payment Transactions Search
+      description: Advanced search with configurable logical operators (AND/OR) across
+        transaction fields
+      operationId: advancedSearchPaymentTransactions
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdvancedSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePaymentTransaction'
   /payments/transfers/pending:
     get:
       tags:
@@ -1133,6 +1187,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -1142,8 +1198,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
@@ -1430,6 +1484,30 @@ components:
           type: integer
           description: Filter transfers associated with a specific bag.
           format: int64
+        transfer_ids:
+          uniqueItems: true
+          type: array
+          description: Filter transfers based on a collection of transferIds.
+          items:
+            type: integer
+            description: Filter transfers based on a collection of transferIds.
+            format: int64
+        order_ids:
+          uniqueItems: true
+          type: array
+          description: Filter transfers associated with multiple orders.
+          items:
+            type: integer
+            description: Filter transfers associated with multiple orders.
+            format: int64
+        bag_ids:
+          uniqueItems: true
+          type: array
+          description: Filter transfers associated with multiple bags.
+          items:
+            type: integer
+            description: Filter transfers associated with multiple bags.
+            format: int64
         merchant_id:
           type: integer
           description: Filter transfers related to a specific merchant.
@@ -1468,6 +1546,298 @@ components:
           format: date-time
       description: "Parameters used to filter and retrieve payout transfers based\
         \ on criteria such as order, merchant, status, and creation date."
+    PagePaymentTransaction:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentTransaction'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PaymentTransaction:
+      required:
+      - amount
+      - currency
+      - order_id
+      - payment_provider
+      - payment_provider_transaction_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object
+          format: int64
+        order_id:
+          type: integer
+          description: Identifier of the Order entity that this payment transaction
+            is associated with
+          format: int64
+        payment_provider:
+          type: string
+          description: Payment Provider that this transaction is executed against.
+            This is the provider that handles payment processing for this transaction.
+        payment_provider_transaction_id:
+          type: string
+          description: Identifier of the payment transaction in the underlying payment
+            provider system.
+        payment_method_id:
+          type: integer
+          description: 'Identifier of the payment method associated with this payment
+            transaction in Violet. '
+          format: int64
+        payment_provider_payment_method_id:
+          type: string
+          description: 'Identifier of the payment method associated with this payment
+            transaction in the underlying payment provider system. '
+        payment_intent_client_secret:
+          type: string
+          description: Client secret for the payment intent associated to this payment
+            transaction
+        amount:
+          type: integer
+          description: 'Amount of this payment in the fractional currency unit of
+            this transaction (e.g. cents). This is the amount charged to the shopper. '
+          format: int32
+        currency:
+          type: string
+          description: Currency that the amount of this payment transaction is reflected
+            in. This is the currency that the payment provider uses to charge the
+            shopper payment method.
+        capture_status:
+          type: string
+          description: Underlying status of the payment capture in the payment provider
+            system and should be used to determine what action to take next against
+            this payment transaction.
+          enum:
+          - PROCESSING
+          - CAPTURED
+          - CANCELLED
+          - FAILED
+          - BYPASSED
+          - REQUIRES_ACTION
+          - REQUIRES_PAYMENT_METHOD
+          - REQUIRES_AUTHORIZATION
+          - AUTHORIZED
+          - REFUNDED
+          - PARTIALLY_REFUNDED
+        capture_method:
+          type: string
+          description: Underlying status of the payment in the payment provider system
+            and should be used to determine what action to take next against this
+            payment transaction.
+          enum:
+          - AUTOMATIC
+          - CUSTOM
+          - DISABLED
+          - EXTERNAL
+        transfer_status:
+          type: string
+          description: Status of the transfer of distributions associated with this
+            payment transaction.
+          enum:
+          - SENT
+          - REVERSED
+          - PARTIALLY_REVERSED
+          - PENDING
+          - FAILED
+          - BYPASSED
+          - PARTIALLY_SENT
+        transfer_method:
+          type: string
+          description: Underlying status of the payment in the payment provider system
+            and should be used to determine what action to take next against this
+            payment transaction.
+          enum:
+          - AUTOMATIC
+          - CUSTOM
+          - DISABLED
+          - EXTERNAL
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: Metadata from the payment provider associated to this payment
+              transaction
+          description: Metadata from the payment provider associated to this payment
+            transaction
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: 'Identifiers of the Bags in Violet that are associated with
+            this payment transaction. The amount of this payment transaction is directly
+            computed from the total amounts on the related bags. '
+          items:
+            type: string
+            description: 'Identifiers of the Bags in Violet that are associated with
+              this payment transaction. The amount of this payment transaction is
+              directly computed from the total amounts on the related bags. '
+        related_refunds:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Refunds in Violet that are associated with
+            this payment transaction. Refund amounts are not reflected in the amount
+            on this payment transaction.
+          items:
+            type: string
+            description: Identifiers of the Refunds in Violet that are associated
+              with this payment transaction. Refund amounts are not reflected in the
+              amount on this payment transaction.
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this payment transaction during
+            processing.. This value will only be populated if there are errors during
+            processing
+          items:
+            $ref: '#/components/schemas/PaymentTransactionError'
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+        status:
+          type: string
+          enum:
+          - PROCESSING
+          - CAPTURED
+          - CANCELLED
+          - FAILED
+          - BYPASSED
+          - REQUIRES_ACTION
+          - REQUIRES_PAYMENT_METHOD
+          - REQUIRES_AUTHORIZATION
+          - AUTHORIZED
+          - REFUNDED
+          - PARTIALLY_REFUNDED
+      description: Payment Transaction
+    PaymentTransactionError:
+      required:
+      - error_message
+      - payment_transaction_id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the object.
+          format: int64
+          readOnly: true
+        error_code:
+          type: integer
+          description: Unique error code corresponding to this error.
+          format: int32
+        error_message:
+          type: string
+          description: Error message describing the issue in the underlying system.
+        resolved:
+          type: boolean
+          description: Indicates whether the error has been resolved. Defaults to
+            false.
+        date_resolved:
+          type: string
+          description: "Time at which this error was resolved. In ISO-8601 format.\
+            \ By default, this value is null and only applies to "
+          format: date-time
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        payment_transaction_id:
+          type: integer
+          description: Identifier of the PaymentTransaction entity that this error
+            is associated with
+          format: int64
+      description: Error associated to a payment transaction
+    AdvancedSearchRequest:
+      type: object
+      properties:
+        query:
+          $ref: '#/components/schemas/SearchQuery'
+        filters:
+          type: array
+          description: Configurable filter options that allow for granular control
+            over search results
+          items:
+            $ref: '#/components/schemas/FilterExpression'
+      description: Advanced Search Request
+    FilterCondition:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Field to filter on
+        operator:
+          type: string
+          description: Comparison operator used for filter query
+          enum:
+          - EQUALS
+          - NOT_EQUALS
+          - CONTAINS
+          - NOT_CONTAINS
+          - GREATER_THAN
+          - LESS_THAN
+          - GREATER_THAN_EQUALS
+          - LESS_THAN_EQUALS
+          - IS_EMPTY
+          - IS_NOT_EMPTY
+          - IN
+        value:
+          type: object
+          description: Value of entity to compare against
+      description: Filter Condition
+    FilterExpression:
+      type: object
+      properties:
+        conditions:
+          type: array
+          description: Top-level filter conditions that describe the query to be performed
+          items:
+            $ref: '#/components/schemas/FilterCondition'
+        filters:
+          type: array
+          description: A list of filters that can be expressed recursively as groups
+          items:
+            $ref: '#/components/schemas/FilterExpression'
+        operator:
+          type: string
+          description: Logical operator connecting all top-level elements
+          enum:
+          - AND
+          - OR
+      description: Filter Expression
+    SearchQuery:
+      type: object
+      properties:
+        input:
+          type: string
+          description: Text input to search across a heuristic index of entities
+      description: Configurable text-based search query
     PendingTransferResponse:
       type: object
       properties:
