@@ -1739,6 +1739,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               examples:
+                Empty Request Body:
+                  description: Empty Request Body
+                  value:
+                    message: Empty body in request. Expected CalculateCartRequest
+                      object.
+                    error: empty_body
+                    code: 9910
+                Shipping Address Not Provided:
+                  description: Shipping Address Not Provided
+                  value:
+                    message: Required parameter 'shipping_address' cannot be null
+                      or empty.
+                    error: missing_parameter
+                    code: 9002
+                Sku's Not Provided:
+                  description: Sku's Not Provided
+                  value:
+                    message: Required parameter 'skus' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+                Sku ID Not Provided:
+                  description: Sku ID Not Provided
+                  value:
+                    message: "Required parameter 'skus[0].id' cannot be null or empty."
+                    error: missing_parameter
+                    code: 9002
                 Blocked Address:
                   description: Blocked Address
                   value:
@@ -1746,6 +1772,45 @@ paths:
                       of being used for fraudulent orders.
                     error: blocked_address
                     code: 4236
+                Invalid Shipping Address:
+                  description: Invalid Shipping Address
+                  value:
+                    message: The provided shipping address is invalid.
+                    error: invalid_shipping_address
+                    code: 4232
+        "401":
+          description: unauthorized
+          content:
+            application/json:
+              examples:
+                Sku Not Accessible:
+                  description: Sku Not Accessible
+                  value:
+                    message: Sku is not accessible to your application.
+                    error: sku_not_accessible
+                    code: 2008
+        "404":
+          description: not found
+          content:
+            application/json:
+              examples:
+                Sku Not Found:
+                  description: Sku Not Found
+                  value:
+                    message: Sku identified by 99999 could not be found.
+                    error: sku_not_found
+                    code: 2002
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              examples:
+                Unknown Error:
+                  description: Unknown Error
+                  value:
+                    message: An unknown error has occurred.
+                    error: unknown_error
+                    code: 9000
   /orders/{order_id}/bags/{bag_id}/cancel:
     post:
       tags:
@@ -2826,14 +2891,175 @@ paths:
                 order_id: 54609
                 guest: true
         "400":
-          description: external error
+          description: bad request
           content:
             application/json:
-              example:
-                message: External error messaging from the commerce platform will
-                  be surfaced here.
-                error: external_write_order_error
-                code: 2700
+              examples:
+                External Order Error:
+                  description: External Order Error
+                  value:
+                    message: "{External error messaging from the commerce platform\
+                      \ will be surfaced here.}"
+                    error: external_write_order_error
+                    code: 2700
+                No Bags Provided:
+                  description: No Bags Provided
+                  value:
+                    message: Required parameter 'bags' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+                No Sku's Provided:
+                  description: No Sku's Provided
+                  value:
+                    message: "Required parameter 'bag[0].skus' cannot be null or empty."
+                    error: missing_parameter
+                    code: 9002
+                Sku Price Not Provided:
+                  description: Sku Price Not Provided
+                  value:
+                    message: "Required parameter 'bag[0].skus[0].price' cannot be\
+                      \ null or empty."
+                    error: missing_parameter
+                    code: 9002
+                Sku ID Not Provided:
+                  description: Sku ID Not Provided
+                  value:
+                    message: "Required parameter 'bag[0].skus[0].id' cannot be null\
+                      \ or empty."
+                    error: missing_parameter
+                    code: 9002
+                Insufficient Sku Inventory:
+                  description: Insufficient Sku Inventory
+                  value:
+                    message: "Insufficient inventory for item with ID {%d}."
+                    error: insufficient_inventory
+                    code: 4223
+                Sku Not Available for Purchase:
+                  description: Sku Not Available for Purchase
+                  value:
+                    message: "Sku identified by {%d} is currently not available."
+                    error: sku_not_available
+                    code: 2003
+                Offer Not Published:
+                  description: Offer Not Published
+                  value:
+                    message: "Offer not published by merchant: {%d}."
+                    error: offer_not_published
+                    code: 2011
+                Bag Shipping Method Not Provided:
+                  description: Bag Shipping Method Not Provided
+                  value:
+                    message: "Required parameter 'bag[0].shipping_method' cannot be\
+                      \ null or empty."
+                    error: missing_parameter
+                    code: 9002
+                Bag Shipping Method Label Not Provided:
+                  description: Bag Shipping Method Label Not Provided
+                  value:
+                    message: "Required parameter 'bag[0].shipping_method.label' cannot\
+                      \ be null or empty."
+                    error: missing_parameter
+                    code: 9002
+                Bag Shipping Method Price Not Provided:
+                  description: Bag Shipping Method Price Not Provided
+                  value:
+                    message: "Required parameter 'bag[0].shipping_method.price' cannot\
+                      \ be null or empty."
+                    error: missing_parameter
+                    code: 9002
+                App Order ID Not Provided:
+                  description: App Order ID Not Provided
+                  value:
+                    message: Required parameter 'app_order_id' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+                Currency Not Provided:
+                  description: Currency Not Provided
+                  value:
+                    message: Required parameter 'currency' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+                Invalid Currency:
+                  description: Invalid Currency
+                  value:
+                    message: Invalid currency code.
+                    error: invalid_currency
+                    code: 4226
+                Shipping Address Not Provided:
+                  description: Shipping Address Not Provided
+                  value:
+                    message: Required parameter 'shipping_address' cannot be null
+                      or empty.
+                    error: missing_parameter
+                    code: 9002
+                Customer Not Provided:
+                  description: Customer Not Provided
+                  value:
+                    message: Required parameter 'customer' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+                Customer Email Not Provided:
+                  description: Customer Email Not Provided
+                  value:
+                    message: Required parameter 'customer.email' cannot be null or
+                      empty.
+                    error: missing_parameter
+                    code: 9002
+                Shipping Totals Mismatch:
+                  description: Shipping Totals Mismatch
+                  value:
+                    message: "Shipping total mismatch in bag[0]: shipping_total={%d}\
+                      \ does not match shipping_method.price={%d}."
+                    error: bad_request
+                    code: 1001
+                Payment Already Captured:
+                  description: Payment Already Captured
+                  value:
+                    message: "Payment was already captured, this was likely a second\
+                      \ attempt to complete the order, check that the order was completed\
+                      \ in the first attempt."
+                    error: payment_already_captured
+                    code: 4421
+                Invalid Payment Method:
+                  description: Invalid Payment Method
+                  value:
+                    message: Invalid Payment Method.
+                    error: invalid_payment_method
+                    code: 4409
+        "401":
+          description: unauthorized
+          content:
+            application/json:
+              examples:
+                Merchant Not Connected:
+                  description: Merchant Not Connected
+                  value:
+                    message: "App not connected to merchant with ID {%d}. Merchant\
+                      \ must connect to your app before you can access their data."
+                    error: merchant_not_connected
+                    code: 7118
+        "404":
+          description: not found
+          content:
+            application/json:
+              examples:
+                Sku Not Found:
+                  description: Sku Not Found
+                  value:
+                    message: Sku identified by 99999 could not be found.
+                    error: sku_not_found
+                    code: 2002
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              examples:
+                Unknown Error:
+                  description: Unknown Error
+                  value:
+                    message: An unknown error has occurred.
+                    error: unknown_error
+                    code: 9000
   /checkout/cart/{cart_id}:
     get:
       tags:
