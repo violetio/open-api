@@ -3315,8 +3315,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/CalculateCartResponse'
               examples:
-                Estimated Order:
-                  description: Estimated Order
+                Estimated Cart:
+                  description: Estimated Cart
                   value:
                     estimated_carts:
                     - merchant_id: 10000
@@ -3362,6 +3362,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               examples:
+                Empty Request Body:
+                  description: Empty Request Body
+                  value:
+                    message: Empty body in request. Expected CalculateCartRequest
+                      object.
+                    error: empty_body
+                    code: 9910
+                Shipping Address Not Provided:
+                  description: Shipping Address Not Provided
+                  value:
+                    message: Required parameter 'shipping_address' cannot be null
+                      or empty.
+                    error: missing_parameter
+                    code: 9002
+                Sku's Not Provided:
+                  description: Sku's Not Provided
+                  value:
+                    message: Required parameter 'skus' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+                Sku ID Not Provided:
+                  description: Sku ID Not Provided
+                  value:
+                    message: "Required parameter 'skus[0].id' cannot be null or empty."
+                    error: missing_parameter
+                    code: 9002
                 Blocked Address:
                   description: Blocked Address
                   value:
@@ -3369,6 +3395,45 @@ paths:
                       of being used for fraudulent orders.
                     error: blocked_address
                     code: 4236
+                Invalid Shipping Address:
+                  description: Invalid Shipping Address
+                  value:
+                    message: The provided shipping address is invalid.
+                    error: invalid_shipping_address
+                    code: 4232
+        "401":
+          description: unauthorized
+          content:
+            application/json:
+              examples:
+                Sku Not Accessible:
+                  description: Sku Not Accessible
+                  value:
+                    message: Sku is not accessible to your application.
+                    error: sku_not_accessible
+                    code: 2008
+        "404":
+          description: not found
+          content:
+            application/json:
+              examples:
+                Sku Not Found:
+                  description: Sku Not Found
+                  value:
+                    message: Sku identified by 99999 could not be found.
+                    error: sku_not_found
+                    code: 2002
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              examples:
+                Unknown Error:
+                  description: Unknown Error
+                  value:
+                    message: An unknown error has occurred.
+                    error: unknown_error
+                    code: 9000
   /checkout/cart/{cart_id}/shipping/available:
     get:
       tags:
