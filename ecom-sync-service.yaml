@@ -3217,9 +3217,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -3236,6 +3233,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -3284,9 +3284,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
