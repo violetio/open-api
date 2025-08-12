@@ -396,12 +396,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageTransferReversal'
+  /payments/transfers/search/v1.1:
+    post:
+      tags:
+      - Payments - Transfers
+      summary: Advanced Transfers Search
+      description: Advanced search with configurable logical operators (AND/OR) across
+        transfer fields
+      operationId: searchTransfers
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 100
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdvancedSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePayoutTransfer'
   /payments/transfers:
     post:
       tags:
       - Payments - Transfers
       summary: Search Transfers
-      operationId: searchTransfers
+      operationId: searchTransfers_1
       parameters:
       - name: X-Violet-Token
         in: header
@@ -580,6 +634,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/RegisterExternalTransferResponse'
   /payments/payout_accounts/{payout_account_id}:
+    get:
+      tags:
+      - Payments - Payout Accounts
+      summary: Get Payout Account by ID
+      operationId: getPayoutAccountById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: payout_account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: extended
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutAccount'
     delete:
       tags:
       - Payments - Payout Accounts
@@ -659,47 +753,6 @@ paths:
         schema:
           type: integer
           format: int32
-      responses:
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PayoutAccount'
-  /payments/payout_account/{payout_account_id}:
-    get:
-      tags:
-      - Payments - Payout Accounts
-      summary: Get Payout Account by ID
-      operationId: getPayoutAccountById
-      parameters:
-      - name: X-Violet-Token
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: X-Violet-App-Secret
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: X-Violet-App-Id
-        in: header
-        required: true
-        schema:
-          type: integer
-          format: int32
-      - name: payout_account_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      - name: extended
-        in: query
-        schema:
-          type: boolean
-          default: false
       responses:
         default:
           description: default response
@@ -1013,6 +1066,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1025,8 +1080,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -1375,6 +1428,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1387,8 +1442,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -1450,6 +1503,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1462,8 +1517,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -1473,6 +1526,70 @@ components:
           type: boolean
         empty:
           type: boolean
+    AdvancedSearchRequest:
+      type: object
+      properties:
+        query:
+          $ref: '#/components/schemas/SearchQuery'
+        filters:
+          type: array
+          description: Configurable filter options that allow for granular control
+            over search results
+          items:
+            $ref: '#/components/schemas/FilterExpression'
+      description: Advanced Search Request
+    FilterCondition:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Field to filter on
+        operator:
+          type: string
+          description: Comparison operator used for filter query
+          enum:
+          - EQUALS
+          - NOT_EQUALS
+          - CONTAINS
+          - NOT_CONTAINS
+          - GREATER_THAN
+          - LESS_THAN
+          - GREATER_THAN_EQUALS
+          - LESS_THAN_EQUALS
+          - IS_EMPTY
+          - IS_NOT_EMPTY
+          - IN
+        value:
+          type: object
+          description: Value of entity to compare against
+      description: Filter Condition
+    FilterExpression:
+      type: object
+      properties:
+        conditions:
+          type: array
+          description: Top-level filter conditions that describe the query to be performed
+          items:
+            $ref: '#/components/schemas/FilterCondition'
+        filters:
+          type: array
+          description: A list of filters that can be expressed recursively as groups
+          items:
+            $ref: '#/components/schemas/FilterExpression'
+        operator:
+          type: string
+          description: Logical operator connecting all top-level elements
+          enum:
+          - AND
+          - OR
+      description: Filter Expression
+    SearchQuery:
+      type: object
+      properties:
+        input:
+          type: string
+          description: Text input to search across a heuristic index of entities
+      description: Configurable text-based search query
     SearchTransfersRequest:
       type: object
       properties:
@@ -1555,6 +1672,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1567,8 +1686,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -1774,70 +1891,6 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
-    AdvancedSearchRequest:
-      type: object
-      properties:
-        query:
-          $ref: '#/components/schemas/SearchQuery'
-        filters:
-          type: array
-          description: Configurable filter options that allow for granular control
-            over search results
-          items:
-            $ref: '#/components/schemas/FilterExpression'
-      description: Advanced Search Request
-    FilterCondition:
-      type: object
-      properties:
-        field:
-          type: string
-          description: Field to filter on
-        operator:
-          type: string
-          description: Comparison operator used for filter query
-          enum:
-          - EQUALS
-          - NOT_EQUALS
-          - CONTAINS
-          - NOT_CONTAINS
-          - GREATER_THAN
-          - LESS_THAN
-          - GREATER_THAN_EQUALS
-          - LESS_THAN_EQUALS
-          - IS_EMPTY
-          - IS_NOT_EMPTY
-          - IN
-        value:
-          type: object
-          description: Value of entity to compare against
-      description: Filter Condition
-    FilterExpression:
-      type: object
-      properties:
-        conditions:
-          type: array
-          description: Top-level filter conditions that describe the query to be performed
-          items:
-            $ref: '#/components/schemas/FilterCondition'
-        filters:
-          type: array
-          description: A list of filters that can be expressed recursively as groups
-          items:
-            $ref: '#/components/schemas/FilterExpression'
-        operator:
-          type: string
-          description: Logical operator connecting all top-level elements
-          enum:
-          - AND
-          - OR
-      description: Filter Expression
-    SearchQuery:
-      type: object
-      properties:
-        input:
-          type: string
-          description: Text input to search across a heuristic index of entities
-      description: Configurable text-based search query
     PendingTransferResponse:
       type: object
       properties:
