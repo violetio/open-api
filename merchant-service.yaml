@@ -889,6 +889,11 @@ components:
           type: boolean
           description: "Is order creation, or cart submission, disabled for this merchant."
           default: false
+        order_prefix:
+          type: string
+          description: "When supported by the commerce platform, this prefix will\
+            \ be used for orders."
+          default: "null"
         custom_tags:
           uniqueItems: true
           type: array
@@ -1075,6 +1080,9 @@ components:
           - ZAR
           - ZMW
           - BTN
+        handle:
+          type: string
+          description: The handle or external ID to use when utilizing this method.
         calculation_type:
           type: string
           description: Whether the price is calculated per the entire order or per
@@ -1927,9 +1935,9 @@ components:
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
     PageMerchantOnboardingRecord:
       type: object
