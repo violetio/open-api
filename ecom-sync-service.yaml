@@ -2885,6 +2885,10 @@ components:
           type: integer
           format: int64
           readOnly: true
+        sku_id:
+          type: integer
+          description: ID of the SKU this discount belong to if a line-item discount
+          format: int64
         bag_id:
           type: integer
           description: ID of the Bag this discount belong to
@@ -2899,6 +2903,7 @@ components:
           - NOT_SUPPORTED
           - ERROR
           - EXPIRED
+          - VALID
         type:
           type: string
           description: Type of discount
@@ -3284,9 +3289,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        first_name:
-          type: string
         last_name:
+          type: string
+        first_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
