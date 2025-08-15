@@ -1129,6 +1129,7 @@ components:
           - TRANSFER_REVERSAL_FAILED
           - OFFER_ADDED
           - OFFER_DELETED
+          - ORDER_DELIVERED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook event was sent.
@@ -1265,6 +1266,7 @@ components:
             - TRANSFER_REVERSAL_FAILED
             - OFFER_ADDED
             - OFFER_DELETED
+            - ORDER_DELIVERED
         entity_ids:
           uniqueItems: true
           type: array
@@ -1381,6 +1383,7 @@ components:
           - TRANSFER_REVERSAL_FAILED
           - OFFER_ADDED
           - OFFER_DELETED
+          - ORDER_DELIVERED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook posts against.
