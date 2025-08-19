@@ -18,6 +18,121 @@ tags:
 - name: Currencies
 - name: Catalog - Offer subscriptions
 paths:
+  /catalog_consumer/offers:
+    post:
+      tags:
+      - Catalog
+      summary: Create Offer
+      operationId: createOrUpdateOffer
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Offer'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+  /catalog_consumer/offers/{merchant_id}/batch:
+    post:
+      tags:
+      - Catalog
+      summary: Create or Update multiple Offers for a Merchant
+      operationId: createOrUpdateOffers
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Offer'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+  /catalog_consumer/products:
+    post:
+      tags:
+      - Catalog
+      summary: Create Product
+      operationId: createProduct
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
   /catalog/categories:
     get:
       tags:
@@ -855,116 +970,6 @@ paths:
                 $ref: '#/components/schemas/Latest'
 components:
   schemas:
-    Category:
-      required:
-      - depth
-      - name
-      - slug
-      type: object
-      properties:
-        id:
-          type: string
-          readOnly: true
-        name:
-          type: string
-          description: Category Name
-        slug:
-          type: string
-          description: Category Slug
-        parent_id:
-          type: string
-          description: Parent ID
-        depth:
-          type: integer
-          description: Category Depth
-          format: int32
-      description: Product Category
-    VioletPageCategory:
-      type: object
-      properties:
-        content:
-          type: array
-          description: The actual content of the response; A list of the result objects
-          items:
-            $ref: '#/components/schemas/Category'
-        last:
-          type: boolean
-          description: Boolean indicating if this is the last page
-        total_pages:
-          type: integer
-          description: The total count of pages available
-          format: int32
-        total_elements:
-          type: integer
-          description: The total count of objects available
-          format: int32
-        first:
-          type: boolean
-          description: Boolean indicating if this is the first page of the response
-        number_of_elements:
-          type: integer
-          description: The total number of objects in this specific response
-          format: int32
-        size:
-          type: integer
-          description: The page size selected at request time
-          format: int32
-        number:
-          type: integer
-          description: The page number selected at request time
-          format: int32
-        empty:
-          type: boolean
-          description: Boolean indicating if the response content is empty
-        next_page_cursor:
-          type: string
-          description: Contains the cursor for the next page. This property will only
-            be used for situations where the API does not support the page number/page
-            size paradigm and it will mutually exclusive with the size/number fields
-            in the response. If this property is returned it must be passed when requesting
-            the next page from the API. Does not apply to endpoints that do not have
-            a next_page_cursor query param documented.
-        pageable:
-          $ref: '#/components/schemas/VioletPageable'
-        sort:
-          $ref: '#/components/schemas/VioletSort'
-    VioletPageable:
-      type: object
-      properties:
-        page_number:
-          type: integer
-          description: The current page number (one based)
-          format: int32
-        page_size:
-          type: integer
-          description: The number of elements per page
-          format: int32
-        sort:
-          $ref: '#/components/schemas/VioletSort'
-        offset:
-          type: integer
-          description: The offset
-          format: int64
-        paged:
-          type: boolean
-          description: Boolean indicating if the result is paged
-        unpaged:
-          type: boolean
-          description: Boolean indicating if the result is unpaged
-      description: Violet wrapper for springframework pageable
-    VioletSort:
-      type: object
-      properties:
-        unsorted:
-          type: boolean
-          description: Boolean indicating if the result set is unsorted
-        sorted:
-          type: boolean
-          description: Boolean indicating if the result set is sorted
-        empty:
-          type: boolean
-          description: Boolean indicating if the result set is empty
-      description: Violet Wrapper for springframework sort
     Album:
       required:
       - parent_id
@@ -2129,6 +2134,381 @@ components:
           description: The order the variant values are displayed in.
           format: int32
       description: Individual Variation Value
+    Weight:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Weight value
+          format: double
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - TONNES
+      description: Weight required to enable the shipping method.
+      nullable: true
+    Category:
+      required:
+      - depth
+      - name
+      - slug
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          description: Category Name
+        slug:
+          type: string
+          description: Category Slug
+        parent_id:
+          type: string
+          description: Parent ID
+        depth:
+          type: integer
+          description: Category Depth
+          format: int32
+      description: Product Category
+    Meta:
+      required:
+      - key
+      - offer_id
+      - value
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        offer_id:
+          type: integer
+          description: Offer Id
+          format: int64
+        key:
+          type: string
+          description: Key
+        value:
+          type: string
+          description: Value
+      description: Additional Product MetaData
+    Product:
+      required:
+      - name
+      - slug
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          description: Product Name
+        description:
+          type: string
+          description: Product Description
+        long_description:
+          type: string
+          description: Product Long Description
+        slug:
+          type: string
+          description: Product Slug/Handle. The URL part that is unique to the product.
+        brand:
+          type: string
+          description: Brand
+        available:
+          type: boolean
+          description: Is the Product Available
+        visible:
+          type: boolean
+          description: Is the Product Visible
+        total_sales:
+          type: integer
+          description: Number of times this product has been sold
+          format: int32
+        type:
+          type: string
+          description: Product Type
+          enum:
+          - PHYSICAL
+          - DIGITAL
+          - VIRTUAL
+          - BUNDLED
+        min_price:
+          type: integer
+          description: Minimum Price of the Product
+          format: int32
+        max_price:
+          type: integer
+          description: Maximum Price of the Product
+          format: int32
+        variants:
+          uniqueItems: true
+          type: array
+          description: Product Variants. These are different from the offer variants.
+          items:
+            $ref: '#/components/schemas/ProductVariant'
+        offers:
+          uniqueItems: true
+          type: array
+          description: Merchant Offerings. Offers are the versions of the product
+            a merchant is selling. Multiple merchants can sell the same product.
+          items:
+            $ref: '#/components/schemas/Offer'
+        categories:
+          uniqueItems: true
+          type: array
+          description: Categories
+          items:
+            $ref: '#/components/schemas/Category'
+        gender:
+          type: string
+          description: Gender
+          enum:
+          - MALE
+          - FEMALE
+          - UNISEX
+        meta:
+          uniqueItems: true
+          type: array
+          description: Meta Data
+          items:
+            $ref: '#/components/schemas/Meta'
+        tags:
+          uniqueItems: true
+          type: array
+          description: Tags
+          items:
+            type: string
+            description: Tags
+        related_product_ids:
+          uniqueItems: true
+          type: array
+          description: ID's of related products.
+          items:
+            type: string
+            description: ID's of related products.
+        cross_sale_product_ids:
+          uniqueItems: true
+          type: array
+          description: ID's of Cross Saleable Products.
+          items:
+            type: string
+            description: ID's of Cross Saleable Products.
+        gtins:
+          uniqueItems: true
+          type: array
+          description: "List of Global Trade Item Numbers. This can inlude SKUs, Barcodes,\
+            \ and MPNs"
+          items:
+            type: string
+            description: "List of Global Trade Item Numbers. This can inlude SKUs,\
+              \ Barcodes, and MPNs"
+        default_image_url:
+          type: string
+          description: The default/cover image of the Product
+        qty_available:
+          type: integer
+          description: Overall Quantity
+          format: int32
+        merchant_ids:
+          uniqueItems: true
+          type: array
+          description: List of merchants selling this product.
+          items:
+            type: integer
+            description: List of merchants selling this product.
+            format: int32
+        date_created:
+          type: string
+          description: Date of product creation
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last product update
+          format: date-time
+        channelReady:
+          type: boolean
+        requires:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - TAXONOMY
+            - GENDER
+            - GTINS
+        offersAvailable:
+          type: integer
+          format: int32
+      description: Products
+    ProductVariant:
+      required:
+      - name
+      - product_id
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        product_id:
+          type: string
+          description: Product ID
+        name:
+          type: string
+          description: Name
+        visual:
+          type: boolean
+          description: "Is this a visual variant. Visual variants are variants that\
+            \ can be seen, like colors, patterns, and materials."
+        values:
+          uniqueItems: true
+          type: array
+          description: Product Variant values
+          items:
+            $ref: '#/components/schemas/ProductVariantValue'
+        display_order:
+          type: integer
+          description: Display Order
+          format: int32
+      description: Product Variant
+    ProductVariantValue:
+      required:
+      - variant_id
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        variant_id:
+          type: string
+          description: ID of the Variation
+        name:
+          type: string
+          description: Name
+        display_order:
+          type: integer
+          description: Display Order
+          format: int32
+        swatch:
+          type: string
+          description: Color/Pattern Swatch URL
+        hex:
+          type: string
+          description: Hex Code
+      description: Product Variant Value
+    VioletPageCategory:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Category'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    VioletPageable:
+      type: object
+      properties:
+        page_number:
+          type: integer
+          description: The current page number (one based)
+          format: int32
+        page_size:
+          type: integer
+          description: The number of elements per page
+          format: int32
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+        offset:
+          type: integer
+          description: The offset
+          format: int64
+        paged:
+          type: boolean
+          description: Boolean indicating if the result is paged
+        unpaged:
+          type: boolean
+          description: Boolean indicating if the result is unpaged
+      description: Violet wrapper for springframework pageable
+    VioletSort:
+      type: object
+      properties:
+        unsorted:
+          type: boolean
+          description: Boolean indicating if the result set is unsorted
+        sorted:
+          type: boolean
+          description: Boolean indicating if the result set is sorted
+        empty:
+          type: boolean
+          description: Boolean indicating if the result set is empty
+      description: Violet Wrapper for springframework sort
     VioletPageOffer:
       type: object
       properties:
@@ -2178,44 +2558,6 @@ components:
           $ref: '#/components/schemas/VioletPageable'
         sort:
           $ref: '#/components/schemas/VioletSort'
-    Weight:
-      type: object
-      properties:
-        value:
-          type: number
-          description: Weight value
-          format: double
-          nullable: true
-        unit:
-          type: string
-          nullable: true
-          enum:
-          - INCHES
-          - FEET
-          - CENTIMETERS
-          - OUNCES
-          - POUNDS
-          - GRAMS
-          - KILOGRAMS
-          - CARATS
-          - YARDS
-          - MILLIMETERS
-          - TONNES
-          - MILLIGRAMS
-          - LITERS
-          - MILLILITERS
-          - QUARTS
-          - QUARTERS
-          - GALLONS
-          - PINTS
-          - METERS
-          - OUNCES
-          - POUNDS
-          - GRAMS
-          - KILOGRAMS
-          - TONNES
-      description: Weight required to enable the shipping method.
-      nullable: true
     ProductCount:
       type: object
       properties:
