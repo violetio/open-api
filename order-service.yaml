@@ -6417,6 +6417,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -6428,9 +6431,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        bag_id:
-          type: integer
-          format: int64
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -6510,6 +6510,10 @@ components:
           type: string
           description: "Customer email address, possibly necessary for once-per-customer\
             \ discounts."
+        merchant_id:
+          type: integer
+          description: "Merchant ID this discount belongs to, if applicable."
+          format: int32
       description: Bag Discount
       nullable: true
     BagFulfillment:
@@ -8309,6 +8313,12 @@ components:
             $ref: '#/components/schemas/BaseSku'
         shipping_address:
           $ref: '#/components/schemas/BaseAddress'
+        discounts:
+          uniqueItems: true
+          type: array
+          description: Optional discounts to apply to the cart.
+          items:
+            $ref: '#/components/schemas/BagDiscount'
       description: Calculate Cart Request
     Refund:
       required:
@@ -9667,6 +9677,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -9676,8 +9688,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
