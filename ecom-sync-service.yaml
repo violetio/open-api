@@ -1253,6 +1253,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
         seller:
           type: string
           description: Name of the merchant selling product.
@@ -2835,6 +2836,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
         fulfillments:
           uniqueItems: true
           type: array
@@ -2952,6 +2954,10 @@ components:
           type: string
           description: "Customer email address, possibly necessary for once-per-customer\
             \ discounts."
+        merchant_id:
+          type: integer
+          description: "Merchant ID this discount belongs to, if applicable."
+          format: int32
       description: Bag Discount
       nullable: true
     BagFulfillment:
@@ -3439,6 +3445,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
       description: Order Error
       nullable: true
     OrderPaymentMethod:
