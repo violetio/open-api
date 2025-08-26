@@ -6393,6 +6393,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
         fulfillments:
           uniqueItems: true
           type: array
@@ -6435,6 +6436,8 @@ components:
           type: string
           description: Name of the merchant the Bag is related to.
           readOnly: true
+        communication_preferences:
+          $ref: '#/components/schemas/communication_preferences'
       description: Per Merchant Bag in Order
     BagDiscount:
       type: object
@@ -7001,6 +7004,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
       description: Order Error
       nullable: true
     OrderPaymentMethod:
@@ -7541,6 +7545,44 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
+    communication_preference_detail:
+      type: object
+      properties:
+        requested:
+          type: string
+          description: Requested communication preference
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+        result:
+          type: string
+          description: |-
+            Result of email communication preference opt-in.
+            OPT_IN: Used for marketing preferences, applies to any future email communication after the order is fulfilled.
+            SINGLE_OPT_IN: Used for orderConfirmation and orderFulfillment, applies only to communication about the current order (confirmation/fulfillment).
+            UNKNOWN: Used for e-commerce platforms that do not support explicit request parameters for different email communication settings; the use of the email for communication is not known.
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+          - SINGLE_OPT_IN
+          - UNKNOWN
+      description: Order fulfillment email communication preference detail
+    communication_preferences:
+      type: object
+      properties:
+        email_preferences:
+          $ref: '#/components/schemas/email_preferences'
+      description: Communication preferences requested and resultant states for this
+        Bag.
+    email_preferences:
+      type: object
+      properties:
+        marketing:
+          $ref: '#/components/schemas/communication_preference_detail'
+        order_confirmation:
+          $ref: '#/components/schemas/communication_preference_detail'
+        order_fulfillment:
+          $ref: '#/components/schemas/communication_preference_detail'
     Error:
       type: object
       properties:
@@ -7899,6 +7941,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
         base_currency:
           maxLength: 3
           minLength: 3
@@ -8693,7 +8736,15 @@ components:
           description: The amount for the shipping method applied to the Bag. In the
             Order currency. In Cents.
           format: int32
+        communication_preferences:
+          $ref: '#/components/schemas/CommunicationPreferenceRequestsDTO'
       description: Bags of items being purchased.
+    CommunicationPreferenceRequestsDTO:
+      type: object
+      properties:
+        email_preferences:
+          $ref: '#/components/schemas/EmailCommunicationRequestPreferencesDTO'
+      description: Communication preferences requested for this Bag.
     CustomerDTO:
       required:
       - email
@@ -8714,6 +8765,28 @@ components:
           description: Email address of the customer.
           example: super@mar.io
       description: Customer information for the order.
+    EmailCommunicationRequestPreferencesDTO:
+      type: object
+      properties:
+        marketing:
+          type: string
+          description: Marketing email opt-in request.
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+        order_confirmation:
+          type: string
+          description: Order confirmation email opt-in request.
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+        order_fulfillment:
+          type: string
+          description: Order fulfillment email opt-in request.
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+      description: Email communication preferences for this bag.
     OrderDTO:
       required:
       - app_order_id
