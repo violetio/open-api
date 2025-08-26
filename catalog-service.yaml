@@ -1292,6 +1292,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
         seller:
           type: string
           description: Name of the merchant selling product.
