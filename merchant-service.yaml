@@ -1423,6 +1423,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
         platform_plan:
           type: string
           description: The eCommerce platform plan of the store
@@ -1935,9 +1936,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PageMerchantOnboardingRecord:
       type: object
