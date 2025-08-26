@@ -396,13 +396,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageTransferReversal'
+  /payments/transfers/reversals/search/v1.1:
+    post:
+      tags:
+      - Payments - Transfer Reversals
+      summary: Advanced Transfer Reversals Search
+      description: "Advanced search with configurable logical operators (AND/OR) across\
+        \ transfer reversal fields, including merchant name from joined distribution"
+      operationId: searchTransferReversals
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 100
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdvancedSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageMerchant Transfer Reversal'
   /payments/transfers/search/v1.1:
     post:
       tags:
       - Payments - Transfers
       summary: Advanced Transfers Search
-      description: Advanced search with configurable logical operators (AND/OR) across
-        transfer fields
+      description: "Advanced search with configurable logical operators (AND/OR) across\
+        \ transfer fields, including merchant name from joined distribution"
       operationId: searchTransfers
       parameters:
       - name: X-Violet-Token
@@ -449,7 +503,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PagePayoutTransfer'
+                $ref: '#/components/schemas/PageMerchantTransfer'
   /payments/transfers:
     post:
       tags:
@@ -1036,13 +1090,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -1054,6 +1101,13 @@ components:
           format: int32
         externalTransactionId:
           type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
       description: "Records detailing the financial transactions and distributions\
         \ for a specific Bag, which includes a breakdown of fund allocations and payment\
         \ gateway fees for Merchants and Channels."
@@ -1240,6 +1294,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -1249,8 +1305,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
@@ -1494,7 +1548,79 @@ components:
           format: date-time
       description: "Parameters used to filter and retrieve transfer reversals based\
         \ on criteria such as transfer ID, merchant, status, and creation date."
-    PagePayoutTransfer:
+    Merchant Transfer Reversal:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        object:
+          type: string
+          description: Name of the object that this object represents. This value
+            will always be `transfer_reversal`.
+        transfer:
+          type: integer
+          description: Unique identifier for the transfer object that was reversed.
+          format: int64
+        status:
+          type: string
+          description: Status of the transfer.
+          enum:
+          - PENDING
+          - COMPLETE
+          - FAILED
+        amount:
+          type: integer
+          description: "Amount, in fractional currency unit (e.g. cents), that was\
+            \ reversed."
+          format: int64
+        currency:
+          type: string
+          description: Main currency (e.g. USD) of this transfer reversal.
+        paypro:
+          type: string
+          description: Payment provider that processed this transfer reversal.
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        paypro_data:
+          type: object
+          additionalProperties:
+            type: object
+            description: Additional data about this transfer reversal directly from
+              the payment provider.
+          description: Additional data about this transfer reversal directly from
+            the payment provider.
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this transfer reversal. This value
+            will only be populated if there are errors during processing.
+          items:
+            $ref: '#/components/schemas/TransferReversalError'
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+        merchant_name:
+          type: string
+          description: Name of the merchant associated with this Transfer Reversal
+            from the linked distribution.
+        merchant_id:
+          type: integer
+          description: ID of the merchant associated with this Transfer Reversal from
+            the linked distribution.
+          format: int32
+      description: Record of Transfer Reversal with merchant name from associated
+        distribution
+    PageMerchant Transfer Reversal:
       type: object
       properties:
         totalPages:
@@ -1511,7 +1637,7 @@ components:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/PayoutTransfer'
+            $ref: '#/components/schemas/Merchant Transfer Reversal'
         number:
           type: integer
           format: int32
@@ -1590,6 +1716,215 @@ components:
           type: string
           description: Text input to search across a heuristic index of entities
       description: Configurable text-based search query
+    MerchantTransfer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        payment_transaction:
+          type: integer
+          description: Unique identifier of the Payment Transaction that this Transfer
+            is associated with.
+          format: int64
+        payout_id:
+          type: integer
+          description: "ID of the Payout, if any, this Transfer is associated to"
+          format: int32
+        payment_provider_id:
+          type: string
+          description: ID of the transfer record in Stripe
+        payment_provider_payout_id:
+          type: string
+          description: External ID of the payout record
+        payout_account_id:
+          type: integer
+          description: ID of the Payout Account this Transfer belongs to.
+          format: int32
+        bag_amount:
+          type: integer
+          description: Total value for the bag associated to this transfer
+          format: int32
+        bag_currency:
+          type: string
+          description: Original currency that this bag was processed in.
+        amount:
+          type: integer
+          description: Total amount in fractional currency unit (e.g. cents) for this
+            transfer.
+          format: int32
+        currency:
+          type: string
+          description: Currency that this transfer was processed in.
+        status:
+          type: string
+          description: Status of the transfer.
+          enum:
+          - SENT
+          - REVERSED
+          - PARTIALLY_REVERSED
+          - PENDING
+          - FAILED
+          - BYPASSED
+          - PARTIALLY_SENT
+        type:
+          type: string
+          description: Account type of the Transfer recipient.
+          enum:
+          - MERCHANT
+          - DEVELOPER
+        payment_provider:
+          type: string
+          description: Payment Provider that this transfer is executed with. This
+            is the provider that handles transfer processing for this payout account.
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        related_orders:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Orders in Violet that are associated with
+            this transfer.
+          items:
+            type: string
+            description: Identifiers of the Orders in Violet that are associated with
+              this transfer.
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Bags in Violet that are associated with
+            this transfer.
+          items:
+            type: string
+            description: Identifiers of the Bags in Violet that are associated with
+              this transfer.
+        related_distributions:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Distributions in Violet that are associated
+            with this transfer. The amount of this Transfer is directly computed as
+            the sum of all Distributions related to it.
+          items:
+            type: string
+            description: Identifiers of the Distributions in Violet that are associated
+              with this transfer. The amount of this Transfer is directly computed
+              as the sum of all Distributions related to it.
+        transfer_reversals:
+          uniqueItems: true
+          type: array
+          description: Unique identifiers of the Transfer Reversal objects in Violet
+            that are associated with this transfer.
+          items:
+            type: string
+            description: Unique identifiers of the Transfer Reversal objects in Violet
+              that are associated with this transfer.
+        idempotency_key:
+          type: string
+          description: Unique key to prevent duplicate transfers. This is generated
+            by the Violet and unique for each transfer being processed.
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+        errors:
+          uniqueItems: true
+          type: array
+          description: List of errors associated to this payout transfer during processing..
+            This value will only be populated if there are errors during processing
+          items:
+            $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
+        payoutExternalId:
+          type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        merchant_name:
+          type: string
+          description: Name of the merchant associated with this Transfer from the
+            linked distribution.
+        merchant_id:
+          type: integer
+          description: ID of the merchant associated with this Transfer from the linked
+            distribution.
+          format: int32
+      description: Record of Payout Transfer with merchant name from associated distribution
+    PageMerchantTransfer:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantTransfer'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PagePayoutTransfer:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayoutTransfer'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        empty:
+          type: boolean
     SearchTransfersRequest:
       type: object
       properties:
