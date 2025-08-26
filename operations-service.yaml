@@ -1126,6 +1126,7 @@ components:
           - AMAZON
           - BIGCARTEL
           - RITHUM
+          - SHOPRENTER
         store_url:
           type: string
           description: The URL Of the Store
@@ -1785,6 +1786,7 @@ components:
             - AMAZON
             - BIGCARTEL
             - RITHUM
+            - SHOPRENTER
         status:
           type: string
           description: Filter by ConnectionHealth Status
