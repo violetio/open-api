@@ -2879,6 +2879,8 @@ components:
           type: string
           description: Name of the merchant the Bag is related to.
           readOnly: true
+        communication_preferences:
+          $ref: '#/components/schemas/communication_preferences'
       description: Per Merchant Bag in Order
     BagDiscount:
       type: object
@@ -3228,9 +3230,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -3247,6 +3246,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -3986,6 +3988,44 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
+    communication_preference_detail:
+      type: object
+      properties:
+        requested:
+          type: string
+          description: Requested communication preference
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+        result:
+          type: string
+          description: |-
+            Result of email communication preference opt-in.
+            OPT_IN: Used for marketing preferences, applies to any future email communication after the order is fulfilled.
+            SINGLE_OPT_IN: Used for orderConfirmation and orderFulfillment, applies only to communication about the current order (confirmation/fulfillment).
+            UNKNOWN: Used for e-commerce platforms that do not support explicit request parameters for different email communication settings; the use of the email for communication is not known.
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+          - SINGLE_OPT_IN
+          - UNKNOWN
+      description: Order fulfillment email communication preference detail
+    communication_preferences:
+      type: object
+      properties:
+        email_preferences:
+          $ref: '#/components/schemas/email_preferences'
+      description: Communication preferences requested and resultant states for this
+        Bag.
+    email_preferences:
+      type: object
+      properties:
+        marketing:
+          $ref: '#/components/schemas/communication_preference_detail'
+        order_confirmation:
+          $ref: '#/components/schemas/communication_preference_detail'
+        order_fulfillment:
+          $ref: '#/components/schemas/communication_preference_detail'
     VioletPageOrder:
       type: object
       properties:
