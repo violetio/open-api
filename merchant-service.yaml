@@ -788,6 +788,8 @@ components:
           $ref: '#/components/schemas/InventoryConfig'
         availability:
           $ref: '#/components/schemas/AvailabilityConfig'
+        exclusions:
+          $ref: '#/components/schemas/ExclusionsConfig'
         syncPolicy:
           $ref: '#/components/schemas/SyncPolicy'
       description: Configurations for the merchants catalog behaviors.
@@ -835,6 +837,39 @@ components:
       description: Any conditions that determine if a shipping method is applicable
         to the order.
       nullable: true
+    ExclusionRule:
+      type: object
+      properties:
+        excluded:
+          type: boolean
+        unpublished:
+          type: boolean
+      description: Exclusion rules for the merchants catalog.
+    ExclusionRules:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExclusionRule'
+        categories:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExclusionRule'
+        collections:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExclusionRule'
+        vendors:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExclusionRule'
+    ExclusionsConfig:
+      type: object
+      properties:
+        exclusionRules:
+          $ref: '#/components/schemas/ExclusionRules'
+      description: Configurations for the merchants exclusion behaviors.
     InventoryConfig:
       type: object
       properties:
@@ -1921,6 +1956,8 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        unpaged:
+          type: boolean
         pageNumber:
           type: integer
           format: int32
@@ -1929,16 +1966,14 @@ components:
           format: int32
         paged:
           type: boolean
-        unpaged:
-          type: boolean
     Sort:
       type: object
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
     PageMerchantOnboardingRecord:
       type: object
