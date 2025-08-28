@@ -706,7 +706,11 @@ paths:
     get:
       tags:
       - Merchants - Onboarding
-      summary: Get pre-formatted links for Violet Connect onboarding for a given merchant
+      summary: Get pre-formatted links for Violet Connect onboarding for a given merchant.
+      description: "This endpoint will return pre-formatted links for a given merchant\
+        \ that take them straight to a specific step during Violet Connect onboarding.\
+        \ These links are specific to the merchant and the platform they are using\
+        \ (e.g., Shopify, WooCommerce)."
       operationId: getVioletConnectUrls
       parameters:
       - name: X-Violet-Token
@@ -740,14 +744,53 @@ paths:
         schema:
           type: string
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OnboardingStep'
+                type: string
+              example:
+              - step: PAYOUTS
+                url: https://connect.violet.io/appsubdomain/platforms/shopify/payments?merchantId=11222
+              - step: COMMISSION_RATE
+                url: https://connect.violet.io/appsubdomain/platforms/shopify/commission-rate?merchantId=11222
+              - step: CREATE_STRIPE_EXPRESS_ACCOUNT
+                url: https://connect.violet.io/appsubdomain/platforms/shopify/payments?merchantId=11222&setupAccountType=express
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              examples:
+                Merchant Not Connected:
+                  description: Merchant Not Connected
+                  value:
+                    message: App not connected to merchant. Merchant must connect
+                      to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: Insufficient Permissions
+          content:
+            application/json:
+              examples:
+                No Permissions to Access Resource:
+                  description: No Permissions to Access Resource
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                Unknown Error:
+                  description: Unknown Error
+                  value:
+                    message: An unknown error has occurred.
+                    error: unknown_error
+                    code: 9000
 components:
   schemas:
     AvailabilityConfig:
@@ -1925,6 +1968,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1937,8 +1982,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -1956,8 +1999,6 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
-        unpaged:
-          type: boolean
         pageNumber:
           type: integer
           format: int32
@@ -1966,14 +2007,16 @@ components:
           format: int32
         paged:
           type: boolean
+        unpaged:
+          type: boolean
     Sort:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PageMerchantOnboardingRecord:
       type: object
@@ -1984,6 +2027,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1996,8 +2041,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
