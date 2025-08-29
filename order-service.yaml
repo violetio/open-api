@@ -6418,6 +6418,9 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -6429,15 +6432,12 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        bag_id:
-          type: integer
-          format: int64
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
           readOnly: true
-        communication_preferences:
-          $ref: '#/components/schemas/communication_preferences'
       description: Per Merchant Bag in Order
     BagDiscount:
       type: object
@@ -6470,6 +6470,7 @@ components:
           description: Type of discount
           enum:
           - CODE
+          - CUSTOM
         value_type:
           type: string
           description: Value type of discount
@@ -6787,6 +6788,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -6803,9 +6807,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -7242,6 +7243,8 @@ components:
             \ or duties."
           items:
             $ref: '#/components/schemas/OrderSkuRate'
+        discount:
+          $ref: '#/components/schemas/SkuDiscount'
         line_price:
           type: integer
           description: "Price of the Sku multiplied by the quantity, in Cents"
@@ -7545,6 +7548,35 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
+    SkuDiscount:
+      type: object
+      properties:
+        sku_id:
+          type: integer
+          description: ID of the SKU this discount belongs to
+          format: int64
+        type:
+          type: string
+          description: Type of discount
+          enum:
+          - CODE
+          - CUSTOM
+        amount:
+          type: integer
+          description: Amount of discount
+          format: int32
+        percentage:
+          type: number
+          description: Percentage of discount
+          format: double
+        value_type:
+          type: string
+          description: Value Type of discount
+          enum:
+          - AMOUNT
+          - PERCENTAGE
+      description: "Discount that should be applied to this SKU, if any. Only `CUSTOM`\
+        \ discounts can be passed to be applied at the SKU-level."
     communication_preference_detail:
       type: object
       properties:
@@ -7572,8 +7604,6 @@ components:
       properties:
         email_preferences:
           $ref: '#/components/schemas/email_preferences'
-      description: Communication preferences requested and resultant states for this
-        Bag.
     email_preferences:
       type: object
       properties:
@@ -7848,6 +7878,8 @@ components:
           type: integer
           description: "Price of the individual Sku, in cents."
           format: int32
+        discount:
+          $ref: '#/components/schemas/SkuDiscount'
         name:
           type: string
           description: Name of the Sku
@@ -8196,6 +8228,8 @@ components:
           type: integer
           description: "Price of the individual Sku, in cents."
           format: int32
+        discount:
+          $ref: '#/components/schemas/SkuDiscount'
       description: A list of one or more Violet Sku's. Sku's from the same merchant
         will be grouped and calculated together.
     CalculateCartRequest:
@@ -8736,6 +8770,16 @@ components:
           description: The amount for the shipping method applied to the Bag. In the
             Order currency. In Cents.
           format: int32
+        discount_total:
+          type: integer
+          description: The total discounts applied to the price of the Bag in the
+            base currency. In Cents
+          format: int32
+        discounts:
+          type: array
+          description: List of discounts to apply to the bag
+          items:
+            $ref: '#/components/schemas/DiscountDTO'
         communication_preferences:
           $ref: '#/components/schemas/CommunicationPreferenceRequestsDTO'
       description: Bags of items being purchased.
@@ -8765,6 +8809,74 @@ components:
           description: Email address of the customer.
           example: super@mar.io
       description: Customer information for the order.
+    DiscountDTO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: "Code of discount in the merchant platform, if any."
+        external_id:
+          type: string
+          description: ID of discount in the merchant platform.
+        type:
+          type: string
+          description: Type of discount. Currently only `CODE` is supported.
+          enum:
+          - CODE
+          - CUSTOM
+        value_type:
+          type: string
+          description: Value type of discount (AMOUNT or PERCENTAGE)
+          enum:
+          - AMOUNT
+          - PERCENTAGE
+        target_type:
+          type: string
+          description: "Specifies where the discount is applied. This can be at the\
+            \ ORDER, SKU, or SHIPPING level."
+          enum:
+          - ORDER
+          - SKU
+          - SHIPPING
+        amount:
+          type: integer
+          description: "Amount of discount, in fractional currency units (e.g. cents).\
+            \ This field is only applicable if value_type is AMOUNT."
+          format: int32
+        percentage:
+          type: number
+          description: Percentage of discount. This field is only applicable if value_type
+            is PERCENTAGE.
+          format: double
+        amount_total:
+          type: integer
+          description: Total amount of discount applied to bag in fractional currency
+            units (e.g. cents).
+          format: int32
+        status:
+          type: string
+          description: "Status of discount. This can be one of: PENDING, APPLIED,\
+            \ INVALID, NOT_SUPPORTED, ERROR, or EXPIRED."
+          enum:
+          - PENDING
+          - APPLIED
+          - INVALID
+          - NOT_SUPPORTED
+          - ERROR
+          - EXPIRED
+        sku_id:
+          type: integer
+          description: ID of the SKU this discount belongs to if target_type is SKU
+          format: int64
+        email:
+          type: string
+          description: "Customer email address, possibly necessary for once-per-customer\
+            \ discounts."
+        merchant_id:
+          type: integer
+          description: "Merchant ID this discount belongs to, if applicable."
+          format: int32
+      description: List of discounts to apply to the bag
     EmailCommunicationRequestPreferencesDTO:
       type: object
       properties:
@@ -9750,8 +9862,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -9761,6 +9871,8 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        externalId:
+          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
