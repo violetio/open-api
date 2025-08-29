@@ -2881,6 +2881,10 @@ components:
           type: string
           description: Name of the merchant the Bag is related to.
           readOnly: true
+        data:
+          $ref: '#/components/schemas/data'
+        communication_preferences:
+          $ref: '#/components/schemas/communication_preferences'
       description: Per Merchant Bag in Order
     BagDiscount:
       type: object
@@ -4047,6 +4051,14 @@ components:
       properties:
         email_preferences:
           $ref: '#/components/schemas/email_preferences'
+      description: Communication preferences requested and resultant states for this
+        Bag.
+    data:
+      type: object
+      properties:
+        communication_preferences:
+          $ref: '#/components/schemas/communication_preferences'
+      description: Container for bag-related data stored in JSON format
     email_preferences:
       type: object
       properties:
