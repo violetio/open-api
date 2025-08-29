@@ -2861,6 +2861,8 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
@@ -2879,8 +2881,6 @@ components:
           type: string
           description: Name of the merchant the Bag is related to.
           readOnly: true
-        communication_preferences:
-          $ref: '#/components/schemas/communication_preferences'
       description: Per Merchant Bag in Order
     BagDiscount:
       type: object
@@ -2913,6 +2913,7 @@ components:
           description: Type of discount
           enum:
           - CODE
+          - CUSTOM
         value_type:
           type: string
           description: Value type of discount
@@ -3297,9 +3298,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        first_name:
-          type: string
         last_name:
+          type: string
+        first_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
@@ -3685,6 +3686,8 @@ components:
             \ or duties."
           items:
             $ref: '#/components/schemas/OrderSkuRate'
+        discount:
+          $ref: '#/components/schemas/SkuDiscount'
         line_price:
           type: integer
           description: "Price of the Sku multiplied by the quantity, in Cents"
@@ -3988,6 +3991,35 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
+    SkuDiscount:
+      type: object
+      properties:
+        sku_id:
+          type: integer
+          description: ID of the SKU this discount belongs to
+          format: int64
+        type:
+          type: string
+          description: Type of discount
+          enum:
+          - CODE
+          - CUSTOM
+        amount:
+          type: integer
+          description: Amount of discount
+          format: int32
+        percentage:
+          type: number
+          description: Percentage of discount
+          format: double
+        value_type:
+          type: string
+          description: Value Type of discount
+          enum:
+          - AMOUNT
+          - PERCENTAGE
+      description: "Discount that should be applied to this SKU, if any. Only `CUSTOM`\
+        \ discounts can be passed to be applied at the SKU-level."
     communication_preference_detail:
       type: object
       properties:
@@ -4015,8 +4047,6 @@ components:
       properties:
         email_preferences:
           $ref: '#/components/schemas/email_preferences'
-      description: Communication preferences requested and resultant states for this
-        Bag.
     email_preferences:
       type: object
       properties:
