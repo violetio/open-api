@@ -2861,11 +2861,11 @@ components:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_status:
           type: string
           enum:
@@ -3302,9 +3302,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
