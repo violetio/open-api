@@ -503,6 +503,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -518,8 +520,6 @@ components:
         numberOfElements:
           type: integer
           format: int32
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
