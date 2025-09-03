@@ -1134,13 +1134,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     Pageable:
@@ -1496,13 +1496,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     SearchTransfersReversalsRequest:
@@ -1643,13 +1643,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     AdvancedSearchRequest:
@@ -1884,13 +1884,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     PagePayoutTransfer:
@@ -1916,13 +1916,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     SearchTransfersRequest:
@@ -2021,13 +2021,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     PaymentTransaction:
