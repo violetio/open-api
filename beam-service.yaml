@@ -1,0 +1,15 @@
+openapi: 3.0.1
+info:
+  title: Beam-Service
+  description: Beam Service API
+  contact:
+    name: Violet.io
+    url: https://violet.io
+  version: v1
+servers:
+- url: https://sandbox-api.violet.io/v1
+tags:
+- name: Beam
+- name: Channel Management
+- name: Platform Auth
+- name: Webhooks
