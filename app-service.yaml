@@ -517,11 +517,11 @@ components:
           $ref: '#/components/schemas/Sort'
         first:
           type: boolean
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -537,9 +537,9 @@ components:
         pageNumber:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
         paged:
+          type: boolean
+        unpaged:
           type: boolean
         pageSize:
           type: integer
@@ -549,7 +549,7 @@ components:
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
