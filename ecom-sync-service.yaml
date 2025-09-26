@@ -2592,6 +2592,22 @@ components:
       - order_id
       type: object
       properties:
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
+        bag_id:
+          type: integer
+          format: int64
+        bag_status:
+          type: string
+          enum:
+          - IN_PROGRESS
+          - SUBMITTED
+          - ACCEPTED
+          - COMPLETED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REJECTED
+          - CANCELED
         id:
           type: integer
           description: Unique ID of the Bag.
@@ -2605,6 +2621,10 @@ components:
           type: integer
           description: ID of the merchant the Bag is related to.
           format: int32
+        merchant_name:
+          type: string
+          description: Name of the merchant the Bag is related to.
+          readOnly: true
         app_id:
           type: integer
           description: ID of the App responsible for the creation and submission of
@@ -2857,32 +2877,12 @@ components:
           type: boolean
           description: Is this Bag going to be placed through wallet-based checkout.
           default: false
+        data:
+          $ref: '#/components/schemas/data'
         app_name:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
-        bag_status:
-          type: string
-          enum:
-          - IN_PROGRESS
-          - SUBMITTED
-          - ACCEPTED
-          - COMPLETED
-          - PARTIALLY_REFUNDED
-          - REFUNDED
-          - REJECTED
-          - CANCELED
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
-        bag_id:
-          type: integer
-          format: int64
-        merchant_name:
-          type: string
-          description: Name of the merchant the Bag is related to.
-          readOnly: true
-        data:
-          $ref: '#/components/schemas/data'
         communication_preferences:
           $ref: '#/components/schemas/communication_preferences'
       description: Per Merchant Bag in Order
@@ -3235,9 +3235,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -3254,6 +3251,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
