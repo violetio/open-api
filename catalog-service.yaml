@@ -2781,6 +2781,16 @@ components:
         sort_direction:
           type: string
           description: Direction to sort by
+        date_last_modified:min:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include offers modified after this date.
+          format: date-time
+        date_last_modified:max:
+          pattern: yyyy-MM-dd'T'HH:mm:ssZ
+          type: string
+          description: Only include offers modified before this date.
+          format: date-time
       description: Offer Search Request
     VioletPageLong:
       type: object
