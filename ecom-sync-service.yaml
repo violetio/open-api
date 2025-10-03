@@ -1254,6 +1254,7 @@ components:
           - BIGCARTEL
           - RITHUM
           - SHOPRENTER
+          - MANUAL
         seller:
           type: string
           description: Name of the merchant selling product.
@@ -2857,6 +2858,7 @@ components:
           - BIGCARTEL
           - RITHUM
           - SHOPRENTER
+          - MANUAL
         fulfillments:
           uniqueItems: true
           type: array
@@ -3453,6 +3455,7 @@ components:
           - BIGCARTEL
           - RITHUM
           - SHOPRENTER
+          - MANUAL
       description: Order Error
       nullable: true
     OrderPaymentMethod:
