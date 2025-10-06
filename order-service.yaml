@@ -6431,6 +6431,7 @@ components:
           - BIGCARTEL
           - RITHUM
           - SHOPRENTER
+          - MANUAL
         fulfillments:
           uniqueItems: true
           type: array
@@ -7027,6 +7028,7 @@ components:
           - BIGCARTEL
           - RITHUM
           - SHOPRENTER
+          - MANUAL
       description: Order Error
       nullable: true
     OrderPaymentMethod:
@@ -7884,6 +7886,11 @@ components:
           type: string
           description: The ID of the shipping method in the external commerce platform.
           readOnly: true
+        description:
+          type: string
+          description: "The description of the shipping method, when provided by the\
+            \ merchant."
+          readOnly: true
       description: Calculated Cart Shipping Method
       readOnly: true
     CalculatedCartSku:
@@ -8003,6 +8010,7 @@ components:
           - BIGCARTEL
           - RITHUM
           - SHOPRENTER
+          - MANUAL
         base_currency:
           maxLength: 3
           minLength: 3
