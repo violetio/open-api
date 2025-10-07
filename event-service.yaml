@@ -1088,7 +1088,6 @@ components:
           - ORDER_RETURNED
           - MERCHANT_CONNECTED
           - MERCHANT_DISCONNECTED
-          - OFFER_CREATED
           - OFFER_UPDATED
           - OFFER_REMOVED
           - PRODUCT_SYNC_STARTED
@@ -1226,7 +1225,6 @@ components:
             - ORDER_RETURNED
             - MERCHANT_CONNECTED
             - MERCHANT_DISCONNECTED
-            - OFFER_CREATED
             - OFFER_UPDATED
             - OFFER_REMOVED
             - PRODUCT_SYNC_STARTED
@@ -1344,7 +1342,6 @@ components:
           - ORDER_RETURNED
           - MERCHANT_CONNECTED
           - MERCHANT_DISCONNECTED
-          - OFFER_CREATED
           - OFFER_UPDATED
           - OFFER_REMOVED
           - PRODUCT_SYNC_STARTED
