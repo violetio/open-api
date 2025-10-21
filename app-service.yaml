@@ -534,13 +534,13 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
-        pageNumber:
-          type: integer
-          format: int32
         paged:
           type: boolean
         unpaged:
           type: boolean
+        pageNumber:
+          type: integer
+          format: int32
         pageSize:
           type: integer
           format: int32
