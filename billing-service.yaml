@@ -1150,13 +1150,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         first:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
         last:
           type: boolean
         empty:
@@ -1173,10 +1173,10 @@ components:
           type: boolean
         unpaged:
           type: boolean
-        pageNumber:
+        pageSize:
           type: integer
           format: int32
-        pageSize:
+        pageNumber:
           type: integer
           format: int32
     Sort:
@@ -1512,13 +1512,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         first:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
         last:
           type: boolean
         empty:
@@ -1659,13 +1659,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         first:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
         last:
           type: boolean
         empty:
@@ -1900,13 +1900,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         first:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
         last:
           type: boolean
         empty:
@@ -1932,13 +1932,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         first:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
         last:
           type: boolean
         empty:
@@ -2037,13 +2037,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        numberOfElements:
-          type: integer
-          format: int32
         first:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
         last:
           type: boolean
         empty:
