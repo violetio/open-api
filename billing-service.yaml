@@ -1018,6 +1018,24 @@ components:
             \ applied to the Bag in the base currency. In fractional currency unit\
             \ (e.g. cents)."
           format: int32
+        gross_subtotal:
+          type: integer
+          description: "The bag subtotal before commission deduction (GROSS amount).\
+            \ For orders where commission is pre-deducted, this represents the original\
+            \ shopper-paid amount. In fractional currency unit (e.g. cents)."
+          format: int32
+        gross_total:
+          type: integer
+          description: "The bag total before commission deduction (GROSS amount).\
+            \ For orders where commission is pre-deducted, this represents the original\
+            \ shopper-paid amount. In fractional currency unit (e.g. cents)."
+          format: int32
+        totals_include_commission:
+          type: boolean
+          description: "Whether the bag totals include commission. If true (default),\
+            \ bag totals are GROSS basis and commission is calculated from them. If\
+            \ false, bag totals are NET basis (commission already deducted) and GROSS\
+            \ amounts are calculated backwards."
         external_order_id:
           type: string
           description: Unique identifier of the Order in the external ecommerce platform
@@ -1132,11 +1150,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
@@ -1294,6 +1312,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -1303,8 +1323,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
@@ -1494,11 +1512,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
@@ -1641,11 +1659,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
@@ -1840,6 +1858,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -1849,8 +1869,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
         merchant_name:
           type: string
           description: Name of the merchant associated with this Transfer from the
@@ -1882,11 +1900,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
@@ -1914,11 +1932,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
@@ -2019,11 +2037,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         last:
