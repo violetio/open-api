@@ -546,7 +546,6 @@ paths:
         in: query
         schema:
           type: string
-          default: USD
       - name: include
         in: query
         description: Comma-separated list of extra data to be included.
