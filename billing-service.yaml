@@ -67,12 +67,170 @@ paths:
           type: integer
           format: int32
       responses:
-        default:
-          description: default response
+        "200":
+          description: Distribution found successfully
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Distribution'
+              examples:
+                GROSS Basis Distribution (Merchant Payment):
+                  description: GROSS Basis Distribution (Merchant Payment)
+                  value:
+                    id: 12345
+                    type: PAYMENT
+                    payout_account_id: 5678
+                    payout_account_type: MERCHANT
+                    currency: USD
+                    net_distribution_amount: 110000
+                    distribution_amount: 110000
+                    tax_amount: 10000
+                    shipping_amount: 10000
+                    commission: -10000
+                    payment_provider_total_fee: 0
+                    payment_provider_volume_fee: 0
+                    payment_provider_fixed_fee: 0
+                    app_id: 10193
+                    app_name: Sample App
+                    merchant_id: 10064
+                    merchant_name: Space Drinks
+                    merchant_commission_rate: 10.0
+                    payment_provider_transaction_id: pi_3PXoWvK29KDiBVld1n7ym4B0
+                    payment_provider: STRIPE
+                    status: SENT
+                    bag_id: 64579
+                    bag_sub_total: 100000
+                    bag_commissionable_amount: 100000
+                    bag_shipping_total: 10000
+                    bag_tax_total: 10000
+                    bag_discount_total: 0
+                    bag_total: 120000
+                    gross_subtotal: 100000
+                    gross_total: 120000
+                    totals_include_commission: true
+                    external_order_id: null
+                    order_id: 54609
+                    order_total: 120000
+                    payout_id: 9876
+                    payout_amount: 110000
+                    date_payout_created: 2024-07-15T18:30:00+0000
+                    date_payout_settled: null
+                    payout_transfer_id: null
+                    refund_id: null
+                    tax_remitter: MERCHANT
+                    date_created: 2024-07-01T18:00:45+0000
+                    date_last_modified: 2024-07-15T18:30:00+0000
+                NET Basis Distribution (Channel Payment):
+                  description: NET Basis Distribution (Channel Payment)
+                  value:
+                    id: 12346
+                    type: PAYMENT
+                    payout_account_id: 1234
+                    payout_account_type: DEVELOPER
+                    currency: USD
+                    net_distribution_amount: 6490
+                    distribution_amount: 10000
+                    tax_amount: 0
+                    shipping_amount: 0
+                    commission: 10000
+                    payment_provider_total_fee: 3510
+                    payment_provider_volume_fee: 3480
+                    payment_provider_fixed_fee: 30
+                    app_id: 10193
+                    app_name: Sample Channel
+                    merchant_id: 10064
+                    merchant_name: Space Drinks
+                    merchant_commission_rate: 10.0
+                    payment_provider_transaction_id: pi_3PXoWvK29KDiBVld1n7ym4B0
+                    payment_provider: STRIPE
+                    status: SENT
+                    bag_id: 64579
+                    bag_sub_total: 100000
+                    bag_commissionable_amount: 100000
+                    bag_shipping_total: 10000
+                    bag_tax_total: 10000
+                    bag_discount_total: 0
+                    bag_total: 120000
+                    gross_subtotal: 100000
+                    gross_total: 120000
+                    totals_include_commission: true
+                    external_order_id: null
+                    order_id: 54609
+                    order_total: 120000
+                    payout_id: 9877
+                    payout_amount: 6490
+                    date_payout_created: 2024-07-15T18:30:00+0000
+                    date_payout_settled: null
+                    payout_transfer_id: null
+                    refund_id: null
+                    tax_remitter: MERCHANT
+                    date_created: 2024-07-01T18:00:45+0000
+                    date_last_modified: 2024-07-15T18:30:00+0000
+                Refund Distribution (Merchant Reversal):
+                  description: Refund Distribution (Merchant Reversal)
+                  value:
+                    id: 12347
+                    type: REFUND
+                    payout_account_id: 5678
+                    payout_account_type: MERCHANT
+                    currency: USD
+                    net_distribution_amount: -55000
+                    distribution_amount: -55000
+                    tax_amount: -5000
+                    shipping_amount: 0
+                    commission: 5000
+                    payment_provider_total_fee: 0
+                    payment_provider_volume_fee: 0
+                    payment_provider_fixed_fee: 0
+                    app_id: 10193
+                    app_name: Sample App
+                    merchant_id: 10064
+                    merchant_name: Space Drinks
+                    merchant_commission_rate: 10.0
+                    payment_provider_transaction_id: re_3PYoWvK29KDiBVld1n8zm5C1
+                    payment_provider: STRIPE
+                    status: PENDING
+                    bag_id: 64579
+                    bag_sub_total: 100000
+                    bag_commissionable_amount: 100000
+                    bag_shipping_total: 10000
+                    bag_tax_total: 10000
+                    bag_discount_total: 0
+                    bag_total: 120000
+                    gross_subtotal: 100000
+                    gross_total: 120000
+                    totals_include_commission: true
+                    external_order_id: null
+                    order_id: 54609
+                    order_total: 120000
+                    payout_id: null
+                    payout_amount: null
+                    date_payout_created: null
+                    date_payout_settled: null
+                    payout_transfer_id: null
+                    refund_id: 7890
+                    refund_discrepancy: null
+                    tax_remitter: MERCHANT
+                    date_created: 2024-07-10T14:20:30+0000
+                    date_last_modified: 2024-07-10T14:20:30+0000
+        "404":
+          description: Distribution not found
+          content:
+            application/json:
+              examples:
+                Distribution Not Found:
+                  description: Distribution Not Found
+                  value:
+                    message: "Distribution with ID {12345} not found"
+        "403":
+          description: Forbidden - Account does not have access to this distribution
+          content:
+            application/json:
+              examples:
+                Access Denied:
+                  description: Access Denied
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
   /payments/{account_type}/{account_id}/distributions:
     get:
       tags:
@@ -1199,13 +1357,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
         last:
           type: boolean
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         empty:
           type: boolean
     Pageable:
@@ -1216,13 +1374,13 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
         unpaged:
           type: boolean
         pageNumber:
           type: integer
           format: int32
-        paged:
-          type: boolean
         pageSize:
           type: integer
           format: int32
@@ -1561,13 +1719,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
         last:
           type: boolean
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         empty:
           type: boolean
     SearchTransfersReversalsRequest:
@@ -1708,13 +1866,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
         last:
           type: boolean
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         empty:
           type: boolean
     AdvancedSearchRequest:
@@ -1949,13 +2107,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
         last:
           type: boolean
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         empty:
           type: boolean
     PagePayoutTransfer:
@@ -1981,13 +2139,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
         last:
           type: boolean
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         empty:
           type: boolean
     SearchTransfersRequest:
@@ -2086,13 +2244,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
         last:
           type: boolean
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         empty:
           type: boolean
     PaymentTransaction:
