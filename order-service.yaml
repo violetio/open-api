@@ -6166,9 +6166,6 @@ components:
       - order_id
       type: object
       properties:
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -6182,6 +6179,9 @@ components:
           - CANCELED
         communicationPreferencesInternal:
           $ref: '#/components/schemas/communication_preferences'
+        bag_id:
+          type: integer
+          format: int64
         id:
           type: integer
           description: Unique ID of the Bag.
