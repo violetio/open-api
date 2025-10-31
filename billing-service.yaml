@@ -1343,8 +1343,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -1357,6 +1355,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -1517,6 +1517,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -1526,8 +1528,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
@@ -1705,8 +1705,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -1719,6 +1717,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -1852,8 +1852,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -1866,6 +1864,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2063,6 +2063,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -2072,8 +2074,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
         merchant_name:
           type: string
           description: Name of the merchant associated with this Transfer from the
@@ -2093,8 +2093,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2107,6 +2105,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2125,8 +2125,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2139,6 +2137,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2230,8 +2230,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2244,6 +2242,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2477,6 +2477,19 @@ components:
               response. The total pending transfer amount equals the sum of all related
               pending distributions.
             format: int32
+        merchant_name:
+          type: string
+          description: Name of the merchant associated with this pending transfer.
+        distribution_count:
+          type: integer
+          description: Total number of distributions being settled in this pending
+            transfer. This count matches the size of related_distributions.
+          format: int32
+        payout_account_id:
+          type: integer
+          description: Violet Payout Account ID for this merchant and the requesting
+            app. This is the payout account that should receive the transfer.
+          format: int32
     ErrorDetails:
       type: object
       properties:
