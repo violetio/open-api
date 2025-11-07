@@ -798,6 +798,16 @@ components:
       properties:
         availabilityRules:
           $ref: '#/components/schemas/AvailabilityRules'
+        enforce_draft_as_available:
+          type: boolean
+          description: "If true, then a draft product will be considered as available."
+          default: false
+        bypass_inventory_policy:
+          type: boolean
+          description: "If true, then inventory policy's and availability will be\
+            \ ignored. If products are purchasable they will be considered in stock\
+            \ and available."
+          default: false
       description: Configurations for the merchants availability behaviors.
     AvailabilityRule:
       type: object
@@ -860,6 +870,30 @@ components:
             type: string
             description: A set of Alpha-2 country codes where the shipping method
               cannot be applied.
+            nullable: true
+        applicable_offer_ids:
+          uniqueItems: true
+          type: array
+          description: A set of Offer ID's that this shipping method is applicable
+            to.
+          nullable: true
+          items:
+            type: integer
+            description: A set of Offer ID's that this shipping method is applicable
+              to.
+            format: int64
+            nullable: true
+        inapplicable_offer_ids:
+          uniqueItems: true
+          type: array
+          description: A set of Offer ID's that this shipping method is not applicable
+            to.
+          nullable: true
+          items:
+            type: integer
+            description: A set of Offer ID's that this shipping method is not applicable
+              to.
+            format: int64
             nullable: true
         min_order_amount:
           type: integer
@@ -1013,6 +1047,9 @@ components:
         label:
           type: string
           description: The name of the shipping method.
+        description:
+          type: string
+          description: Description of the shipping method.
         price:
           type: integer
           description: The price of the shipping method in cents.
