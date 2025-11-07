@@ -10,13 +10,13 @@ servers:
 - url: https://sandbox-api.violet.io/v1
 tags:
 - name: Payments - Addresses
+- name: Payments - Distributions
 - name: Payments - Payment Capture
 - name: Payments - Payment Integration Health
 - name: Payments - Payout Accounts
 - name: Payments - Payout Methods
 - name: Payments - Transfers
 - name: Payments - Payouts
-- name: Payments - Distributions
 - name: Payments - Payment Transactions
 - name: Payments - Payment Transfers
 - name: Payments - Payout Account Migrations
@@ -1085,11 +1085,12 @@ components:
           format: int32
         type:
           type: string
-          description: "Type of this Distribution record. Can be either {PAYMENT}\
-            \ or {REFUND}."
+          description: "Type of this Distribution record. Can be {PAYMENT}, {REFUND},\
+            \ or {ADJUSTMENT}."
           enum:
           - PAYMENT
           - REFUND
+          - ADJUSTMENT
         payout_account_id:
           type: integer
           description: Unique identifier of the Violet Payout Account that this Distribution
@@ -1287,6 +1288,11 @@ components:
           description: "Unique identifier of the Refund associated with this Distribution,\
             \ if any."
           format: int64
+        adjustment_id:
+          type: integer
+          description: "Unique identifier of the BagAdjustment associated with this\
+            \ Distribution, if any."
+          format: int64
         refund_discrepancy:
           type: integer
           description: "Discrepancy amount, if any, associated with this Refund. In\
@@ -1389,9 +1395,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PayoutTransfer:
       type: object
