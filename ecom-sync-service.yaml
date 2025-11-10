@@ -3578,30 +3578,6 @@ components:
           type: integer
           description: Unique ID of the Sku in relation to the order.
           format: int64
-        offer_id:
-          type: integer
-          description: ID of the parent Offer that this Sku is a child of.
-          format: int64
-        merchant_id:
-          type: integer
-          description: ID of the Merchant this Sku belongs to.
-          format: int32
-        app_id:
-          type: integer
-          description: ID of the App responsible for the creation and submission of
-            this Order.
-          format: int32
-        product_id:
-          type: string
-          description: ID of the parent product the offer is a child off.
-          deprecated: true
-        sku_id:
-          type: integer
-          description: ID of the referenced Sku from the Violet catalog.
-          format: int64
-        external_id:
-          type: string
-          description: ID of the SKU on the external commerce platform.
         name:
           type: string
           description: "Name of the Sku, as provided by the merchant."
@@ -3662,6 +3638,41 @@ components:
           - ERROR
           - PARTIALLY_RETURNED
           - PARTIALLY_REFUNDED
+        custom:
+          type: boolean
+          description: Is the Sku custom. Is `true` when the price has been overridden.
+        rates:
+          type: array
+          description: "Rates that apply specifically to this Sku such as taxes, fees,\
+            \ or duties."
+          items:
+            $ref: '#/components/schemas/OrderSkuRate'
+        discount:
+          $ref: '#/components/schemas/SkuDiscount'
+        offer_id:
+          type: integer
+          description: ID of the parent Offer that this Sku is a child of.
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the Merchant this Sku belongs to.
+          format: int32
+        app_id:
+          type: integer
+          description: ID of the App responsible for the creation and submission of
+            this Order.
+          format: int32
+        product_id:
+          type: string
+          description: ID of the parent product the offer is a child off.
+          deprecated: true
+        sku_id:
+          type: integer
+          description: ID of the referenced Sku from the Violet catalog.
+          format: int64
+        external_id:
+          type: string
+          description: ID of the SKU on the external commerce platform.
         product_type:
           type: string
           description: Product type that describes the Sku.
@@ -3670,9 +3681,6 @@ components:
           - DIGITAL
           - VIRTUAL
           - BUNDLED
-        custom:
-          type: boolean
-          description: Is the Sku custom. Is `true` when the price has been overridden.
         custom_properties:
           type: array
           description: Used to provide the merchant with custom values for the product.
@@ -3683,21 +3691,13 @@ components:
             value: Happy Birthday!
           items:
             $ref: '#/components/schemas/OrderSkuCustomProperty'
-        quantity_fulfilled:
-          type: integer
-          description: The quantity of this item that has been fulfilled by the merchant.
-          format: int32
-        rates:
-          type: array
-          description: "Rates that apply specifically to this Sku such as taxes, fees,\
-            \ or duties."
-          items:
-            $ref: '#/components/schemas/OrderSkuRate'
-        discount:
-          $ref: '#/components/schemas/SkuDiscount'
         line_price:
           type: integer
           description: "Price of the Sku multiplied by the quantity, in Cents"
+          format: int32
+        quantity_fulfilled:
+          type: integer
+          description: The quantity of this item that has been fulfilled by the merchant.
           format: int32
       description: SKUs belonging to an Order
     OrderSkuCustomProperty:
