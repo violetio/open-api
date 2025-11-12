@@ -1684,6 +1684,7 @@ paths:
                     country: US
                     postal_code: "98121"
                     phone: "1234567890"
+        required: true
       responses:
         "200":
           description: success
@@ -2758,6 +2759,7 @@ paths:
                   country: US
                   postal_code: '10282'
                 currency: USD
+        required: true
       responses:
         "200":
           description: successful operation
@@ -3324,6 +3326,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CalculateCartRequest'
+        required: true
       responses:
         "200":
           description: success
