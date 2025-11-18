@@ -2726,39 +2726,342 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateOrderRequest'
-            example:
-              payment_method:
-                type: SINGLE_USE_CARD_TOKEN
-                payment_provider: STRIPE
-                token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
-              order:
-                app_order_id: mario-test-1
-                customer:
-                  first_name: Ultra
-                  last_name: Violet
-                  email: super@mar.io
-                bags:
-                  - skus:
+            examples:
+              Basic Direct Order:
+                description: Basic Direct Order
+                value: |
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: mario-test-1
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: super@mar.io
+                    bags:
+                      - skus:
+                          - sku_id: 80455
+                            price: 100000
+                        shipping_method:
+                          label: Teleportation
+                          price: 10000
+                        tax_total: 10000
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: '98121'
+                    billing_address:
+                      address_1: 200 West Street
+                      city: New York
+                      state: NY
+                      country: US
+                      postal_code: '10282'
+                    currency: USD
+              Line Item Tax - Rate Based:
+                description: Direct Order Submission with line item taxes using rate-based
+                  approach
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: order-with-tax-rate-001
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
                       - sku_id: 80455
                         price: 100000
-                    shipping_method:
-                      label: Teleportation
-                      price: 10000
-                    tax_total: 10000
-                shipping_address:
-                  address_1: 2815 Elliott Ave
-                  address_2: Unit 100
-                  city: Seattle
-                  state: WA
-                  country: US
-                  postal_code: '98121'
-                billing_address:
-                  address_1: 200 West Street
-                  city: New York
-                  state: NY
-                  country: US
-                  postal_code: '10282'
-                currency: USD
+                        rates:
+                        - name: WA Sales Tax
+                          type: TAX
+                          rate: 10.0
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 10000
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
+              Line Item Tax - Amount Based:
+                description: Direct Order Submission with line item taxes using amount-based
+                  approach
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: order-with-tax-amount-002
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                        rates:
+                        - name: WA Sales Tax
+                          type: TAX
+                          amount: 10000
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 10000
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
+              Line Item Tax - Combined:
+                description: Direct Order Submission with line item taxes using combined
+                  rate and amount
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: order-with-tax-combined-003
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                        rates:
+                        - name: WA Sales Tax
+                          type: TAX
+                          rate: 10.0
+                          amount: 10000
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 10000
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
+              Custom Discount - Order Level:
+                description: Direct Order Submission with custom discount applied
+                  at ORDER level (15% off entire order)
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: order-with-order-discount-004
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 10000
+                      discounts:
+                      - merchant_id: 11111
+                        type: CUSTOM
+                        target_type: ORDER
+                        percentage: 15.0
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
+              Custom Discount - SKU Level:
+                description: Direct Order Submission with custom discount applied
+                  at SKU level ($50 off specific item)
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: order-with-sku-discount-005
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 10000
+                      discounts:
+                      - merchant_id: 11111
+                        type: CUSTOM
+                        target_type: SKU
+                        sku_id: 80455
+                        amount: 5000
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
+              Custom Discount - Shipping Level:
+                description: Direct Order Submission with custom discount applied
+                  at SHIPPING level (free shipping)
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: order-with-shipping-discount-006
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 10000
+                      discounts:
+                      - merchant_id: 11111
+                        type: CUSTOM
+                        target_type: SHIPPING
+                        percentage: 100.0
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
+              Payment Intent:
+                description: Direct Order Submission using pre-authorized Stripe Payment
+                  Intent (requires manual capture)
+                value:
+                  payment_method:
+                    type: PAYMENT_INTENT
+                    payment_provider: STRIPE
+                    token: pi_3PXoWvK29KDiBVld1n7ym4B0
+                  order:
+                    app_order_id: order-with-payment-intent-008
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                        rates:
+                        - name: WA Sales Tax
+                          type: TAX
+                          amount: 10000
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 10000
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
+              Comprehensive DOS Example:
+                description: "Complete Direct Order Submission example with multiple\
+                  \ line item taxes, multiple custom discounts, and all optional fields"
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: comprehensive-dos-order-007
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                        quantity: 2
+                        rates:
+                        - name: WA State Sales Tax
+                          type: TAX
+                          rate: 6.5
+                          amount: 13000
+                        - name: WA Local Sales Tax
+                          type: TAX
+                          rate: 3.5
+                          amount: 7000
+                      shipping_method:
+                        carrier: USPS
+                        label: Priority Mail
+                        price: 10000
+                      tax_total: 20000
+                      discounts:
+                      - merchant_id: 11111
+                        type: CUSTOM
+                        target_type: ORDER
+                        percentage: 10.0
+                      - merchant_id: 11111
+                        type: CUSTOM
+                        target_type: SHIPPING
+                        amount: 5000
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                      phone: "2065551234"
+                    billing_address:
+                      address_1: 200 West Street
+                      city: New York
+                      state: NY
+                      country: US
+                      postal_code: "10282"
+                    currency: USD
         required: true
       responses:
         "200":
@@ -6813,9 +7116,6 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -6832,6 +7132,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
