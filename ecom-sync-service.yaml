@@ -3868,6 +3868,7 @@ components:
           - AUTHORIZED
           - REFUNDED
           - PARTIALLY_REFUNDED
+          - NOT_REQUIRED
         capture_method:
           type: string
           description: Underlying status of the payment in the payment provider system
@@ -3960,6 +3961,7 @@ components:
           - AUTHORIZED
           - REFUNDED
           - PARTIALLY_REFUNDED
+          - NOT_REQUIRED
       description: Payment Transaction
     PaymentTransactionError:
       required:
