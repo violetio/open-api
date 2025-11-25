@@ -1343,12 +1343,12 @@ components:
     PageDistribution:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         size:
           type: integer
           format: int32
@@ -1705,12 +1705,12 @@ components:
     PageTransferReversal:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         size:
           type: integer
           format: int32
@@ -1852,12 +1852,12 @@ components:
     PageMerchant Transfer Reversal:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         size:
           type: integer
           format: int32
@@ -2093,12 +2093,12 @@ components:
     PageMerchantTransfer:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         size:
           type: integer
           format: int32
@@ -2125,12 +2125,12 @@ components:
     PagePayoutTransfer:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         size:
           type: integer
           format: int32
@@ -2230,12 +2230,12 @@ components:
     PagePaymentTransaction:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         size:
           type: integer
           format: int32
@@ -2325,6 +2325,7 @@ components:
           - AUTHORIZED
           - REFUNDED
           - PARTIALLY_REFUNDED
+          - NOT_REQUIRED
         capture_method:
           type: string
           description: Underlying status of the payment in the payment provider system
@@ -2417,6 +2418,7 @@ components:
           - AUTHORIZED
           - REFUNDED
           - PARTIALLY_REFUNDED
+          - NOT_REQUIRED
       description: Payment Transaction
     PaymentTransactionError:
       required:
