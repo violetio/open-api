@@ -3891,6 +3891,7 @@ components:
           - FAILED
           - BYPASSED
           - PARTIALLY_SENT
+          - QUEUED
         transfer_method:
           type: string
           description: Underlying status of the payment in the payment provider system
