@@ -1081,6 +1081,7 @@ components:
           - APPLICATION_SUBMITTED
           - APPLICATION_DENIED
           - APPLICATION_ACCEPTED
+          - PENDING
         platform:
           type: string
           description: The eCommerce platform this merchant uses
@@ -1127,6 +1128,7 @@ components:
           - BIGCARTEL
           - RITHUM
           - SHOPRENTER
+          - MANUAL
         store_url:
           type: string
           description: The URL Of the Store
@@ -1787,6 +1789,7 @@ components:
             - BIGCARTEL
             - RITHUM
             - SHOPRENTER
+            - MANUAL
         status:
           type: string
           description: Filter by ConnectionHealth Status
