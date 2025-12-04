@@ -6472,8 +6472,9 @@ components:
       - order_id
       type: object
       properties:
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -6485,9 +6486,8 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        bag_id:
-          type: integer
-          format: int64
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         id:
           type: integer
           description: Unique ID of the Bag.
@@ -7770,6 +7770,7 @@ components:
           - FAILED
           - BYPASSED
           - PARTIALLY_SENT
+          - QUEUED
         transfer_method:
           type: string
           description: Underlying status of the payment in the payment provider system
@@ -10135,6 +10136,7 @@ components:
           - FAILED
           - BYPASSED
           - PARTIALLY_SENT
+          - QUEUED
         type:
           type: string
           description: Account type of the Transfer recipient.
@@ -10192,6 +10194,15 @@ components:
           type: string
           description: Unique key to prevent duplicate transfers. This is generated
             by the Violet and unique for each transfer being processed.
+        transfer_mechanism:
+          type: string
+          description: "Mechanism used to execute this transfer. STANDARD_TRANSFERS\
+            \ uses /v1/transfers API, DESTINATION_PAYMENTS uses Payment Intent with\
+            \ transfer_data.destination. This is stored at creation time to prevent\
+            \ configuration race conditions."
+          enum:
+          - STANDARD_TRANSFERS
+          - DESTINATION_PAYMENTS
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
