@@ -24,7 +24,7 @@ tags:
 - name: Merchants - Credential
   description: Operations relating to Merchant Credentials
 - name: Merchants - External
-  description: Convenience methods for external merchant management (i.e. createing
+  description: Convenience methods for external merchant management (i.e. creating
     merchants through Violet Connect or ecommerce apps)
 - name: Merchants - App Relationships
   description: Merchant App Relationship Endpoints
@@ -212,6 +212,195 @@ paths:
                   custom_tags:
                   - tag1
                   - tag2
+  /merchants/external/pre-register/{merchant_id}:
+    put:
+      tags:
+      - Merchants - External
+      summary: Update a pre-registration
+      description: Update an existing pre-registration for a merchant.
+      operationId: updatePreRegistration
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreRegistrationRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreRegistrationResponse'
+    delete:
+      tags:
+      - Merchants - External
+      summary: Delete a pre-registration
+      description: Delete an existing pre-registration for a merchant.
+      operationId: deletePreRegistration
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /merchants/external/pre-register:
+    get:
+      tags:
+      - Merchants - External
+      summary: Lookup a pre-registration by store URL
+      description: Find an existing pre-registration by matching store URL.
+      operationId: getPreRegistrationByStoreUrl
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: store_url
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreRegistrationResponse'
+    post:
+      tags:
+      - Merchants - External
+      summary: Pre-register a Shopify merchant
+      description: Pre-register a Shopify merchant with partial credentials before
+        onboarding. This supports Shopify's Developer-based Custom Apps flow where
+        developers must provide partial OAuth credentials and a store URL for each
+        merchant before that merchant can onboard into Violet.
+      operationId: preRegisterMerchant
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreRegistrationRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreRegistrationResponse'
+  /merchants/external/pre-registrations:
+    get:
+      tags:
+      - Merchants - External
+      summary: List all pre-registrations for an app
+      description: Get all pending pre-registrations for the specified app ID.
+      operationId: getPreRegistrations
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PreRegistrationResponse'
   /merchants/app_relationships/{app_id}/tax_remitter/{tax_remitter}:
     put:
       operationId: updateTaxRemitterOnMerchantAppRelationships
@@ -1474,6 +1663,67 @@ components:
           type: boolean
           description: Is the setting enabled.
       description: Request body for toggling the boolean value of a setting.
+    PreRegistrationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the pre-registration
+          format: int64
+        merchant_id:
+          type: integer
+          description: Associated merchant ID
+          format: int32
+        app_id:
+          type: integer
+          description: App ID that registered this merchant
+          format: int32
+        store_url:
+          type: string
+          description: Shopify merchant store URL
+        install_link:
+          type: string
+          description: Shopify app install link
+        status:
+          type: string
+          description: Status of the pre-registration
+          enum:
+          - INACTIVE
+          - ACTIVE
+          - DISABLED
+          - FOR_DELETION
+          - PENDING
+        date_created:
+          type: string
+          description: When the pre-registration was created
+          format: date-time
+        date_last_modified:
+          type: string
+          description: When the pre-registration was last modified
+          format: date-time
+      description: Response containing pre-registration details
+    PreRegistrationRequest:
+      required:
+      - client_id
+      - install_link
+      - secret
+      - store_url
+      type: object
+      properties:
+        install_link:
+          type: string
+          description: Shopify app install link for the merchant
+        store_url:
+          type: string
+          description: Shopify merchant store URL
+        client_id:
+          type: string
+          description: Partial OAuth credential - Client ID from Shopify custom app
+        secret:
+          type: string
+          description: Partial OAuth credential - Client Secret from Shopify custom
+            app
+      description: Request for pre-registering a Shopify merchant with partial credentials
     Merchant:
       required:
       - email
@@ -2009,6 +2259,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2021,15 +2273,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
+        last:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     Pageable:
@@ -2040,16 +2290,16 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
     Sort:
       type: object
       properties:
@@ -2068,6 +2318,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2080,15 +2332,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
+        last:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     OnboardingStep:
