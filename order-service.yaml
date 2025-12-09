@@ -4083,11 +4083,9 @@ paths:
         in: query
         required: true
         schema:
-          uniqueItems: true
           type: array
           items:
-            type: integer
-            format: int64
+            type: string
       responses:
         default:
           description: default response
