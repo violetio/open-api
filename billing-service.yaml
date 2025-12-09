@@ -1350,6 +1350,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1362,8 +1364,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -1704,6 +1704,10 @@ components:
           type: integer
           description: ID of the payout associated to this Distribution.
           format: int32
+        payout_transfer_id:
+          type: integer
+          description: ID of the payout transfer associated to this Distribution.
+          format: int64
         before_date:
           type: string
           description: Before date
@@ -1722,6 +1726,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1734,8 +1740,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -1869,6 +1873,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -1881,8 +1887,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2120,6 +2124,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2132,8 +2138,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2152,6 +2156,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2164,8 +2170,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2258,6 +2262,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2270,8 +2276,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
