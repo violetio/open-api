@@ -4056,6 +4056,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Refund'
+  /orders/bags:
+    get:
+      tags:
+      - Order
+      summary: Get Bags by IDs
+      operationId: getBagsByIds
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: ids
+        in: query
+        required: true
+        schema:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bag'
   /orders/{order_id}:
     get:
       tags:
