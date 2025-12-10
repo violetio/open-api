@@ -9,6 +9,8 @@ info:
 servers:
 - url: https://sandbox-api.violet.io/v1
 tags:
+- name: Admin
+  description: Admin-only operations
 - name: Checkout - Cart
 - name: Checkout - Items
 - name: Checkout - Discounts
@@ -22,6 +24,114 @@ tags:
 - name: Checkout - Order Transfers
 - name: Checkout - Bag Transfers
 paths:
+  /admin/bags/search:
+    post:
+      tags:
+      - Admin
+      summary: Admin Search Bags
+      description: Admin-only endpoint for searching bags with flexible filtering
+        options
+      operationId: searchBags
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      requestBody:
+        description: Admin bag search request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminBagSearchRequest'
+      responses:
+        "200":
+          description: Successfully retrieved bags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageBag'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
+  /admin/orders/search:
+    post:
+      tags:
+      - Admin
+      summary: Admin Search Orders
+      description: Admin-only endpoint for searching orders with flexible filtering
+        options
+      operationId: searchOrders
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      requestBody:
+        description: Admin order search request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminOrderSearchRequest'
+      responses:
+        "200":
+          description: Successfully retrieved orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageOrder'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
   /checkout/cart/{cart_id}/discounts:
     post:
       tags:
@@ -5379,7 +5489,7 @@ paths:
       tags:
       - Orders
       summary: Search Bags
-      operationId: searchBags
+      operationId: searchBags_1
       parameters:
       - name: X-Violet-Token
         in: header
@@ -5436,7 +5546,7 @@ paths:
       tags:
       - Orders
       summary: Search Orders
-      operationId: searchOrders
+      operationId: searchOrders_1
       parameters:
       - name: X-Violet-Token
         in: header
@@ -6511,9 +6621,8 @@ components:
       - order_id
       type: object
       properties:
-        bag_id:
-          type: integer
-          format: int64
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_status:
           type: string
           enum:
@@ -6525,8 +6634,9 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
+        bag_id:
+          type: integer
+          format: int64
         id:
           type: integer
           description: Unique ID of the Bag.
@@ -6979,434 +7089,6 @@ components:
           description: Quantity of the this item fulfilled by this fulfillment.
           format: int32
       description: A bag fulfillment sku
-    Order:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: ID of the Violet cart or order.
-          format: int64
-          readOnly: true
-        token:
-          type: string
-          description: An alternative UUID that can be used as an ID to reference
-            the cart or order.
-          readOnly: true
-          deprecated: true
-        errors:
-          type: array
-          description: "Errors on the Order. During checkout, if there was an error\
-            \ or issue on one of the order's bags, there will be an error added to\
-            \ this list describing the issue. The checkout API will return 200 with\
-            \ the order object in the response even if there was an issue with a bag\
-            \ so you must always check the response for errors in this list to know\
-            \ if there was an issue on the order."
-          nullable: true
-          items:
-            $ref: '#/components/schemas/OrderError'
-        user_id:
-          type: integer
-          description: ID of the User placing the order
-          format: int64
-          deprecated: true
-        app_id:
-          type: integer
-          description: ID of the App responsible for the creation and submission of
-            this Order.
-          format: int32
-        developer_id:
-          type: integer
-          description: ID of the Developer responsible for the creation and submission
-            of this Order.
-          format: int32
-        customer:
-          $ref: '#/components/schemas/OrderCustomer'
-        bags:
-          type: array
-          description: "One or more Bags that make up the Order. Each Bag will contain\
-            \ the Sku's, shipping methods, and totals unique to a merchant. Each merchant\
-            \ in an Order will have their own Bag."
-          items:
-            $ref: '#/components/schemas/Bag'
-        shipping_address:
-          $ref: '#/components/schemas/OrderAddress'
-        billing_address:
-          $ref: '#/components/schemas/OrderAddress'
-        payment_method:
-          $ref: '#/components/schemas/OrderPaymentMethod'
-        sub_total:
-          type: integer
-          description: "The price of the Order in the base currency before discounts,\
-            \ shipping, duties, taxes, and tips. In Cents."
-          format: int32
-          default: 0
-        shipping_total:
-          type: integer
-          description: The sum of all shipping methods applied to the Order in the
-            base currency. In Cents.
-          format: int32
-          default: 0
-        tax_total:
-          type: integer
-          description: The sum of all the taxes applied to the Order in the base currency.
-            In Cents.
-          format: int32
-          default: 0
-        discount_total:
-          type: integer
-          description: The total discounts applied to the price of the Order in the
-            base currency. In Cents.
-          format: int32
-          default: 0
-        total:
-          type: integer
-          description: "The sum of all item prices, discounts, shipping, and taxes\
-            \ applied to the Order in the base currency. In Cents."
-          format: int32
-          default: 0
-        app_customer_id:
-          type: string
-          description: App Customer ID. This should be used to map the order to the
-            ID of the customer in your application.
-          nullable: true
-        app_order_id:
-          type: string
-          description: "App Order ID. This should be set to a unique identifier in\
-            \ your system. While not enforced unique in Violet's system, it is strongly\
-            \ recommended that unique values are used for each cart to help correlate\
-            \ identifiers between Violet's system and yours."
-          nullable: true
-        status:
-          type: string
-          description: Status of the Order
-          readOnly: true
-          enum:
-          - IN_PROGRESS
-          - PROCESSING
-          - COMPLETED
-          - CANCELED
-          - PARTIALLY_REFUNDED
-          - REFUNDED
-          - REQUIRES_ACTION
-        is_guest:
-          type: boolean
-          description: Order is Guest
-          readOnly: true
-          default: true
-        date_created:
-          type: string
-          description: Date of order creation
-          format: date-time
-          readOnly: true
-        date_last_modified:
-          type: string
-          description: "Indicates when the order was last modified. This timestamp\
-            \ is updated only when a property on the Order entity itself changes.\
-            \ Modifications to related entities (e.g., Bags) will not update this\
-            \ timestamp unless the change also triggers an update to the Order entity."
-          format: date-time
-          readOnly: true
-        date_submitted:
-          maxLength: 24
-          type: string
-          description: Date the Order was last submitted in Violet. This value is
-            captured immediately after the Order is successfully validated and before
-            the nested Bag(s) are submitted to the external commerce platforms.
-          format: date-time
-          nullable: true
-          readOnly: true
-        priced:
-          type: boolean
-          description: Is the cart priced
-          readOnly: true
-          default: false
-        wallet_based_checkout:
-          type: boolean
-          description: Is this cart going to be placed through wallet-based checkout
-          default: false
-        currency:
-          type: string
-          description: Base currency of cart
-          default: USD
-        referral_id:
-          type: string
-          description: Optional value used to represent an identifier in your system.
-            This value is not required to represent a referral. It can represent the
-            ID of anything in your system and can be used to filter order lookup results.
-            Max length of 128 characters.
-          nullable: true
-        currency_symbol:
-          type: string
-          description: Symbol representing the currency the Order operates in.
-        app_name:
-          type: string
-          description: Name of app that originated the order. Use the "extended" query
-            param when looking up orders to include this value.
-        stripe_key:
-          type: string
-          description: Stripe publishable key. Use for tokenizing payment methods.
-        payment_intent_client_secret:
-          type: string
-          description: Payment intent client secret. Use for payment intent based
-            payment capture and external captures
-        payment_transactions:
-          uniqueItems: true
-          type: array
-          description: Payment Transactions associated to the bags on this Cart
-          items:
-            $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
-        guest:
-          type: boolean
-        order_status:
-          type: string
-          enum:
-          - IN_PROGRESS
-          - PROCESSING
-          - COMPLETED
-          - CANCELED
-          - PARTIALLY_REFUNDED
-          - REFUNDED
-          - REQUIRES_ACTION
-        intent_based_checkout:
-          type: boolean
-          description: Boolean indicating if the cart/order will be payed using a
-            payment intent.
-      description: Violet Order Entity
-    OrderAddress:
-      required:
-      - address_1
-      - city
-      - country
-      - postal_code
-      - state
-      - type
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name on Address
-        city:
-          type: string
-          description: City
-        state:
-          type: string
-          description: State or province abbreviated code.
-        country:
-          type: string
-          description: Country ISO2 Code
-        postal_code:
-          type: string
-          description: "Postal or Zip code to be applied to the address. This value\
-            \ is required for all countries that have postal codes. For countries\
-            \ that do not have postal codes, this value is optional."
-        phone:
-          type: string
-          description: "Phone number related to the address. Note: Some external commerce\
-            \ platforms require this value. For these platforms Violet will use a\
-            \ fake number if no value is provided to ensure that the order succeeds."
-        type:
-          type: string
-          description: Address Type
-          enum:
-          - SHIPPING
-          - BILLING
-        email:
-          type: string
-          description: Email Address
-        address_1:
-          type: string
-          description: First line of the Address
-        address_2:
-          type: string
-          description: Second line of the address
-        first_name:
-          type: string
-        last_name:
-          type: string
-      description: The shipping or billing address of a user placing an order
-      nullable: true
-    OrderCustomer:
-      required:
-      - email
-      - first_name
-      - last_name
-      type: object
-      properties:
-        first_name:
-          maxLength: 32
-          type: string
-          description: Customer's first name.
-        last_name:
-          maxLength: 32
-          type: string
-          description: Customer's last name.
-        email:
-          maxLength: 64
-          type: string
-          description: Customer's valid email address.
-        shipping_address:
-          $ref: '#/components/schemas/OrderAddress'
-        billing_address:
-          $ref: '#/components/schemas/OrderAddress'
-        same_address:
-          type: boolean
-          description: "When only one address is provided, should the one address\
-            \ be used for both the shipping and billing addresses."
-          default: false
-        name:
-          type: string
-          description: Full name of the customer.
-          readOnly: true
-      description: Details of the customer placing the order.
-      nullable: true
-    OrderError:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Unique ID of the error.
-          format: int64
-          readOnly: true
-        order_id:
-          type: integer
-          description: ID of the parent Order this error occurred in.
-          format: int64
-        bag_id:
-          type: integer
-          description: ID of the parent Bag this error occurred in.
-          format: int64
-        entity_id:
-          type: string
-          description: ID of the entity that caused the error. See the `entity_type`
-            property to determine which entity this ID is associated with.
-        entity_type:
-          type: string
-          description: Type of entity that caused the error. See the `entity_id` property
-            to determine which entity of this type is related to the error.
-          nullable: true
-          enum:
-          - ORDER
-          - BAG
-          - SKU
-        type:
-          type: string
-          description: "Type of error, indicates which action was being taken when\
-            \ the error occurred."
-          enum:
-          - EXTERNAL_CREATE_CART
-          - EXTERNAL_ADD_ITEM
-          - EXTERNAL_UPDATE_ITEM
-          - EXTERNAL_REMOVE_ITEM
-          - EXTERNAL_ADD_CUSTOMER
-          - EXTERNAL_ADD_ADDRESSES
-          - EXTERNAL_ADD_SHIPPING_ADDRESS
-          - EXTERNAL_ADD_BILLING_ADDRESS
-          - EXTERNAL_GET_SHIPPING_METHODS
-          - EXTERNAL_SET_SHIPPING_METHOD
-          - EXTERNAL_SET_PAYMENT_METHOD
-          - EXTERNAL_PRICE_CART
-          - EXTERNAL_SUBMIT_CART
-          - INTERNAL_ADD_ITEM
-          - EXTERNAL_DELETE_CART
-          - EXTERNAL_CANCEL_ORDER
-          - EXTERNAL_WRITE_ORDER
-          - EXTERNAL_MARK_ORDER_AS_PAID
-          - EXTERNAL_ADD_DISCOUNT_CODE
-          - EXTERNAL_REMOVE_DISCOUNT_CODE
-          - EXTERNAL_DELETE_ORDER
-          - EXTERNAL_REFUND_ORDER
-        message:
-          maxLength: 255
-          type: string
-          description: A string message providing more details about the error.
-          nullable: true
-        date_created:
-          type: string
-          description: Date the error was first created in Violet.
-          format: date-time
-        platform:
-          type: string
-          description: The external commerce platform the error occurred in.
-          enum:
-          - OTHER
-          - SHOPIFY
-          - MAGENTO
-          - MAGENTO_ONE
-          - WOOCOMMERCE
-          - BIGCOMMERCE
-          - LIGHTSPEED
-          - ECWID
-          - YAAS
-          - SPREECOMMERCE
-          - DEMANDWARE
-          - VOLUSION
-          - PRESTASHOP
-          - THREEDCART
-          - SYLIUS
-          - WIX
-          - CUSTOM
-          - SWELL
-          - MIVA
-          - WEBSPHERE
-          - ORACLECC
-          - SAPCC
-          - SQUARESPACE
-          - SHOPWARE
-          - COMMERCETOOLS
-          - MEDUSA
-          - ABICART
-          - SPRYKER
-          - MYSTORE
-          - CENTRA
-          - XCART
-          - VTEX
-          - KIBO
-          - SALEOR
-          - VENDO
-          - CHORD
-          - DIGITALRIVER
-          - SQUARE
-          - AMAZON
-          - BIGCARTEL
-          - RITHUM
-          - SHOPRENTER
-          - MANUAL
-      description: Order Error
-      nullable: true
-    OrderPaymentMethod:
-      required:
-      - payment_method_id
-      type: object
-      properties:
-        brand:
-          type: string
-          description: Brand of Card
-        last_four:
-          type: string
-          description: Last Four Numbers on Card
-        exp_month:
-          type: integer
-          description: Card Expiration Month
-          format: int32
-        exp_year:
-          type: integer
-          description: Card Expiration Year
-          format: int32
-        cardholder_name:
-          type: string
-          description: Name as it appears on Card
-        payment_method_id:
-          type: integer
-          description: ID of the referenced Payment Method
-          format: int64
-        default:
-          type: boolean
-          description: Is Default Method
-      description: Payment Method belonging to an Order
-      nullable: true
     OrderShippingMethod:
       required:
       - bag_id
@@ -7720,6 +7402,711 @@ components:
           description: Description of the Tax
       description: Taxes belonging to an Order Bag
       nullable: true
+    SkuDiscount:
+      type: object
+      properties:
+        sku_id:
+          type: integer
+          description: ID of the SKU this discount belongs to
+          format: int64
+        type:
+          type: string
+          description: Type of discount
+          enum:
+          - CODE
+          - CUSTOM
+        amount:
+          type: integer
+          description: Amount of discount
+          format: int32
+        percentage:
+          type: number
+          description: Percentage of discount
+          format: double
+        value_type:
+          type: string
+          description: Value Type of discount
+          enum:
+          - AMOUNT
+          - PERCENTAGE
+      description: "Discount that should be applied to this SKU, if any. Only `CUSTOM`\
+        \ discounts can be passed to be applied at the SKU-level."
+    VioletPageBag:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Bag'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    VioletPageable:
+      type: object
+      properties:
+        page_number:
+          type: integer
+          description: The current page number (one based)
+          format: int32
+        page_size:
+          type: integer
+          description: The number of elements per page
+          format: int32
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+        offset:
+          type: integer
+          description: The offset
+          format: int64
+        paged:
+          type: boolean
+          description: Boolean indicating if the result is paged
+        unpaged:
+          type: boolean
+          description: Boolean indicating if the result is unpaged
+      description: Violet wrapper for springframework pageable
+    VioletSort:
+      type: object
+      properties:
+        unsorted:
+          type: boolean
+          description: Boolean indicating if the result set is unsorted
+        sorted:
+          type: boolean
+          description: Boolean indicating if the result set is sorted
+        empty:
+          type: boolean
+          description: Boolean indicating if the result set is empty
+      description: Violet Wrapper for springframework sort
+    communication_preference_detail:
+      type: object
+      properties:
+        requested:
+          type: string
+          description: Requested communication preference
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+        result:
+          type: string
+          description: |-
+            Result of email communication preference opt-in.
+            OPT_IN: Used for marketing preferences, applies to any future email communication after the order is fulfilled.
+            SINGLE_OPT_IN: Used for orderConfirmation and orderFulfillment, applies only to communication about the current order (confirmation/fulfillment).
+            UNKNOWN: Used for e-commerce platforms that do not support explicit request parameters for different email communication settings; the use of the email for communication is not known.
+          enum:
+          - NO_OPT_IN
+          - OPT_IN
+          - SINGLE_OPT_IN
+          - UNKNOWN
+      description: Order fulfillment email communication preference detail
+    communication_preferences:
+      type: object
+      properties:
+        email_preferences:
+          $ref: '#/components/schemas/email_preferences'
+      description: Communication preferences requested and resultant states for this
+        Bag.
+    data:
+      type: object
+      properties:
+        communication_preferences:
+          $ref: '#/components/schemas/communication_preferences'
+      description: Container for bag-related data stored in JSON format
+    email_preferences:
+      type: object
+      properties:
+        marketing:
+          $ref: '#/components/schemas/communication_preference_detail'
+        order_confirmation:
+          $ref: '#/components/schemas/communication_preference_detail'
+        order_fulfillment:
+          $ref: '#/components/schemas/communication_preference_detail'
+    AdminBagSearchRequest:
+      type: object
+      properties:
+        externalId:
+          type: string
+          description: External ID to search for (exact match)
+        externalReferenceId:
+          type: string
+          description: External reference ID to search for (exact match)
+        merchantId:
+          type: integer
+          description: Merchant ID to filter by
+          format: int32
+        dateSubmittedMin:
+          type: string
+          description: Minimum date submitted (inclusive)
+          format: date-time
+        dateSubmittedMax:
+          type: string
+          description: Maximum date submitted (inclusive)
+          format: date-time
+        dateLastModifiedMin:
+          type: string
+          description: Minimum date last modified (inclusive)
+          format: date-time
+        dateLastModifiedMax:
+          type: string
+          description: Maximum date last modified (inclusive)
+          format: date-time
+        status:
+          type: string
+          description: Bag status to filter by
+          enum:
+          - IN_PROGRESS
+          - SUBMITTED
+          - ACCEPTED
+          - COMPLETED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REJECTED
+          - CANCELED
+        financialStatus:
+          type: string
+          description: Financial status to filter by
+          enum:
+          - UNPAID
+          - AUTHORIZED
+          - PENDING
+          - PAID
+          - PARTIALLY_PAID
+          - REFUNDED
+          - PARTIALLY_REFUNDED
+          - VOIDED
+        fulfillmentStatus:
+          type: string
+          description: Fulfillment status to filter by
+          enum:
+          - PROCESSING
+          - SHIPPED
+          - PARTIALLY_SHIPPED
+          - DELIVERED
+          - COULD_NOT_DELIVER
+          - RETURNED
+        platform:
+          type: string
+          description: Platform to filter by
+          enum:
+          - OTHER
+          - SHOPIFY
+          - MAGENTO
+          - MAGENTO_ONE
+          - WOOCOMMERCE
+          - BIGCOMMERCE
+          - LIGHTSPEED
+          - ECWID
+          - YAAS
+          - SPREECOMMERCE
+          - DEMANDWARE
+          - VOLUSION
+          - PRESTASHOP
+          - THREEDCART
+          - SYLIUS
+          - WIX
+          - CUSTOM
+          - SWELL
+          - MIVA
+          - WEBSPHERE
+          - ORACLECC
+          - SAPCC
+          - SQUARESPACE
+          - SHOPWARE
+          - COMMERCETOOLS
+          - MEDUSA
+          - ABICART
+          - SPRYKER
+          - MYSTORE
+          - CENTRA
+          - XCART
+          - VTEX
+          - KIBO
+          - SALEOR
+          - VENDO
+          - CHORD
+          - DIGITALRIVER
+          - SQUARE
+          - AMAZON
+          - BIGCARTEL
+          - RITHUM
+          - SHOPRENTER
+          - MANUAL
+        sortBy:
+          type: string
+          description: "Field to sort by (id, dateLastModified, dateSubmitted, total,\
+            \ shippingTotal, subTotal, taxTotal)"
+        sortDirection:
+          type: string
+          description: Sort direction (asc or desc)
+      description: Admin bag search request
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the Violet cart or order.
+          format: int64
+          readOnly: true
+        token:
+          type: string
+          description: An alternative UUID that can be used as an ID to reference
+            the cart or order.
+          readOnly: true
+          deprecated: true
+        errors:
+          type: array
+          description: "Errors on the Order. During checkout, if there was an error\
+            \ or issue on one of the order's bags, there will be an error added to\
+            \ this list describing the issue. The checkout API will return 200 with\
+            \ the order object in the response even if there was an issue with a bag\
+            \ so you must always check the response for errors in this list to know\
+            \ if there was an issue on the order."
+          nullable: true
+          items:
+            $ref: '#/components/schemas/OrderError'
+        user_id:
+          type: integer
+          description: ID of the User placing the order
+          format: int64
+          deprecated: true
+        app_id:
+          type: integer
+          description: ID of the App responsible for the creation and submission of
+            this Order.
+          format: int32
+        developer_id:
+          type: integer
+          description: ID of the Developer responsible for the creation and submission
+            of this Order.
+          format: int32
+        customer:
+          $ref: '#/components/schemas/OrderCustomer'
+        bags:
+          type: array
+          description: "One or more Bags that make up the Order. Each Bag will contain\
+            \ the Sku's, shipping methods, and totals unique to a merchant. Each merchant\
+            \ in an Order will have their own Bag."
+          items:
+            $ref: '#/components/schemas/Bag'
+        shipping_address:
+          $ref: '#/components/schemas/OrderAddress'
+        billing_address:
+          $ref: '#/components/schemas/OrderAddress'
+        payment_method:
+          $ref: '#/components/schemas/OrderPaymentMethod'
+        sub_total:
+          type: integer
+          description: "The price of the Order in the base currency before discounts,\
+            \ shipping, duties, taxes, and tips. In Cents."
+          format: int32
+          default: 0
+        shipping_total:
+          type: integer
+          description: The sum of all shipping methods applied to the Order in the
+            base currency. In Cents.
+          format: int32
+          default: 0
+        tax_total:
+          type: integer
+          description: The sum of all the taxes applied to the Order in the base currency.
+            In Cents.
+          format: int32
+          default: 0
+        discount_total:
+          type: integer
+          description: The total discounts applied to the price of the Order in the
+            base currency. In Cents.
+          format: int32
+          default: 0
+        total:
+          type: integer
+          description: "The sum of all item prices, discounts, shipping, and taxes\
+            \ applied to the Order in the base currency. In Cents."
+          format: int32
+          default: 0
+        app_customer_id:
+          type: string
+          description: App Customer ID. This should be used to map the order to the
+            ID of the customer in your application.
+          nullable: true
+        app_order_id:
+          type: string
+          description: "App Order ID. This should be set to a unique identifier in\
+            \ your system. While not enforced unique in Violet's system, it is strongly\
+            \ recommended that unique values are used for each cart to help correlate\
+            \ identifiers between Violet's system and yours."
+          nullable: true
+        status:
+          type: string
+          description: Status of the Order
+          readOnly: true
+          enum:
+          - IN_PROGRESS
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REQUIRES_ACTION
+        is_guest:
+          type: boolean
+          description: Order is Guest
+          readOnly: true
+          default: true
+        date_created:
+          type: string
+          description: Date of order creation
+          format: date-time
+          readOnly: true
+        date_last_modified:
+          type: string
+          description: "Indicates when the order was last modified. This timestamp\
+            \ is updated only when a property on the Order entity itself changes.\
+            \ Modifications to related entities (e.g., Bags) will not update this\
+            \ timestamp unless the change also triggers an update to the Order entity."
+          format: date-time
+          readOnly: true
+        date_submitted:
+          maxLength: 24
+          type: string
+          description: Date the Order was last submitted in Violet. This value is
+            captured immediately after the Order is successfully validated and before
+            the nested Bag(s) are submitted to the external commerce platforms.
+          format: date-time
+          nullable: true
+          readOnly: true
+        priced:
+          type: boolean
+          description: Is the cart priced
+          readOnly: true
+          default: false
+        wallet_based_checkout:
+          type: boolean
+          description: Is this cart going to be placed through wallet-based checkout
+          default: false
+        currency:
+          type: string
+          description: Base currency of cart
+          default: USD
+        referral_id:
+          type: string
+          description: Optional value used to represent an identifier in your system.
+            This value is not required to represent a referral. It can represent the
+            ID of anything in your system and can be used to filter order lookup results.
+            Max length of 128 characters.
+          nullable: true
+        currency_symbol:
+          type: string
+          description: Symbol representing the currency the Order operates in.
+        app_name:
+          type: string
+          description: Name of app that originated the order. Use the "extended" query
+            param when looking up orders to include this value.
+        stripe_key:
+          type: string
+          description: Stripe publishable key. Use for tokenizing payment methods.
+        payment_intent_client_secret:
+          type: string
+          description: Payment intent client secret. Use for payment intent based
+            payment capture and external captures
+        payment_transactions:
+          uniqueItems: true
+          type: array
+          description: Payment Transactions associated to the bags on this Cart
+          items:
+            $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
+        order_status:
+          type: string
+          enum:
+          - IN_PROGRESS
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REQUIRES_ACTION
+        guest:
+          type: boolean
+        intent_based_checkout:
+          type: boolean
+          description: Boolean indicating if the cart/order will be payed using a
+            payment intent.
+      description: Violet Order Entity
+    OrderAddress:
+      required:
+      - address_1
+      - city
+      - country
+      - postal_code
+      - state
+      - type
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name on Address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State or province abbreviated code.
+        country:
+          type: string
+          description: Country ISO2 Code
+        postal_code:
+          type: string
+          description: "Postal or Zip code to be applied to the address. This value\
+            \ is required for all countries that have postal codes. For countries\
+            \ that do not have postal codes, this value is optional."
+        phone:
+          type: string
+          description: "Phone number related to the address. Note: Some external commerce\
+            \ platforms require this value. For these platforms Violet will use a\
+            \ fake number if no value is provided to ensure that the order succeeds."
+        type:
+          type: string
+          description: Address Type
+          enum:
+          - SHIPPING
+          - BILLING
+        email:
+          type: string
+          description: Email Address
+        address_1:
+          type: string
+          description: First line of the Address
+        address_2:
+          type: string
+          description: Second line of the address
+        first_name:
+          type: string
+        last_name:
+          type: string
+      description: The shipping or billing address of a user placing an order
+      nullable: true
+    OrderCustomer:
+      required:
+      - email
+      - first_name
+      - last_name
+      type: object
+      properties:
+        first_name:
+          maxLength: 32
+          type: string
+          description: Customer's first name.
+        last_name:
+          maxLength: 32
+          type: string
+          description: Customer's last name.
+        email:
+          maxLength: 64
+          type: string
+          description: Customer's valid email address.
+        shipping_address:
+          $ref: '#/components/schemas/OrderAddress'
+        billing_address:
+          $ref: '#/components/schemas/OrderAddress'
+        same_address:
+          type: boolean
+          description: "When only one address is provided, should the one address\
+            \ be used for both the shipping and billing addresses."
+          default: false
+        name:
+          type: string
+          description: Full name of the customer.
+          readOnly: true
+      description: Details of the customer placing the order.
+      nullable: true
+    OrderError:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique ID of the error.
+          format: int64
+          readOnly: true
+        order_id:
+          type: integer
+          description: ID of the parent Order this error occurred in.
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the parent Bag this error occurred in.
+          format: int64
+        entity_id:
+          type: string
+          description: ID of the entity that caused the error. See the `entity_type`
+            property to determine which entity this ID is associated with.
+        entity_type:
+          type: string
+          description: Type of entity that caused the error. See the `entity_id` property
+            to determine which entity of this type is related to the error.
+          nullable: true
+          enum:
+          - ORDER
+          - BAG
+          - SKU
+        type:
+          type: string
+          description: "Type of error, indicates which action was being taken when\
+            \ the error occurred."
+          enum:
+          - EXTERNAL_CREATE_CART
+          - EXTERNAL_ADD_ITEM
+          - EXTERNAL_UPDATE_ITEM
+          - EXTERNAL_REMOVE_ITEM
+          - EXTERNAL_ADD_CUSTOMER
+          - EXTERNAL_ADD_ADDRESSES
+          - EXTERNAL_ADD_SHIPPING_ADDRESS
+          - EXTERNAL_ADD_BILLING_ADDRESS
+          - EXTERNAL_GET_SHIPPING_METHODS
+          - EXTERNAL_SET_SHIPPING_METHOD
+          - EXTERNAL_SET_PAYMENT_METHOD
+          - EXTERNAL_PRICE_CART
+          - EXTERNAL_SUBMIT_CART
+          - INTERNAL_ADD_ITEM
+          - EXTERNAL_DELETE_CART
+          - EXTERNAL_CANCEL_ORDER
+          - EXTERNAL_WRITE_ORDER
+          - EXTERNAL_MARK_ORDER_AS_PAID
+          - EXTERNAL_ADD_DISCOUNT_CODE
+          - EXTERNAL_REMOVE_DISCOUNT_CODE
+          - EXTERNAL_DELETE_ORDER
+          - EXTERNAL_REFUND_ORDER
+        message:
+          maxLength: 255
+          type: string
+          description: A string message providing more details about the error.
+          nullable: true
+        date_created:
+          type: string
+          description: Date the error was first created in Violet.
+          format: date-time
+        platform:
+          type: string
+          description: The external commerce platform the error occurred in.
+          enum:
+          - OTHER
+          - SHOPIFY
+          - MAGENTO
+          - MAGENTO_ONE
+          - WOOCOMMERCE
+          - BIGCOMMERCE
+          - LIGHTSPEED
+          - ECWID
+          - YAAS
+          - SPREECOMMERCE
+          - DEMANDWARE
+          - VOLUSION
+          - PRESTASHOP
+          - THREEDCART
+          - SYLIUS
+          - WIX
+          - CUSTOM
+          - SWELL
+          - MIVA
+          - WEBSPHERE
+          - ORACLECC
+          - SAPCC
+          - SQUARESPACE
+          - SHOPWARE
+          - COMMERCETOOLS
+          - MEDUSA
+          - ABICART
+          - SPRYKER
+          - MYSTORE
+          - CENTRA
+          - XCART
+          - VTEX
+          - KIBO
+          - SALEOR
+          - VENDO
+          - CHORD
+          - DIGITALRIVER
+          - SQUARE
+          - AMAZON
+          - BIGCARTEL
+          - RITHUM
+          - SHOPRENTER
+          - MANUAL
+      description: Order Error
+      nullable: true
+    OrderPaymentMethod:
+      required:
+      - payment_method_id
+      type: object
+      properties:
+        brand:
+          type: string
+          description: Brand of Card
+        last_four:
+          type: string
+          description: Last Four Numbers on Card
+        exp_month:
+          type: integer
+          description: Card Expiration Month
+          format: int32
+        exp_year:
+          type: integer
+          description: Card Expiration Year
+          format: int32
+        cardholder_name:
+          type: string
+          description: Name as it appears on Card
+        payment_method_id:
+          type: integer
+          description: ID of the referenced Payment Method
+          format: int64
+        default:
+          type: boolean
+          description: Is Default Method
+      description: Payment Method belonging to an Order
+      nullable: true
     PaymentTransaction:
       required:
       - amount
@@ -7919,79 +8306,98 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
-    SkuDiscount:
+    VioletPageOrder:
       type: object
       properties:
-        sku_id:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Order'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
           type: integer
-          description: ID of the SKU this discount belongs to
-          format: int64
-        type:
-          type: string
-          description: Type of discount
-          enum:
-          - CODE
-          - CUSTOM
-        amount:
-          type: integer
-          description: Amount of discount
+          description: The total count of pages available
           format: int32
-        percentage:
-          type: number
-          description: Percentage of discount
-          format: double
-        value_type:
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
           type: string
-          description: Value Type of discount
-          enum:
-          - AMOUNT
-          - PERCENTAGE
-      description: "Discount that should be applied to this SKU, if any. Only `CUSTOM`\
-        \ discounts can be passed to be applied at the SKU-level."
-    communication_preference_detail:
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    AdminOrderSearchRequest:
       type: object
       properties:
-        requested:
+        orderId:
+          type: integer
+          description: Order ID to search for
+          format: int64
+        appId:
+          type: integer
+          description: App ID to filter orders by (not the header app ID)
+          format: int32
+        customerEmail:
           type: string
-          description: Requested communication preference
-          enum:
-          - NO_OPT_IN
-          - OPT_IN
-        result:
+          description: "Customer email address to search for (exact match, case-insensitive)"
+        customerLastName:
           type: string
-          description: |-
-            Result of email communication preference opt-in.
-            OPT_IN: Used for marketing preferences, applies to any future email communication after the order is fulfilled.
-            SINGLE_OPT_IN: Used for orderConfirmation and orderFulfillment, applies only to communication about the current order (confirmation/fulfillment).
-            UNKNOWN: Used for e-commerce platforms that do not support explicit request parameters for different email communication settings; the use of the email for communication is not known.
+          description: "Customer last name to search for (partial match, case-insensitive)"
+        totalMin:
+          type: integer
+          description: Minimum order total in cents
+          format: int32
+        totalMax:
+          type: integer
+          description: Maximum order total in cents
+          format: int32
+        status:
+          type: string
+          description: Order status to filter by
           enum:
-          - NO_OPT_IN
-          - OPT_IN
-          - SINGLE_OPT_IN
-          - UNKNOWN
-      description: Order fulfillment email communication preference detail
-    communication_preferences:
-      type: object
-      properties:
-        email_preferences:
-          $ref: '#/components/schemas/email_preferences'
-      description: Communication preferences requested and resultant states for this
-        Bag.
-    data:
-      type: object
-      properties:
-        communication_preferences:
-          $ref: '#/components/schemas/communication_preferences'
-      description: Container for bag-related data stored in JSON format
-    email_preferences:
-      type: object
-      properties:
-        marketing:
-          $ref: '#/components/schemas/communication_preference_detail'
-        order_confirmation:
-          $ref: '#/components/schemas/communication_preference_detail'
-        order_fulfillment:
-          $ref: '#/components/schemas/communication_preference_detail'
+          - IN_PROGRESS
+          - PROCESSING
+          - COMPLETED
+          - CANCELED
+          - PARTIALLY_REFUNDED
+          - REFUNDED
+          - REQUIRES_ACTION
+        sortBy:
+          type: string
+          description: "Field to sort by (e.g., dateCreated, dateLastModified, total)"
+        sortDirection:
+          type: string
+          description: Sort direction (asc or desc)
+      description: Admin order search request
     Error:
       type: object
       properties:
@@ -9559,92 +9965,6 @@ components:
             \ use a faux number if no value is provided to ensure that the order succeeds.**"
       description: "Shipping address for the order. **Note: this value is not required\
         \ when all items in the order are digital.**"
-    VioletPageOrder:
-      type: object
-      properties:
-        content:
-          type: array
-          description: The actual content of the response; A list of the result objects
-          items:
-            $ref: '#/components/schemas/Order'
-        last:
-          type: boolean
-          description: Boolean indicating if this is the last page
-        total_pages:
-          type: integer
-          description: The total count of pages available
-          format: int32
-        total_elements:
-          type: integer
-          description: The total count of objects available
-          format: int32
-        first:
-          type: boolean
-          description: Boolean indicating if this is the first page of the response
-        number_of_elements:
-          type: integer
-          description: The total number of objects in this specific response
-          format: int32
-        size:
-          type: integer
-          description: The page size selected at request time
-          format: int32
-        number:
-          type: integer
-          description: The page number selected at request time
-          format: int32
-        empty:
-          type: boolean
-          description: Boolean indicating if the response content is empty
-        next_page_cursor:
-          type: string
-          description: Contains the cursor for the next page. This property will only
-            be used for situations where the API does not support the page number/page
-            size paradigm and it will mutually exclusive with the size/number fields
-            in the response. If this property is returned it must be passed when requesting
-            the next page from the API. Does not apply to endpoints that do not have
-            a next_page_cursor query param documented.
-        pageable:
-          $ref: '#/components/schemas/VioletPageable'
-        sort:
-          $ref: '#/components/schemas/VioletSort'
-    VioletPageable:
-      type: object
-      properties:
-        page_number:
-          type: integer
-          description: The current page number (one based)
-          format: int32
-        page_size:
-          type: integer
-          description: The number of elements per page
-          format: int32
-        sort:
-          $ref: '#/components/schemas/VioletSort'
-        offset:
-          type: integer
-          description: The offset
-          format: int64
-        paged:
-          type: boolean
-          description: Boolean indicating if the result is paged
-        unpaged:
-          type: boolean
-          description: Boolean indicating if the result is unpaged
-      description: Violet wrapper for springframework pageable
-    VioletSort:
-      type: object
-      properties:
-        unsorted:
-          type: boolean
-          description: Boolean indicating if the result set is unsorted
-        sorted:
-          type: boolean
-          description: Boolean indicating if the result set is sorted
-        empty:
-          type: boolean
-          description: Boolean indicating if the result set is empty
-      description: Violet Wrapper for springframework sort
     OrderShippingMethodWrapper:
       type: object
       properties:
@@ -9831,55 +10151,6 @@ components:
           nullable: true
       description: Details of any shipping refunds.
       nullable: true
-    VioletPageBag:
-      type: object
-      properties:
-        content:
-          type: array
-          description: The actual content of the response; A list of the result objects
-          items:
-            $ref: '#/components/schemas/Bag'
-        last:
-          type: boolean
-          description: Boolean indicating if this is the last page
-        total_pages:
-          type: integer
-          description: The total count of pages available
-          format: int32
-        total_elements:
-          type: integer
-          description: The total count of objects available
-          format: int32
-        first:
-          type: boolean
-          description: Boolean indicating if this is the first page of the response
-        number_of_elements:
-          type: integer
-          description: The total number of objects in this specific response
-          format: int32
-        size:
-          type: integer
-          description: The page size selected at request time
-          format: int32
-        number:
-          type: integer
-          description: The page number selected at request time
-          format: int32
-        empty:
-          type: boolean
-          description: Boolean indicating if the response content is empty
-        next_page_cursor:
-          type: string
-          description: Contains the cursor for the next page. This property will only
-            be used for situations where the API does not support the page number/page
-            size paradigm and it will mutually exclusive with the size/number fields
-            in the response. If this property is returned it must be passed when requesting
-            the next page from the API. Does not apply to endpoints that do not have
-            a next_page_cursor query param documented.
-        pageable:
-          $ref: '#/components/schemas/VioletPageable'
-        sort:
-          $ref: '#/components/schemas/VioletSort'
     BagSearchRequest:
       type: object
       properties:
