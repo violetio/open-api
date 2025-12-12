@@ -2234,6 +2234,259 @@ paths:
                     message: Order could not be found.
                     error: order_not_found
                     code: 4216
+  /orders/{order_id}/bags/{bag_id}/adjustments:
+    get:
+      tags:
+      - Orders
+      summary: Get Bag Adjustments
+      description: Retrieves all adjustments for a specific bag. Only apps that created
+        the bag (matching app_id) can access its adjustments.
+      operationId: getBagAdjustments
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: bag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BagAdjustment'
+              examples:
+                Bag Adjustments List:
+                  description: Bag Adjustments List
+                  value:
+                  - id: 10001
+                    bag_id: 22222
+                    order_id: 11111
+                    merchant_id: 10000
+                    app_id: 10193
+                    entity_type: SHIPPING_TOTAL
+                    previous_value: 1000
+                    adjusted_value: 500
+                    adjustment_delta: -500
+                    shopper_adjustment: true
+                    shopper_adjustment_amount: -500
+                    merchant_adjustment: false
+                    merchant_adjustment_amount: 0
+                    channel_adjustment: true
+                    channel_adjustment_amount: 500
+                    reason: Shipping was overcharged due to carrier rate update
+                    date_created: 2024-12-08T15:30:00+0000
+                  - id: 10002
+                    bag_id: 22222
+                    order_id: 11111
+                    merchant_id: 10000
+                    app_id: 10193
+                    entity_type: TAX_TOTAL
+                    previous_value: 850
+                    adjusted_value: 1050
+                    adjustment_delta: 200
+                    shopper_adjustment: true
+                    shopper_adjustment_amount: 200
+                    merchant_adjustment: true
+                    merchant_adjustment_amount: -200
+                    channel_adjustment: false
+                    channel_adjustment_amount: 0
+                    reason: Tax was miscalculated for customer's jurisdiction
+                    date_created: 2024-12-08T15:35:00+0000
+        "404":
+          description: Order or bag not found
+    post:
+      tags:
+      - Orders
+      summary: Create Bag Adjustment
+      description: "Creates a new adjustment record for a bag. Adjustments are immutable\
+        \ audit records that track corrections to bag totals (shipping, tax, or discount).\
+        \ The adjustment amounts (shopper, merchant, channel) must sum to zero. Only\
+        \ apps that created the bag (matching app_id) can create adjustments on it."
+      operationId: createBagAdjustment
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: bag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Bag adjustment details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BagAdjustment'
+            examples:
+              Shipping Adjustment:
+                description: "Adjust shipping total when shipping was overcharged.\
+                  \ Refund goes to shopper, channel absorbs the cost."
+                value:
+                  entity_type: SHIPPING_TOTAL
+                  previous_value: 1000
+                  adjusted_value: 500
+                  shopper_adjustment: true
+                  shopper_adjustment_amount: -500
+                  merchant_adjustment: false
+                  merchant_adjustment_amount: 0
+                  channel_adjustment: true
+                  channel_adjustment_amount: 500
+                  reason: Shipping was overcharged due to carrier rate update
+              Tax Adjustment with Metadata:
+                description: "Adjust tax total with additional metadata tracking.\
+                  \ Shopper owes more, merchant receives less."
+                value:
+                  entity_type: TAX_TOTAL
+                  previous_value: 850
+                  adjusted_value: 1050
+                  shopper_adjustment: true
+                  shopper_adjustment_amount: 200
+                  merchant_adjustment: true
+                  merchant_adjustment_amount: -200
+                  channel_adjustment: false
+                  channel_adjustment_amount: 0
+                  reason: Tax was miscalculated for customer's jurisdiction
+                  data:
+                    notes: Customer notified of additional charge
+                    adjusted_by: support@example.com
+                    ticket_id: TICKET-12345
+                    original_tax_rate: 8.5%
+                    corrected_tax_rate: 10.5%
+              Discount Adjustment:
+                description: "Apply a post-order promotional discount. Shopper receives\
+                  \ credit, merchant absorbs the cost."
+                value:
+                  entity_type: DISCOUNT_TOTAL
+                  previous_value: 0
+                  adjusted_value: 1500
+                  shopper_adjustment: true
+                  shopper_adjustment_amount: -1500
+                  merchant_adjustment: true
+                  merchant_adjustment_amount: 1500
+                  channel_adjustment: false
+                  channel_adjustment_amount: 0
+                  reason: Promotional discount applied post-order as customer goodwill
+        required: true
+      responses:
+        "201":
+          description: Adjustment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BagAdjustment'
+              examples:
+                Shipping Adjustment:
+                  description: Shipping Adjustment
+                  value:
+                    id: 10001
+                    bag_id: 22222
+                    order_id: 11111
+                    merchant_id: 10000
+                    app_id: 10193
+                    entity_type: SHIPPING_TOTAL
+                    previous_value: 1000
+                    adjusted_value: 500
+                    adjustment_delta: -500
+                    shopper_adjustment: true
+                    shopper_adjustment_amount: -500
+                    merchant_adjustment: false
+                    merchant_adjustment_amount: 0
+                    channel_adjustment: true
+                    channel_adjustment_amount: 500
+                    reason: Shipping was overcharged due to carrier rate update
+                    date_created: 2024-12-08T15:30:00+0000
+                Tax Adjustment with Metadata:
+                  description: Tax Adjustment with Metadata
+                  value:
+                    id: 10002
+                    bag_id: 22222
+                    order_id: 11111
+                    merchant_id: 10000
+                    app_id: 10193
+                    entity_type: TAX_TOTAL
+                    previous_value: 850
+                    adjusted_value: 1050
+                    adjustment_delta: 200
+                    shopper_adjustment: true
+                    shopper_adjustment_amount: 200
+                    merchant_adjustment: true
+                    merchant_adjustment_amount: -200
+                    channel_adjustment: false
+                    channel_adjustment_amount: 0
+                    reason: Tax was miscalculated for customer's jurisdiction
+                    data:
+                      notes: Customer notified of additional charge
+                      adjusted_by: support@example.com
+                      ticket_id: TICKET-12345
+                      original_tax_rate: 8.5%
+                      corrected_tax_rate: 10.5%
+                    date_created: 2024-12-08T15:30:00+0000
+        "400":
+          description: Invalid adjustment data
+          content:
+            application/json:
+              examples:
+                Missing Required Field:
+                  description: Missing Required Field
+                  value:
+                    message: entity_type is required
+                    error: bad_request
+                    code: 1001
+                Adjustment Amounts Do Not Sum to Zero:
+                  description: Adjustment Amounts Do Not Sum to Zero
+                  value:
+                    message: "Adjustment amounts must sum to zero. Current sum: 100"
+                    error: bad_request
+                    code: 1001
+        "404":
+          description: Order or bag not found
   /checkout/cart:
     post:
       tags:
@@ -3952,6 +4205,94 @@ paths:
                     message: Order could not be found.
                     error: order_not_found
                     code: 4216
+  /orders/{order_id}/bags/{bag_id}/adjustments/{adjustment_id}:
+    get:
+      tags:
+      - Orders
+      summary: Get Bag Adjustment by ID
+      description: Retrieves a specific adjustment for a bag. Only apps that created
+        the bag (matching app_id) can access its adjustments.
+      operationId: getBagAdjustment
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: bag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: adjustment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BagAdjustment'
+              examples:
+                Bag Adjustment:
+                  description: Bag Adjustment
+                  value:
+                    id: 10002
+                    bag_id: 22222
+                    order_id: 11111
+                    merchant_id: 10000
+                    app_id: 10193
+                    entity_type: TAX_TOTAL
+                    previous_value: 850
+                    adjusted_value: 1050
+                    adjustment_delta: 200
+                    shopper_adjustment: true
+                    shopper_adjustment_amount: 200
+                    merchant_adjustment: true
+                    merchant_adjustment_amount: -200
+                    channel_adjustment: false
+                    channel_adjustment_amount: 0
+                    reason: Tax was miscalculated for customer's jurisdiction
+                    data:
+                      notes: Customer notified of additional charge
+                      adjusted_by: support@example.com
+                      ticket_id: TICKET-12345
+                      original_tax_rate: 8.5%
+                      corrected_tax_rate: 10.5%
+                    date_created: 2024-12-08T15:30:00+0000
+        "404":
+          description: "Order, bag, or adjustment not found"
+          content:
+            application/json:
+              examples:
+                Adjustment Not Found:
+                  description: Adjustment Not Found
+                  value:
+                    message: Bag adjustment could not be found.
+                    error: bag_adjustment_not_found
+                    code: 4250
   /orders/{order_id}/bags/{bag_id}/refunds:
     get:
       tags:
@@ -4205,6 +4546,86 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Bag'
+  /orders/{order_id}/adjustments:
+    get:
+      tags:
+      - Orders
+      summary: Get Order Adjustments
+      description: Retrieves all adjustments for all bags in an order. Only apps that
+        created the order (matching app_id) can access its adjustments.
+      operationId: getOrderAdjustments
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BagAdjustment'
+              examples:
+                Order Adjustments List:
+                  description: Order Adjustments List
+                  value:
+                  - id: 10001
+                    bag_id: 22222
+                    order_id: 11111
+                    merchant_id: 10000
+                    app_id: 10193
+                    entity_type: SHIPPING_TOTAL
+                    previous_value: 1000
+                    adjusted_value: 500
+                    adjustment_delta: -500
+                    shopper_adjustment: true
+                    shopper_adjustment_amount: -500
+                    merchant_adjustment: false
+                    merchant_adjustment_amount: 0
+                    channel_adjustment: true
+                    channel_adjustment_amount: 500
+                    reason: Shipping was overcharged due to carrier rate update
+                    date_created: 2024-12-08T15:30:00+0000
+                  - id: 10002
+                    bag_id: 22222
+                    order_id: 11111
+                    merchant_id: 10000
+                    app_id: 10193
+                    entity_type: TAX_TOTAL
+                    previous_value: 850
+                    adjusted_value: 1050
+                    adjustment_delta: 200
+                    shopper_adjustment: true
+                    shopper_adjustment_amount: 200
+                    merchant_adjustment: true
+                    merchant_adjustment_amount: -200
+                    channel_adjustment: false
+                    channel_adjustment_amount: 0
+                    reason: Tax was miscalculated for customer's jurisdiction
+                    date_created: 2024-12-08T15:35:00+0000
+        "404":
+          description: Order not found
   /orders/{order_id}:
     get:
       tags:
@@ -9449,6 +9870,130 @@ components:
           description: Should the customer be notified by the merchants system that
             a cancellation has occurred.
           default: false
+    BagAdjustment:
+      required:
+      - adjusted_value
+      - app_id
+      - bag_id
+      - channel_adjustment
+      - channel_adjustment_amount
+      - entity_type
+      - merchant_adjustment
+      - merchant_adjustment_amount
+      - merchant_id
+      - order_id
+      - previous_value
+      - reason
+      - shopper_adjustment
+      - shopper_adjustment_amount
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique ID of the BagAdjustment.
+          format: int64
+          readOnly: true
+        bag_id:
+          type: integer
+          description: ID of the Bag this adjustment applies to.
+          format: int64
+        order_id:
+          type: integer
+          description: ID of the parent Order (denormalized for convenience).
+          format: int64
+        merchant_id:
+          type: integer
+          description: ID of the merchant this adjustment applies to.
+          format: int32
+        app_id:
+          type: integer
+          description: ID of the App responsible for this Bag.
+          format: int32
+        entity_type:
+          type: string
+          description: "Type of field being adjusted: SHIPPING_TOTAL, TAX_TOTAL, or\
+            \ DISCOUNT_TOTAL."
+          enum:
+          - SHIPPING_TOTAL
+          - TAX_TOTAL
+          - DISCOUNT_TOTAL
+        previous_value:
+          type: integer
+          description: Original incorrect value in cents.
+          format: int32
+        adjusted_value:
+          type: integer
+          description: Corrected value in cents.
+          format: int32
+        adjustment_delta:
+          type: integer
+          description: Calculated difference (adjusted_value - previous_value) in
+            cents.
+          format: int32
+          readOnly: true
+        shopper_adjustment:
+          type: boolean
+          description: Whether this adjustment impacts the shopper.
+        shopper_adjustment_amount:
+          type: integer
+          description: Amount of impact on shopper in cents (negative = refund owed
+            to shopper).
+          format: int32
+        merchant_adjustment:
+          type: boolean
+          description: Whether this adjustment impacts the merchant.
+        merchant_adjustment_amount:
+          type: integer
+          description: "Amount of impact on merchant in cents (positive = merchant\
+            \ owed more, negative = merchant owed less)."
+          format: int32
+        channel_adjustment:
+          type: boolean
+          description: Whether this adjustment impacts the channel.
+        channel_adjustment_amount:
+          type: integer
+          description: Amount of impact on channel in cents (typically opposite of
+            merchant + shopper).
+          format: int32
+        reason:
+          type: string
+          description: Freeform text reason for the adjustment.
+        data:
+          $ref: '#/components/schemas/BagAdjustmentData'
+        date_created:
+          maxLength: 24
+          type: string
+          description: Date the adjustment was created (immutable).
+          format: date-time
+          readOnly: true
+      description: Financial adjustment to a Bag's totals
+    BagAdjustmentData:
+      type: object
+      properties:
+        notes:
+          type: string
+          description: Additional notes about this adjustment
+        adjusted_by:
+          type: string
+          description: User or system that created this adjustment
+        ticket_id:
+          type: string
+          description: Support ticket ID related to this adjustment
+        refund_id:
+          type: integer
+          description: Refund ID if a refund was issued
+          format: int64
+        refund_issued:
+          type: boolean
+          description: Whether a refund was issued to the shopper
+        original_tax_rate:
+          type: string
+          description: Original tax rate if applicable
+        corrected_tax_rate:
+          type: string
+          description: Corrected tax rate if applicable
+      description: Metadata for bag adjustment
+      nullable: true
     CartInitializationRequest:
       type: object
       properties:
@@ -10528,8 +11073,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -10539,6 +11082,8 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        externalId:
+          type: string
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
