@@ -9,6 +9,8 @@ info:
 servers:
 - url: https://sandbox-api.violet.io/v1
 tags:
+- name: Admin
+  description: Admin-only operations
 - name: Apps
 - name: Apps - Merchant Install
   description: Merchant/App Installs
@@ -549,7 +551,7 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
