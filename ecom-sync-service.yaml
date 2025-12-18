@@ -2593,11 +2593,11 @@ components:
       - order_id
       type: object
       properties:
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_status:
           type: string
           enum:
