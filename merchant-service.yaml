@@ -2278,13 +2278,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     Pageable:
@@ -2337,13 +2337,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     OnboardingStep:
