@@ -9,6 +9,8 @@ info:
 servers:
 - url: https://sandbox-api.violet.io/v1
 tags:
+- name: Admin
+  description: Admin-only endpoints
 - name: Orgs
   description: Org related entities
 - name: Access
