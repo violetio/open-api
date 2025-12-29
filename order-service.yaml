@@ -24,6 +24,344 @@ tags:
 - name: Checkout - Order Transfers
 - name: Checkout - Bag Transfers
 paths:
+  /admin/orders/blocked-addresses:
+    get:
+      tags:
+      - Admin
+      summary: Get All Blocked Addresses
+      description: Get all blocked addresses with pagination
+      operationId: getAllBlockedAddresses
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        "200":
+          description: Successfully retrieved blocked addresses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageBlockedAddress'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
+    post:
+      tags:
+      - Admin
+      summary: Create Blocked Address
+      description: Create a new blocked address for fraud prevention
+      operationId: createBlockedAddress
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        description: Blocked address to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockedAddress'
+      responses:
+        "200":
+          description: Successfully created blocked address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockedAddress'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
+  /admin/orders/blocked-addresses/{id}:
+    get:
+      tags:
+      - Admin
+      summary: Get Blocked Address
+      description: "Get a blocked address by ID, including its variations"
+      operationId: getBlockedAddress
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: path
+        description: Blocked address ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Successfully retrieved blocked address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockedAddress'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
+        "404":
+          description: Blocked address not found
+    put:
+      tags:
+      - Admin
+      summary: Update Blocked Address
+      description: Update an existing blocked address
+      operationId: updateBlockedAddress
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: path
+        description: Blocked address ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Updated blocked address data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockedAddress'
+      responses:
+        "200":
+          description: Successfully updated blocked address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockedAddress'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
+        "404":
+          description: Blocked address not found
+    delete:
+      tags:
+      - Admin
+      summary: Delete Blocked Address
+      description: Soft delete a blocked address (sets isActive = false)
+      operationId: deleteBlockedAddress
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: path
+        description: Blocked address ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Successfully deleted blocked address
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
+        "404":
+          description: Blocked address not found
+  /admin/orders/blocked-addresses/{id}/variations:
+    get:
+      tags:
+      - Admin
+      summary: Get Blocked Address Variations
+      description: Get all variations of a blocked address
+      operationId: getBlockedAddressVariations
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: path
+        description: Parent blocked address ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Successfully retrieved variations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockedAddress'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
+    post:
+      tags:
+      - Admin
+      summary: Link Blocked Address Variation
+      description: Link a blocked address as a variation of another
+      operationId: linkBlockedAddressVariation
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: path
+        description: Parent blocked address ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: variation_id
+        in: query
+        description: Variation blocked address ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Successfully linked variation
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
+        "404":
+          description: Blocked address not found
+  /admin/orders/blocked-addresses/cache/invalidate:
+    post:
+      tags:
+      - Admin
+      summary: Invalidate Blocked Address Cache
+      description: Clear the entire blocked address cache
+      operationId: invalidateBlockedAddressCache
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Successfully invalidated cache
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Admin access required
   /admin/bags/search:
     post:
       tags:
@@ -7036,6 +7374,159 @@ paths:
                         payment_service: STRIPE
 components:
   schemas:
+    BlockedAddress:
+      required:
+      - address_1
+      - postal_code
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique ID of the blocked address
+          format: int64
+          readOnly: true
+        address_1:
+          type: string
+          description: First line of the blocked address pattern
+        address_2:
+          type: string
+          description: Second line of the blocked address pattern
+        city:
+          type: string
+          description: City of the blocked address
+        state:
+          type: string
+          description: State or province of the blocked address
+        postal_code:
+          type: string
+          description: Postal code to match against
+        country:
+          type: string
+          description: Country code (ISO 2-letter)
+        type:
+          type: string
+          description: Type of blocked address
+          enum:
+          - UNKNOWN
+          - SINGLE_FAMILY_RESIDENCE
+          - MULTI_FAMILY_RESIDENCE
+          - FREIGHT_FORWARDER
+        parent_id:
+          type: integer
+          description: ID of the parent address if this is a variation
+          format: int64
+        normalized_tokens:
+          type: string
+          description: "Sorted, lowercase tokens for reorder-resistant matching"
+          readOnly: true
+        reason:
+          type: string
+          description: Reason for blocking this address
+        is_active:
+          type: boolean
+          description: Whether this blocked address is active
+        date_created:
+          type: string
+          description: Date the blocked address was created
+          format: date-time
+          readOnly: true
+        date_last_modified:
+          type: string
+          description: Date the blocked address was last modified
+          format: date-time
+          readOnly: true
+        variations:
+          type: array
+          description: Child addresses that are variations of this blocked address
+          items:
+            $ref: '#/components/schemas/BlockedAddress'
+      description: An address blocked for fraud prevention
+    VioletPageBlockedAddress:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/BlockedAddress'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+    VioletPageable:
+      type: object
+      properties:
+        page_number:
+          type: integer
+          description: The current page number (one based)
+          format: int32
+        page_size:
+          type: integer
+          description: The number of elements per page
+          format: int32
+        sort:
+          $ref: '#/components/schemas/VioletSort'
+        offset:
+          type: integer
+          description: The offset
+          format: int64
+        paged:
+          type: boolean
+          description: Boolean indicating if the result is paged
+        unpaged:
+          type: boolean
+          description: Boolean indicating if the result is unpaged
+      description: Violet wrapper for springframework pageable
+    VioletSort:
+      type: object
+      properties:
+        unsorted:
+          type: boolean
+          description: Boolean indicating if the result set is unsorted
+        sorted:
+          type: boolean
+          description: Boolean indicating if the result set is sorted
+        empty:
+          type: boolean
+          description: Boolean indicating if the result set is empty
+      description: Violet Wrapper for springframework sort
     Bag:
       required:
       - merchant_id
@@ -7901,43 +8392,6 @@ components:
           $ref: '#/components/schemas/VioletPageable'
         sort:
           $ref: '#/components/schemas/VioletSort'
-    VioletPageable:
-      type: object
-      properties:
-        page_number:
-          type: integer
-          description: The current page number (one based)
-          format: int32
-        page_size:
-          type: integer
-          description: The number of elements per page
-          format: int32
-        sort:
-          $ref: '#/components/schemas/VioletSort'
-        offset:
-          type: integer
-          description: The offset
-          format: int64
-        paged:
-          type: boolean
-          description: Boolean indicating if the result is paged
-        unpaged:
-          type: boolean
-          description: Boolean indicating if the result is unpaged
-      description: Violet wrapper for springframework pageable
-    VioletSort:
-      type: object
-      properties:
-        unsorted:
-          type: boolean
-          description: Boolean indicating if the result set is unsorted
-        sorted:
-          type: boolean
-          description: Boolean indicating if the result set is sorted
-        empty:
-          type: boolean
-          description: Boolean indicating if the result set is empty
-      description: Violet Wrapper for springframework sort
     communication_preference_detail:
       type: object
       properties:
