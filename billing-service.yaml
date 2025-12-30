@@ -1350,8 +1350,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -1364,6 +1362,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -1726,8 +1726,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -1740,6 +1738,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -1873,8 +1873,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -1887,6 +1885,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2124,8 +2124,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2138,6 +2136,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2156,8 +2156,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2170,6 +2168,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2262,8 +2262,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2276,6 +2274,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2695,6 +2695,10 @@ components:
           type: string
           description: Unique identifier of transfer to the merchant in the payment
             provider system.
+        currency:
+          type: string
+          description: "ISO 4217 currency code of this external transfer (e.g., USD,\
+            \ GBP). Derived from the related distributions."
         successful_distributions:
           type: array
           description: List of Distribution IDs that were successfully processed in
@@ -2753,6 +2757,10 @@ components:
           type: string
           description: Unique identifier of transfer to the merchant in the payment
             provider system.
+        currency:
+          type: string
+          description: "ISO 4217 currency code of this external transfer (e.g., USD,\
+            \ GBP). If not provided, will be derived from the related distributions."
         related_distributions:
           type: array
           description: List of Distribution IDs associated with this pending transfer
