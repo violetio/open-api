@@ -213,6 +213,47 @@ paths:
                   - tag1
                   - tag2
   /merchants/external/pre-register/{merchant_id}:
+    get:
+      tags:
+      - Merchants - External
+      summary: Get a pre-registration by merchant ID
+      description: Lookup an existing pre-registration by merchant ID.
+      operationId: getPreRegistrationByMerchantId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreRegistrationResponse'
     put:
       tags:
       - Merchants - External
@@ -239,6 +280,11 @@ paths:
       - name: merchant_id
         in: path
         required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
         schema:
           type: integer
           format: int32
@@ -283,6 +329,11 @@ paths:
         schema:
           type: integer
           format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
       responses:
         default:
           description: default response
@@ -309,6 +360,11 @@ paths:
       - name: X-Violet-App-Id
         in: header
         required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
         schema:
           type: integer
           format: int32
@@ -347,6 +403,11 @@ paths:
       - name: X-Violet-App-Id
         in: header
         required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
         schema:
           type: integer
           format: int32
