@@ -1771,7 +1771,6 @@ components:
     PreRegistrationRequest:
       required:
       - client_id
-      - install_link
       - secret
       - store_url
       type: object
