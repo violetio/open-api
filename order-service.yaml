@@ -8733,12 +8733,6 @@ components:
         order_id:
           type: integer
           format: int64
-        guest:
-          type: boolean
-        intent_based_checkout:
-          type: boolean
-          description: Boolean indicating if the cart/order will be payed using a
-            payment intent.
         order_status:
           type: string
           enum:
@@ -8749,6 +8743,12 @@ components:
           - PARTIALLY_REFUNDED
           - REFUNDED
           - REQUIRES_ACTION
+        guest:
+          type: boolean
+        intent_based_checkout:
+          type: boolean
+          description: Boolean indicating if the cart/order will be payed using a
+            payment intent.
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -8797,9 +8797,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        first_name:
-          type: string
         last_name:
+          type: string
+        first_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
