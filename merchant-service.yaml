@@ -1775,9 +1775,6 @@ components:
       - store_url
       type: object
       properties:
-        install_link:
-          type: string
-          description: Shopify app install link for the merchant
         store_url:
           type: string
           description: Shopify merchant store URL
@@ -2336,9 +2333,9 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         first:
+          type: boolean
+        last:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
@@ -2395,9 +2392,9 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         first:
+          type: boolean
+        last:
           type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
