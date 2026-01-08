@@ -1740,6 +1740,9 @@ components:
           type: integer
           description: Associated merchant ID
           format: int32
+        merchant_name:
+          type: string
+          description: Merchant name associated with the pre-registration
         app_id:
           type: integer
           description: App ID that registered this merchant
@@ -1747,9 +1750,6 @@ components:
         store_url:
           type: string
           description: Shopify merchant store URL
-        install_link:
-          type: string
-          description: Shopify app install link
         status:
           type: string
           description: Status of the pre-registration
