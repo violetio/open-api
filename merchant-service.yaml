@@ -462,6 +462,60 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PreRegistrationResponse'
+  /merchants/external/pre-register/validate:
+    get:
+      tags:
+      - Merchants - External
+      summary: Validate Shopify app install and retrieve pre-registration
+      description: Validates HMAC signature from Shopify custom app install redirect
+        and returns the pre-registration if valid. Requires both JWT authentication
+        and valid Shopify HMAC signature for security.
+      operationId: validateAndGetPreRegistration
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: shop
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: hmac
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: timestamp
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: app_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreRegistrationResponse'
   /merchants/app_relationships/{app_id}/tax_remitter/{tax_remitter}:
     put:
       operationId: updateTaxRemitterOnMerchantAppRelationships
@@ -2335,6 +2389,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2347,8 +2403,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2394,6 +2448,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2406,8 +2462,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
