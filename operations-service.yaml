@@ -1129,6 +1129,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
         store_url:
           type: string
           description: The URL Of the Store
@@ -1790,6 +1791,7 @@ components:
             - RITHUM
             - SHOPRENTER
             - MANUAL
+            - SHOPTET
         status:
           type: string
           description: Filter by ConnectionHealth Status
