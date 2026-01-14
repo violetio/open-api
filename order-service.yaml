@@ -8797,9 +8797,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        first_name:
-          type: string
         last_name:
+          type: string
+        first_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
@@ -10371,6 +10371,7 @@ components:
           - SHIPPING_TOTAL
           - TAX_TOTAL
           - DISCOUNT_TOTAL
+          - SUB_TOTAL
         previous_value:
           type: integer
           description: Original incorrect value in cents.
