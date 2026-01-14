@@ -1387,10 +1387,10 @@ components:
           type: boolean
         paged:
           type: boolean
-        pageNumber:
+        pageSize:
           type: integer
           format: int32
-        pageSize:
+        pageNumber:
           type: integer
           format: int32
     Sort:
