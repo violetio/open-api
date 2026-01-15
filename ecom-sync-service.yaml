@@ -1255,6 +1255,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
         seller:
           type: string
           description: Name of the merchant selling product.
@@ -2593,11 +2594,11 @@ components:
       - order_id
       type: object
       properties:
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         bag_status:
           type: string
           enum:
@@ -2859,6 +2860,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
         fulfillments:
           uniqueItems: true
           type: array
@@ -2998,6 +3000,7 @@ components:
           - SENDLE
           - POSTNORD
           - YUN_EXPRESS
+          - AUSTRALIA_POST
         raw_carrier:
           type: string
           description: Raw name of carrier from the external commerce platform.
@@ -3456,6 +3459,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
       description: Order Error
       nullable: true
     OrderPaymentMethod:
@@ -3517,6 +3521,7 @@ components:
           - SENDLE
           - POSTNORD
           - YUN_EXPRESS
+          - AUSTRALIA_POST
         label:
           type: string
           description: Shipping method label. This is the name of the shipping method.
