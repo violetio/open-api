@@ -1130,6 +1130,7 @@ components:
           - OFFER_DELETED
           - ORDER_DELIVERED
           - ORDER_ACCEPTED
+          - ORDER_FAILED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook event was sent.
@@ -1267,6 +1268,7 @@ components:
             - OFFER_DELETED
             - ORDER_DELIVERED
             - ORDER_ACCEPTED
+            - ORDER_FAILED
         entity_ids:
           uniqueItems: true
           type: array
@@ -1384,6 +1386,7 @@ components:
           - OFFER_DELETED
           - ORDER_DELIVERED
           - ORDER_ACCEPTED
+          - ORDER_FAILED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook posts against.
