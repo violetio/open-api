@@ -1293,13 +1293,363 @@ components:
             platform.
         store_config:
           $ref: '#/components/schemas/StoreConfig'
-        orders_config:
-          $ref: '#/components/schemas/OrdersConfig'
         catalog_config:
           $ref: '#/components/schemas/CatalogConfig'
         shipping_config:
           $ref: '#/components/schemas/ShippingConfig'
+        orders_config:
+          $ref: '#/components/schemas/OrdersConfig'
       description: A Container for Merchant Configuration info
+    MethodMatchCriteria:
+      type: object
+      properties:
+        names:
+          uniqueItems: true
+          type: array
+          description: Exact shipping method names to match (case-insensitive). OR
+            logic within set.
+          items:
+            type: string
+            description: Exact shipping method names to match (case-insensitive).
+              OR logic within set.
+        name_patterns:
+          uniqueItems: true
+          type: array
+          description: Substrings to match in shipping method names (case-insensitive
+            contains). OR logic within set.
+          items:
+            type: string
+            description: Substrings to match in shipping method names (case-insensitive
+              contains). OR logic within set.
+        name_prefixes:
+          uniqueItems: true
+          type: array
+          description: Prefixes to match at the start of shipping method names (case-insensitive).
+            OR logic within set.
+          items:
+            type: string
+            description: Prefixes to match at the start of shipping method names (case-insensitive).
+              OR logic within set.
+        name_suffixes:
+          uniqueItems: true
+          type: array
+          description: Suffixes to match at the end of shipping method names (case-insensitive).
+            OR logic within set.
+          items:
+            type: string
+            description: Suffixes to match at the end of shipping method names (case-insensitive).
+              OR logic within set.
+        ids:
+          uniqueItems: true
+          type: array
+          description: Shipping method IDs/handles to match exactly. OR logic within
+            set.
+          items:
+            type: string
+            description: Shipping method IDs/handles to match exactly. OR logic within
+              set.
+        id_patterns:
+          uniqueItems: true
+          type: array
+          description: Substrings to match in shipping method IDs (contains). OR logic
+            within set.
+          items:
+            type: string
+            description: Substrings to match in shipping method IDs (contains). OR
+              logic within set.
+        id_prefixes:
+          uniqueItems: true
+          type: array
+          description: Prefixes to match at the start of shipping method IDs. OR logic
+            within set.
+          items:
+            type: string
+            description: Prefixes to match at the start of shipping method IDs. OR
+              logic within set.
+        price_above:
+          type: integer
+          description: "Match methods with price >= this value (in cents, inclusive)."
+          format: int32
+        price_below:
+          type: integer
+          description: "Match methods with price <= this value (in cents, inclusive)."
+          format: int32
+        price_between:
+          $ref: '#/components/schemas/PriceRange'
+        prices:
+          uniqueItems: true
+          type: array
+          description: Match methods with these exact prices (in cents). OR logic
+            within set.
+          items:
+            type: integer
+            description: Match methods with these exact prices (in cents). OR logic
+              within set.
+            format: int32
+        is_free:
+          type: boolean
+          description: Match free shipping methods (price = 0).
+        carriers:
+          uniqueItems: true
+          type: array
+          description: "Carrier names to match (e.g., 'UPS', 'FedEx', 'USPS'). Case-insensitive.\
+            \ OR logic."
+          items:
+            type: string
+            description: "Carrier names to match (e.g., 'UPS', 'FedEx', 'USPS'). Case-insensitive.\
+              \ OR logic."
+        carrier_patterns:
+          uniqueItems: true
+          type: array
+          description: Substrings to match in carrier names. Case-insensitive. OR
+            logic.
+          items:
+            type: string
+            description: Substrings to match in carrier names. Case-insensitive. OR
+              logic.
+        service_levels:
+          uniqueItems: true
+          type: array
+          description: "Service level codes to match (e.g., 'GROUND', 'EXPRESS', 'OVERNIGHT').\
+            \ OR logic."
+          items:
+            type: string
+            description: "Service level codes to match (e.g., 'GROUND', 'EXPRESS',\
+              \ 'OVERNIGHT'). OR logic."
+        exclude_expedited:
+          type: boolean
+          description: Match expedited/express shipping methods.
+        exclude_overnight:
+          type: boolean
+          description: Match overnight/next-day shipping methods.
+        exclude_ground:
+          type: boolean
+          description: Match ground/standard shipping methods.
+        min_delivery_days:
+          type: integer
+          description: Match methods with estimated delivery >= this many days.
+          format: int32
+        max_delivery_days:
+          type: integer
+          description: Match methods with estimated delivery <= this many days.
+          format: int32
+      description: Criteria for identifying which shipping methods to exclude. Multiple
+        criteria use OR logic.
+    OfferConditions:
+      type: object
+      properties:
+        applicable_offer_ids:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only when cart contains offers matching these
+            IDs.
+          items:
+            type: integer
+            description: Exclusion applies only when cart contains offers matching
+              these IDs.
+            format: int64
+        inapplicable_offer_ids:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply when cart contains offers matching
+            these IDs (override/exemption).
+          items:
+            type: integer
+            description: Exclusion does NOT apply when cart contains offers matching
+              these IDs (override/exemption).
+            format: int64
+        applicable_sku_ids:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only when cart contains these SKU IDs.
+          items:
+            type: integer
+            description: Exclusion applies only when cart contains these SKU IDs.
+            format: int64
+        inapplicable_sku_ids:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply when cart contains these SKU IDs.
+          items:
+            type: integer
+            description: Exclusion does NOT apply when cart contains these SKU IDs.
+            format: int64
+        applicable_external_sku_ids:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only when cart contains SKUs with these external
+            IDs.
+          items:
+            type: string
+            description: Exclusion applies only when cart contains SKUs with these
+              external IDs.
+        inapplicable_external_sku_ids:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply when cart contains SKUs with these
+            external IDs.
+          items:
+            type: string
+            description: Exclusion does NOT apply when cart contains SKUs with these
+              external IDs.
+        applicable_categories:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only when cart contains offers in these categories.
+          items:
+            type: string
+            description: Exclusion applies only when cart contains offers in these
+              categories.
+        inapplicable_categories:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply when cart contains offers in these
+            categories.
+          items:
+            type: string
+            description: Exclusion does NOT apply when cart contains offers in these
+              categories.
+        applicable_tags:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only when cart contains offers with these
+            tags.
+          items:
+            type: string
+            description: Exclusion applies only when cart contains offers with these
+              tags.
+        inapplicable_tags:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply when cart contains offers with these
+            tags.
+          items:
+            type: string
+            description: Exclusion does NOT apply when cart contains offers with these
+              tags.
+        applicable_collections:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only when cart contains offers from these
+            collections.
+          items:
+            type: string
+            description: Exclusion applies only when cart contains offers from these
+              collections.
+        inapplicable_collections:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply when cart contains offers from these
+            collections.
+          items:
+            type: string
+            description: Exclusion does NOT apply when cart contains offers from these
+              collections.
+        applicable_vendors:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only when cart contains offers from these
+            vendors.
+          items:
+            type: string
+            description: Exclusion applies only when cart contains offers from these
+              vendors.
+        inapplicable_vendors:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply when cart contains offers from these
+            vendors.
+          items:
+            type: string
+            description: Exclusion does NOT apply when cart contains offers from these
+              vendors.
+        min_cart_value:
+          type: integer
+          description: Exclusion applies only when cart subtotal >= this value (in
+            cents).
+          format: int32
+        max_cart_value:
+          type: integer
+          description: Exclusion applies only when cart subtotal <= this value (in
+            cents).
+          format: int32
+        min_item_count:
+          type: integer
+          description: Exclusion applies only when cart contains >= this many items.
+          format: int32
+        max_item_count:
+          type: integer
+          description: Exclusion applies only when cart contains <= this many items.
+          format: int32
+        min_cart_weight:
+          $ref: '#/components/schemas/WeightThreshold'
+        max_cart_weight:
+          $ref: '#/components/schemas/WeightThreshold'
+        applicable_countries:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only for shipping to these countries (ISO
+            Alpha-2 codes).
+          items:
+            type: string
+            description: Exclusion applies only for shipping to these countries (ISO
+              Alpha-2 codes).
+        inapplicable_countries:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply for shipping to these countries (ISO
+            Alpha-2 codes).
+          items:
+            type: string
+            description: Exclusion does NOT apply for shipping to these countries
+              (ISO Alpha-2 codes).
+        applicable_regions:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only for shipping to these regions/states.
+          items:
+            type: string
+            description: Exclusion applies only for shipping to these regions/states.
+        inapplicable_regions:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply for shipping to these regions/states.
+          items:
+            type: string
+            description: Exclusion does NOT apply for shipping to these regions/states.
+        applicable_postal_codes:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only for shipping to these postal/zip codes.
+          items:
+            type: string
+            description: Exclusion applies only for shipping to these postal/zip codes.
+        inapplicable_postal_codes:
+          uniqueItems: true
+          type: array
+          description: Exclusion does NOT apply for shipping to these postal/zip codes.
+          items:
+            type: string
+            description: Exclusion does NOT apply for shipping to these postal/zip
+              codes.
+        applicable_postal_code_prefixes:
+          uniqueItems: true
+          type: array
+          description: Exclusion applies only for shipping to postal codes starting
+            with these prefixes.
+          items:
+            type: string
+            description: Exclusion applies only for shipping to postal codes starting
+              with these prefixes.
+        match_mode:
+          type: string
+          description: "How to evaluate multiple IDs in applicable sets: ANY (default)\
+            \ = at least one must match, ALL = all must be present."
+          enum:
+          - ANY
+          - ALL
+      description: Conditions that determine when an exclusion rule applies based
+        on cart contents.
     OrdersConfig:
       type: object
       properties:
@@ -1307,11 +1657,6 @@ components:
           type: boolean
           description: "Is order creation, or cart submission, disabled for this merchant."
           default: false
-        order_prefix:
-          type: string
-          description: "When supported by the commerce platform, this prefix will\
-            \ be used for orders."
-          default: "null"
         custom_tags:
           uniqueItems: true
           type: array
@@ -1334,7 +1679,49 @@ components:
           default: false
         sync_policy:
           $ref: '#/components/schemas/SyncPolicy'
+        order_prefix:
+          type: string
+          description: "When supported by the commerce platform, this prefix will\
+            \ be used for orders."
+          default: "null"
       description: Configurations for the merchants order behaviors.
+    PriceExclusionRules:
+      type: object
+      properties:
+        exclude_above:
+          type: integer
+          description: Exclude methods with price greater than or equal to this value
+            (in cents).
+          format: int32
+        exclude_below:
+          type: integer
+          description: Exclude methods with price less than or equal to this value
+            (in cents).
+          format: int32
+        excluded_prices:
+          uniqueItems: true
+          type: array
+          description: Specific price values to exclude (in cents).
+          items:
+            type: integer
+            description: Specific price values to exclude (in cents).
+            format: int32
+        exclude_free:
+          type: boolean
+          description: Exclude free shipping methods (price = 0).
+      description: Price thresholds for excluding shipping methods.
+    PriceRange:
+      type: object
+      properties:
+        min:
+          type: integer
+          description: "Minimum price (inclusive, in cents)."
+          format: int32
+        max:
+          type: integer
+          description: "Maximum price (inclusive, in cents)."
+          format: int32
+      description: A price range with min and max bounds.
     ShippingConfig:
       type: object
       properties:
@@ -1351,7 +1738,60 @@ components:
         exclude_external_methods:
           type: boolean
           description: Should all external shipping methods be excluded.
+        shipping_exclusions:
+          $ref: '#/components/schemas/ShippingExclusionsConfig'
       description: Configurations for the merchants shipping behaviors.
+    ShippingExclusionRule:
+      type: object
+      properties:
+        rule_name:
+          type: string
+          description: Descriptive name for this rule (for debugging/logging purposes).
+        enabled:
+          type: boolean
+          description: Whether this rule is active. Defaults to true if not specified.
+        method_criteria:
+          $ref: '#/components/schemas/MethodMatchCriteria'
+        offer_conditions:
+          $ref: '#/components/schemas/OfferConditions'
+      description: A compound rule combining shipping method matching criteria with
+        offer-based conditions.
+    ShippingExclusionsConfig:
+      type: object
+      properties:
+        excluded_names:
+          uniqueItems: true
+          type: array
+          description: Exact shipping method names/labels to exclude globally (case-insensitive).
+          items:
+            type: string
+            description: Exact shipping method names/labels to exclude globally (case-insensitive).
+        excluded_name_patterns:
+          uniqueItems: true
+          type: array
+          description: Substrings to match against shipping method names for global
+            exclusion (case-insensitive contains match).
+          items:
+            type: string
+            description: Substrings to match against shipping method names for global
+              exclusion (case-insensitive contains match).
+        excluded_ids:
+          uniqueItems: true
+          type: array
+          description: Shipping method IDs or handles to exclude globally.
+          items:
+            type: string
+            description: Shipping method IDs or handles to exclude globally.
+        price_rules:
+          $ref: '#/components/schemas/PriceExclusionRules'
+        exclusion_rules:
+          type: array
+          description: Compound rules that combine method matching criteria with offer-based
+            conditions.
+          items:
+            $ref: '#/components/schemas/ShippingExclusionRule'
+      description: "Rules for excluding external shipping methods based on name, ID,\
+        \ price, or cart conditions."
     ShippingMethod:
       type: object
       properties:
@@ -1761,6 +2201,22 @@ components:
           type: integer
           format: int32
       description: Policies for syncing this merchants catalog.
+    WeightThreshold:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Weight value.
+          format: double
+        unit:
+          type: string
+          description: Unit of measurement.
+          enum:
+          - KG
+          - LB
+          - OZ
+          - G
+      description: A weight value with unit of measurement.
     WeightUnit:
       type: object
       properties:
@@ -1922,6 +2378,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
         platform_plan:
           type: string
           description: The eCommerce platform plan of the store
@@ -2389,8 +2846,6 @@ components:
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2403,13 +2858,15 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     Pageable:
@@ -2420,16 +2877,16 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
     Sort:
       type: object
       properties:
@@ -2448,8 +2905,6 @@ components:
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2462,13 +2917,15 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     OnboardingStep:
