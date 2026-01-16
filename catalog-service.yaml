@@ -1294,6 +1294,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
         seller:
           type: string
           description: Name of the merchant selling product.
