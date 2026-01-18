@@ -1099,6 +1099,50 @@ paths:
                     code: 9000
 components:
   schemas:
+    AddonSkuConfig:
+      type: object
+      properties:
+        rules:
+          type: array
+          description: List of addon SKU injection rules.
+          items:
+            $ref: '#/components/schemas/AddonSkuRule'
+      description: Configuration for addon SKU injection rules.
+    AddonSkuRule:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: "Optional descriptor for why this addon is injected (e.g.,\
+            \ 'return-packaging')."
+        enabled:
+          type: boolean
+          description: "Whether this rule is active. Default: true"
+        effectiveQuantityMultiplier:
+          type: integer
+          format: int32
+        rule_name:
+          type: string
+          description: Human-readable name for this rule (for logging/debugging).
+        match_tags:
+          uniqueItems: true
+          type: array
+          description: "Offer tags that trigger this rule. If an Offer has ANY of\
+            \ these tags, the addon is injected."
+          items:
+            type: string
+            description: "Offer tags that trigger this rule. If an Offer has ANY of\
+              \ these tags, the addon is injected."
+        addon_sku_id:
+          type: integer
+          description: The SKU ID to inject when the rule matches.
+          format: int64
+        quantity_multiplier:
+          type: integer
+          description: "Multiplier for addon quantity. Addon qty = original SKU qty\
+            \ × multiplier. Default: 1"
+          format: int32
+      description: A rule defining when to inject an addon SKU.
     AvailabilityConfig:
       type: object
       properties:
@@ -1220,6 +1264,12 @@ components:
       description: Any conditions that determine if a shipping method is applicable
         to the order.
       nullable: true
+    Conventions:
+      type: object
+      properties:
+        addon_sku_config:
+          $ref: '#/components/schemas/AddonSkuConfig'
+      description: Order conventions including addon SKU rules.
     ExclusionRule:
       type: object
       properties:
@@ -1684,6 +1734,8 @@ components:
           description: "When supported by the commerce platform, this prefix will\
             \ be used for orders."
           default: "null"
+        conventions:
+          $ref: '#/components/schemas/Conventions'
       description: Configurations for the merchants order behaviors.
     PriceExclusionRules:
       type: object
