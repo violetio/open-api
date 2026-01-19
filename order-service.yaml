@@ -7799,6 +7799,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
         fulfillments:
           uniqueItems: true
           type: array
@@ -7938,6 +7939,7 @@ components:
           - SENDLE
           - POSTNORD
           - YUN_EXPRESS
+          - AUSTRALIA_POST
         raw_carrier:
           type: string
           description: Raw name of carrier from the external commerce platform.
@@ -8029,6 +8031,7 @@ components:
           - SENDLE
           - POSTNORD
           - YUN_EXPRESS
+          - AUSTRALIA_POST
         label:
           type: string
           description: Shipping method label. This is the name of the shipping method.
@@ -8546,6 +8549,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
         sortBy:
           type: string
           description: "Field to sort by (id, dateLastModified, dateSubmitted, total,\
@@ -8797,9 +8801,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
@@ -8949,6 +8953,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
       description: Order Error
       nullable: true
     OrderPaymentMethod:
@@ -9501,6 +9506,7 @@ components:
           - SENDLE
           - POSTNORD
           - YUN_EXPRESS
+          - AUSTRALIA_POST
         raw_carrier:
           type: string
           description: The raw name of the carrier provided by the merchant in the
@@ -9520,6 +9526,12 @@ components:
           description: "The description of the shipping method, when provided by the\
             \ merchant."
           readOnly: true
+        auxiliary_shipping_method:
+          type: boolean
+          description: Was this rate calculated by the Violet system and not provided
+            by the merchant's platform.
+          readOnly: true
+          default: false
       description: Calculated Cart Shipping Method
       readOnly: true
     CalculatedCartSku:
@@ -9640,6 +9652,7 @@ components:
           - RITHUM
           - SHOPRENTER
           - MANUAL
+          - SHOPTET
         base_currency:
           maxLength: 3
           minLength: 3
@@ -9854,6 +9867,12 @@ components:
             type: string
             description: Error messages from the external commerce platform.
             readOnly: true
+        auxiliary_shipping_rates_applied:
+          type: boolean
+          description: Indicates if auxiliary shipping rates have been applied to
+            this cart. These are rates that are calculated by the Violet system and
+            not from the merchant's platform.
+          default: false
       description: Calculate Cart Response
       readOnly: true
     Inventory:
