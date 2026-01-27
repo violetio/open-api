@@ -3150,11 +3150,13 @@ components:
           format: int32
           default: 0
         app_customer_id:
+          maxLength: 191
           type: string
           description: App Customer ID. This should be used to map the order to the
             ID of the customer in your application.
           nullable: true
         app_order_id:
+          maxLength: 64
           type: string
           description: "App Order ID. This should be set to a unique identifier in\
             \ your system. While not enforced unique in Violet's system, it is strongly\
