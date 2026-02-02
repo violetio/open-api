@@ -7529,6 +7529,7 @@ components:
       description: Violet Wrapper for springframework sort
     Bag:
       required:
+      - id
       - merchant_id
       - order_id
       type: object
@@ -7830,10 +7831,15 @@ components:
           $ref: '#/components/schemas/communication_preferences'
       description: Per Merchant Bag in Order
     BagDiscount:
+      required:
+      - id
+      - merchant_id
+      - type
       type: object
       properties:
         id:
           type: integer
+          description: Unique ID of the BagDiscount.
           format: int64
           readOnly: true
         sku_id:
@@ -7844,9 +7850,11 @@ components:
           type: integer
           description: ID of the Bag this discount belong to
           format: int64
+          readOnly: true
         status:
           type: string
           description: Status of discount
+          readOnly: true
           enum:
           - PENDING
           - APPLIED
@@ -7892,14 +7900,17 @@ components:
           type: integer
           description: Total amount of discount applied to bag
           format: int32
+          readOnly: true
         date_created:
           type: string
           description: Date of creation
           format: date-time
+          readOnly: true
         date_last_modified:
           type: string
           description: Date of last bag discount update
           format: date-time
+          readOnly: true
         email:
           type: string
           description: "Customer email address, possibly necessary for once-per-customer\
@@ -7911,10 +7922,13 @@ components:
       description: Bag Discount
       nullable: true
     BagFulfillment:
+      required:
+      - id
       type: object
       properties:
         id:
           type: integer
+          description: Unique ID of the BagFulfillment.
           format: int64
           readOnly: true
         bag_id:
@@ -7984,10 +7998,13 @@ components:
       description: A Bag Fulfillment
       nullable: true
     BagFulfillmentSku:
+      required:
+      - id
       type: object
       properties:
         id:
           type: integer
+          description: Unique ID of the BagFulfillmentSku.
           format: int64
           readOnly: true
         fulfillment_id:
@@ -8006,6 +8023,7 @@ components:
     OrderShippingMethod:
       required:
       - bag_id
+      - id
       - merchant_id
       - price
       - shipping_method_id
@@ -8064,6 +8082,7 @@ components:
           description: ID(s) on external ecommerce platform
         id:
           type: integer
+          description: Unique ID of the OrderShippingMethod.
           format: int64
           readOnly: true
         shipping_method_id:
@@ -8086,6 +8105,7 @@ components:
       nullable: true
     OrderSku:
       required:
+      - id
       - sku_id
       type: object
       properties:
@@ -8093,21 +8113,26 @@ components:
           type: integer
           description: Unique ID of the Sku in relation to the order.
           format: int64
+          readOnly: true
         name:
           type: string
           description: "Name of the Sku, as provided by the merchant."
+          readOnly: true
         brand:
           type: string
           description: Name of the brand selling this Sku.
+          readOnly: true
         thumbnail:
           type: string
           description: URL of the thumbnail image. Useful for order overview displays.
+          readOnly: true
         quantity:
           maximum: 1000
           type: integer
           description: Quantity of the Sku being purchased. Quantities over 1000 will
             default to 1000.
           format: int32
+          default: 1
         price:
           type: integer
           description: "Price of the individual SKU, in cents."
@@ -8318,6 +8343,9 @@ components:
       description: Taxes belonging to an Order Bag
       nullable: true
     SkuDiscount:
+      required:
+      - type
+      - value_type
       type: object
       properties:
         sku_id:
@@ -8559,6 +8587,8 @@ components:
           description: Sort direction (asc or desc)
       description: Admin bag search request
     Order:
+      required:
+      - id
       type: object
       properties:
         id:
@@ -8736,6 +8766,9 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         order_status:
           type: string
           enum:
@@ -8752,9 +8785,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: Violet Order Entity
     OrderAddress:
       required:
@@ -8763,7 +8793,6 @@ components:
       - country
       - postal_code
       - state
-      - type
       type: object
       properties:
         name:
@@ -8791,6 +8820,7 @@ components:
         type:
           type: string
           description: Address Type
+          readOnly: true
           enum:
           - SHIPPING
           - BILLING
@@ -8803,9 +8833,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
@@ -9352,6 +9382,10 @@ components:
       description: Details of the discount being applied to a cart.
       nullable: true
     PaymentMethodRequest:
+      required:
+      - payment_provider
+      - token
+      - type
       type: object
       properties:
         token:
@@ -9411,6 +9445,8 @@ components:
       description: The payment method request for a cart. If the token is provided
         no card data is required.
     BagShippingMethod:
+      required:
+      - bag_id
       type: object
       properties:
         bag_id:
@@ -10081,6 +10117,7 @@ components:
           uniqueItems: true
           type: array
           description: Optional discounts to apply to the cart.
+          nullable: true
           items:
             $ref: '#/components/schemas/BagDiscount'
       description: Calculate Cart Request
@@ -10089,6 +10126,7 @@ components:
       - amount
       - app_id
       - gateway_transaction_id
+      - id
       - merchant_id
       - order_id
       - payment_transaction_id
@@ -10097,6 +10135,7 @@ components:
       properties:
         id:
           type: integer
+          description: Unique ID of the Refund.
           format: int64
           readOnly: true
         order_id:
@@ -10261,12 +10300,14 @@ components:
       description: Error associated to a refund
     RefundOrderSku:
       required:
+      - id
       - order_sku_id
       - refund_id
       type: object
       properties:
         id:
           type: integer
+          description: Unique ID of the RefundOrderSku.
           format: int64
           readOnly: true
         refund_id:
@@ -10348,15 +10389,12 @@ components:
     BagAdjustment:
       required:
       - adjusted_value
-      - app_id
-      - bag_id
       - channel_adjustment
       - channel_adjustment_amount
       - entity_type
+      - id
       - merchant_adjustment
       - merchant_adjustment_amount
-      - merchant_id
-      - order_id
       - previous_value
       - reason
       - shopper_adjustment
@@ -10372,18 +10410,22 @@ components:
           type: integer
           description: ID of the Bag this adjustment applies to.
           format: int64
+          readOnly: true
         order_id:
           type: integer
           description: ID of the parent Order (denormalized for convenience).
           format: int64
+          readOnly: true
         merchant_id:
           type: integer
           description: ID of the merchant this adjustment applies to.
           format: int32
+          readOnly: true
         app_id:
           type: integer
           description: ID of the App responsible for this Bag.
           format: int32
+          readOnly: true
         entity_type:
           type: string
           description: "Type of field being adjusted: SHIPPING_TOTAL, TAX_TOTAL, or\
@@ -10524,7 +10566,7 @@ components:
       - address_1
       - city
       - country
-      - state
+      - postal_code
       type: object
       properties:
         address_1:
@@ -10539,7 +10581,8 @@ components:
           example: Seattle
         state:
           type: string
-          description: The ISO2 (Alpha 2) code for the state or province.
+          description: The ISO2 (Alpha 2) code for the state or province. Recommended
+            for accurate tax calculation and delivery.
           example: WA
         country:
           type: string
@@ -10604,17 +10647,17 @@ components:
     CustomerDTO:
       required:
       - email
-      - first_name
-      - last_name
       type: object
       properties:
         first_name:
           type: string
-          description: First name of the customer.
+          description: "First name of the customer. While not strictly required by\
+            \ the API, most ecommerce platforms require this value for order processing."
           example: Super
         last_name:
           type: string
-          description: Last name of the customer.
+          description: "Last name of the customer. While not strictly required by\
+            \ the API, most ecommerce platforms require this value for order processing."
           example: Mario
         email:
           type: string
@@ -10622,30 +10665,34 @@ components:
           example: super@mar.io
       description: Customer information for the order.
     DiscountDTO:
+      required:
+      - type
       type: object
       properties:
         code:
           type: string
-          description: "Code of discount in the merchant platform, if any."
+          description: Code of discount in the merchant platform. Required when type
+            is `CODE`.
         external_id:
           type: string
           description: ID of discount in the merchant platform.
         type:
           type: string
-          description: Type of discount. Currently only `CODE` is supported.
+          description: Type of discount. Can be `CODE` or `CUSTOM`.
           enum:
           - CODE
           - CUSTOM
         value_type:
           type: string
-          description: Value type of discount (AMOUNT or PERCENTAGE)
+          description: Value type of discount (AMOUNT or PERCENTAGE). Required when
+            type is `CUSTOM`.
           enum:
           - AMOUNT
           - PERCENTAGE
         target_type:
           type: string
           description: "Specifies where the discount is applied. This can be at the\
-            \ ORDER, SKU, or SHIPPING level."
+            \ ORDER, SKU, or SHIPPING level. Required when type is `CUSTOM`."
           enum:
           - ORDER
           - SKU
@@ -10653,22 +10700,22 @@ components:
         amount:
           type: integer
           description: "Amount of discount, in fractional currency units (e.g. cents).\
-            \ This field is only applicable if value_type is AMOUNT."
+            \ Required when value_type is AMOUNT."
           format: int32
         percentage:
           type: number
-          description: Percentage of discount. This field is only applicable if value_type
-            is PERCENTAGE.
+          description: Percentage of discount. Required when value_type is PERCENTAGE.
           format: double
         amount_total:
           type: integer
           description: Total amount of discount applied to bag in fractional currency
-            units (e.g. cents).
+            units (e.g. cents). Required when type is `CUSTOM`.
           format: int32
         status:
           type: string
           description: "Status of discount. This can be one of: PENDING, APPLIED,\
             \ INVALID, NOT_SUPPORTED, ERROR, or EXPIRED."
+          readOnly: true
           enum:
           - PENDING
           - APPLIED
@@ -10678,7 +10725,8 @@ components:
           - EXPIRED
         sku_id:
           type: integer
-          description: ID of the SKU this discount belongs to if target_type is SKU
+          description: ID of the SKU this discount belongs to. Required when target_type
+            is SKU.
           format: int64
         email:
           type: string
@@ -10881,6 +10929,8 @@ components:
       description: Constructed Order for direct submission to merchant store.
     PaymentMethodRequestDTO:
       required:
+      - payment_provider
+      - token
       - type
       type: object
       properties:
@@ -10896,7 +10946,7 @@ components:
         payment_provider:
           type: string
           description: Payment provider that will process the payment.
-          example: Stripe
+          example: STRIPE
         token:
           type: string
           description: Token representing the payment method.
@@ -10953,7 +11003,7 @@ components:
       - address_1
       - city
       - country
-      - state
+      - postal_code
       type: object
       properties:
         address_1:
@@ -10968,7 +11018,8 @@ components:
           example: Seattle
         state:
           type: string
-          description: The ISO2 (Alpha 2) code for the state or province.
+          description: The ISO2 (Alpha 2) code for the state or province. Recommended
+            for accurate tax calculation and delivery.
           example: WA
         country:
           type: string
@@ -11483,44 +11534,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        related_orders:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Orders in Violet that are associated with
-            this transfer.
-          items:
-            type: string
-            description: Identifiers of the Orders in Violet that are associated with
-              this transfer.
-        related_bags:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Bags in Violet that are associated with
-            this transfer.
-          items:
-            type: string
-            description: Identifiers of the Bags in Violet that are associated with
-              this transfer.
-        related_distributions:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Distributions in Violet that are associated
-            with this transfer. The amount of this Transfer is directly computed as
-            the sum of all Distributions related to it.
-          items:
-            type: string
-            description: Identifiers of the Distributions in Violet that are associated
-              with this transfer. The amount of this Transfer is directly computed
-              as the sum of all Distributions related to it.
-        transfer_reversals:
-          uniqueItems: true
-          type: array
-          description: Unique identifiers of the Transfer Reversal objects in Violet
-            that are associated with this transfer.
-          items:
-            type: string
-            description: Unique identifiers of the Transfer Reversal objects in Violet
-              that are associated with this transfer.
         idempotency_key:
           type: string
           description: Unique key to prevent duplicate transfers. This is generated
@@ -11549,6 +11562,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -11558,8 +11573,118 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        externalId:
-          type: string
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedBagIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedDistributionIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveTransferReversalIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        related_orders:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_order_ids instead. Identifiers of\
+            \ the Orders in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_order_ids instead. Identifiers of\
+              \ the Orders in Violet that are associated with this transfer."
+            deprecated: true
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_bag_ids instead. Identifiers of the\
+            \ Bags in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_bag_ids instead. Identifiers of\
+              \ the Bags in Violet that are associated with this transfer."
+            deprecated: true
+        related_distributions:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_distribution_ids instead. Identifiers\
+            \ of the Distributions in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_distribution_ids instead. Identifiers\
+              \ of the Distributions in Violet that are associated with this transfer."
+            deprecated: true
+        transfer_reversals:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use transfer_reversal_ids instead. Unique identifiers\
+            \ of the Transfer Reversal objects in Violet that are associated with\
+            \ this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use transfer_reversal_ids instead. Unique identifiers\
+              \ of the Transfer Reversal objects in Violet that are associated with\
+              \ this transfer."
+            deprecated: true
+        related_order_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Orders in Violet that are associated with
+            this transfer.
+          items:
+            type: integer
+            description: Identifiers of the Orders in Violet that are associated with
+              this transfer.
+            format: int64
+        related_bag_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Bags in Violet that are associated with
+            this transfer.
+          items:
+            type: integer
+            description: Identifiers of the Bags in Violet that are associated with
+              this transfer.
+            format: int64
+        related_distribution_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Distributions in Violet that are associated
+            with this transfer. The amount of this Transfer is directly computed as
+            the sum of all Distributions related to it.
+          items:
+            type: integer
+            description: Identifiers of the Distributions in Violet that are associated
+              with this transfer. The amount of this Transfer is directly computed
+              as the sum of all Distributions related to it.
+            format: int64
+        transfer_reversal_ids:
+          uniqueItems: true
+          type: array
+          description: Unique identifiers of the Transfer Reversal objects in Violet
+            that are associated with this transfer.
+          items:
+            type: integer
+            description: Unique identifiers of the Transfer Reversal objects in Violet
+              that are associated with this transfer.
+            format: int64
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
