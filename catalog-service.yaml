@@ -1004,12 +1004,14 @@ components:
       description: Product Image Container
     Collection:
       required:
+      - id
       - merchant_id
       type: object
       properties:
         id:
           type: integer
           format: int64
+          readOnly: true
         external_id:
           type: string
           description: External ID
@@ -1218,6 +1220,10 @@ components:
       description: List of available shipping methods for this Offer.
       nullable: true
     Offer:
+      required:
+      - external_id
+      - id
+      - merchant_id
       type: object
       properties:
         id:
@@ -1885,6 +1891,7 @@ components:
       readOnly: true
     Sku:
       required:
+      - id
       - merchant_id
       - name
       - offer_id
@@ -2178,6 +2185,7 @@ components:
     Category:
       required:
       - depth
+      - id
       - name
       - slug
       type: object
@@ -2215,6 +2223,8 @@ components:
           description: Offer Id
           format: int64
         key:
+          maxLength: 191
+          minLength: 1
           type: string
           description: Key
         value:
@@ -2223,6 +2233,7 @@ components:
       description: Additional Product MetaData
     Product:
       required:
+      - id
       - name
       - slug
       type: object
@@ -2566,13 +2577,17 @@ components:
       properties:
         count:
           type: integer
+          description: Total number of products
           format: int32
-        publishedCount:
+        published_count:
           type: integer
+          description: Number of published products
           format: int32
-        notPublishedCount:
+        not_published_count:
           type: integer
+          description: Number of unpublished products
           format: int32
+      description: Product count statistics for a catalog
     Error:
       type: object
       properties:
@@ -2625,6 +2640,7 @@ components:
     ScoredCategory:
       required:
       - depth
+      - id
       - name
       - slug
       type: object
