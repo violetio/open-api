@@ -1470,44 +1470,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        related_orders:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Orders in Violet that are associated with
-            this transfer.
-          items:
-            type: string
-            description: Identifiers of the Orders in Violet that are associated with
-              this transfer.
-        related_bags:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Bags in Violet that are associated with
-            this transfer.
-          items:
-            type: string
-            description: Identifiers of the Bags in Violet that are associated with
-              this transfer.
-        related_distributions:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Distributions in Violet that are associated
-            with this transfer. The amount of this Transfer is directly computed as
-            the sum of all Distributions related to it.
-          items:
-            type: string
-            description: Identifiers of the Distributions in Violet that are associated
-              with this transfer. The amount of this Transfer is directly computed
-              as the sum of all Distributions related to it.
-        transfer_reversals:
-          uniqueItems: true
-          type: array
-          description: Unique identifiers of the Transfer Reversal objects in Violet
-            that are associated with this transfer.
-          items:
-            type: string
-            description: Unique identifiers of the Transfer Reversal objects in Violet
-              that are associated with this transfer.
         idempotency_key:
           type: string
           description: Unique key to prevent duplicate transfers. This is generated
@@ -1547,6 +1509,118 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedBagIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedDistributionIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveTransferReversalIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        related_orders:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_order_ids instead. Identifiers of\
+            \ the Orders in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_order_ids instead. Identifiers of\
+              \ the Orders in Violet that are associated with this transfer."
+            deprecated: true
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_bag_ids instead. Identifiers of the\
+            \ Bags in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_bag_ids instead. Identifiers of\
+              \ the Bags in Violet that are associated with this transfer."
+            deprecated: true
+        related_distributions:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_distribution_ids instead. Identifiers\
+            \ of the Distributions in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_distribution_ids instead. Identifiers\
+              \ of the Distributions in Violet that are associated with this transfer."
+            deprecated: true
+        transfer_reversals:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use transfer_reversal_ids instead. Unique identifiers\
+            \ of the Transfer Reversal objects in Violet that are associated with\
+            \ this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use transfer_reversal_ids instead. Unique identifiers\
+              \ of the Transfer Reversal objects in Violet that are associated with\
+              \ this transfer."
+            deprecated: true
+        related_order_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Orders in Violet that are associated with
+            this transfer.
+          items:
+            type: integer
+            description: Identifiers of the Orders in Violet that are associated with
+              this transfer.
+            format: int64
+        related_bag_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Bags in Violet that are associated with
+            this transfer.
+          items:
+            type: integer
+            description: Identifiers of the Bags in Violet that are associated with
+              this transfer.
+            format: int64
+        related_distribution_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Distributions in Violet that are associated
+            with this transfer. The amount of this Transfer is directly computed as
+            the sum of all Distributions related to it.
+          items:
+            type: integer
+            description: Identifiers of the Distributions in Violet that are associated
+              with this transfer. The amount of this Transfer is directly computed
+              as the sum of all Distributions related to it.
+            format: int64
+        transfer_reversal_ids:
+          uniqueItems: true
+          type: array
+          description: Unique identifiers of the Transfer Reversal objects in Violet
+            that are associated with this transfer.
+          items:
+            type: integer
+            description: Unique identifiers of the Transfer Reversal objects in Violet
+              that are associated with this transfer.
+            format: int64
       description: Record of Payout Transfer
     PayoutTransferError:
       required:
@@ -2030,44 +2104,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        related_orders:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Orders in Violet that are associated with
-            this transfer.
-          items:
-            type: string
-            description: Identifiers of the Orders in Violet that are associated with
-              this transfer.
-        related_bags:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Bags in Violet that are associated with
-            this transfer.
-          items:
-            type: string
-            description: Identifiers of the Bags in Violet that are associated with
-              this transfer.
-        related_distributions:
-          uniqueItems: true
-          type: array
-          description: Identifiers of the Distributions in Violet that are associated
-            with this transfer. The amount of this Transfer is directly computed as
-            the sum of all Distributions related to it.
-          items:
-            type: string
-            description: Identifiers of the Distributions in Violet that are associated
-              with this transfer. The amount of this Transfer is directly computed
-              as the sum of all Distributions related to it.
-        transfer_reversals:
-          uniqueItems: true
-          type: array
-          description: Unique identifiers of the Transfer Reversal objects in Violet
-            that are associated with this transfer.
-          items:
-            type: string
-            description: Unique identifiers of the Transfer Reversal objects in Violet
-              that are associated with this transfer.
         idempotency_key:
           type: string
           description: Unique key to prevent duplicate transfers. This is generated
@@ -2107,6 +2143,118 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedBagIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedDistributionIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveTransferReversalIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        related_orders:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_order_ids instead. Identifiers of\
+            \ the Orders in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_order_ids instead. Identifiers of\
+              \ the Orders in Violet that are associated with this transfer."
+            deprecated: true
+        related_bags:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_bag_ids instead. Identifiers of the\
+            \ Bags in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_bag_ids instead. Identifiers of\
+              \ the Bags in Violet that are associated with this transfer."
+            deprecated: true
+        related_distributions:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use related_distribution_ids instead. Identifiers\
+            \ of the Distributions in Violet that are associated with this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use related_distribution_ids instead. Identifiers\
+              \ of the Distributions in Violet that are associated with this transfer."
+            deprecated: true
+        transfer_reversals:
+          uniqueItems: true
+          type: array
+          description: "DEPRECATED: Use transfer_reversal_ids instead. Unique identifiers\
+            \ of the Transfer Reversal objects in Violet that are associated with\
+            \ this transfer."
+          deprecated: true
+          items:
+            type: string
+            description: "DEPRECATED: Use transfer_reversal_ids instead. Unique identifiers\
+              \ of the Transfer Reversal objects in Violet that are associated with\
+              \ this transfer."
+            deprecated: true
+        related_order_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Orders in Violet that are associated with
+            this transfer.
+          items:
+            type: integer
+            description: Identifiers of the Orders in Violet that are associated with
+              this transfer.
+            format: int64
+        related_bag_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Bags in Violet that are associated with
+            this transfer.
+          items:
+            type: integer
+            description: Identifiers of the Bags in Violet that are associated with
+              this transfer.
+            format: int64
+        related_distribution_ids:
+          uniqueItems: true
+          type: array
+          description: Identifiers of the Distributions in Violet that are associated
+            with this transfer. The amount of this Transfer is directly computed as
+            the sum of all Distributions related to it.
+          items:
+            type: integer
+            description: Identifiers of the Distributions in Violet that are associated
+              with this transfer. The amount of this Transfer is directly computed
+              as the sum of all Distributions related to it.
+            format: int64
+        transfer_reversal_ids:
+          uniqueItems: true
+          type: array
+          description: Unique identifiers of the Transfer Reversal objects in Violet
+            that are associated with this transfer.
+          items:
+            type: integer
+            description: Unique identifiers of the Transfer Reversal objects in Violet
+              that are associated with this transfer.
+            format: int64
         merchant_name:
           type: string
           description: Name of the merchant associated with this Transfer from the
@@ -2646,7 +2794,7 @@ components:
             description: List of Distribution IDs associated with this pending transfer
               response. The total pending transfer amount equals the sum of all related
               pending distributions.
-            format: int32
+            format: int64
         merchant_name:
           type: string
           description: Name of the merchant associated with this pending transfer.
@@ -2669,7 +2817,7 @@ components:
           type: integer
           description: Unique identifier of the Violet Distribution that this error
             is associated with.
-          format: int32
+          format: int64
         reason:
           type: string
           description: Details about why the funds associated with this Distribution
@@ -2711,7 +2859,7 @@ components:
             description: List of Distribution IDs that were successfully processed
               in this external transfer. The total pending transfer amount equals
               the sum of all related pending distributions.
-            format: int32
+            format: int64
         failed_distributions:
           type: array
           description: List of failed Distribution IDs associated with this pending
@@ -2722,7 +2870,7 @@ components:
             description: List of failed Distribution IDs associated with this pending
               transfer response. The total pending transfer amount equals the sum
               of all related pending distributions.
-            format: int32
+            format: int64
         metadata:
           type: object
           additionalProperties:
@@ -2773,7 +2921,7 @@ components:
             description: List of Distribution IDs associated with this pending transfer
               response. The total pending transfer amount equals the sum of all related
               pending distributions.
-            format: int32
+            format: int64
         metadata:
           type: object
           additionalProperties:
