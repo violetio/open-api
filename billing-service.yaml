@@ -1340,6 +1340,14 @@ components:
           format: int32
         externalTransactionId:
           type: string
+        payment_platform_connection_id:
+          type: integer
+          description: "Unique identifier of the PaymentPlatformConnection that processed\
+            \ this Distribution. Set on BOTH merchant and developer distributions\
+            \ for traceability. For DEVELOPER distributions: identifies the platform\
+            \ used for payment processing. For MERCHANT distributions: provides audit\
+            \ trail of which platform processed the payment."
+          format: int64
       description: "Records detailing the financial transactions and distributions\
         \ for a specific Bag, which includes a breakdown of fund allocations and payment\
         \ gateway fees for Merchants and Channels."
