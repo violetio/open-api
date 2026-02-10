@@ -2597,9 +2597,25 @@ components:
           $ref: '#/components/schemas/VioletSort'
     Bag:
       required:
+      - app_id
+      - channel
+      - commission_rate
+      - currency
+      - date_created
+      - date_last_modified
+      - dispute_status
+      - external_checkout
+      - external_currency
+      - financial_status
+      - fulfillment_status
       - id
       - merchant_id
+      - merchant_name
       - order_id
+      - platform
+      - skus
+      - status
+      - taxes_included
       type: object
       properties:
         communicationPreferencesInternal:
@@ -2627,10 +2643,12 @@ components:
           type: integer
           description: ID of the parent order the Bag is a child of.
           format: int64
+          readOnly: true
         merchant_id:
           type: integer
           description: ID of the merchant the Bag is related to.
           format: int32
+          readOnly: true
         merchant_name:
           type: string
           description: Name of the merchant the Bag is related to.
@@ -2693,6 +2711,7 @@ components:
         dispute_status:
           type: string
           description: Dispute status of the Bag.
+          readOnly: true
           default: UNDISPUTED
           enum:
           - UNDISPUTED
@@ -2702,6 +2721,7 @@ components:
         skus:
           type: array
           description: Sku's (line items) that have been added to the Bag.
+          readOnly: true
           items:
             $ref: '#/components/schemas/OrderSku'
         shipping_method:
@@ -2753,6 +2773,7 @@ components:
           description: The rate used to calculate the apps commission rate for the
             Bag.
           format: double
+          readOnly: true
         date_created:
           maxLength: 24
           type: string
@@ -2824,6 +2845,7 @@ components:
         platform:
           type: string
           description: The commerce platform used by this merchant.
+          readOnly: true
           enum:
           - OTHER
           - SHOPIFY
@@ -2898,10 +2920,15 @@ components:
         communication_preferences:
           $ref: '#/components/schemas/communication_preferences'
       description: Per Merchant Bag in Order
+      readOnly: true
     BagDiscount:
       required:
+      - bag_id
+      - date_created
+      - date_last_modified
       - id
       - merchant_id
+      - status
       - type
       type: object
       properties:
@@ -2956,6 +2983,7 @@ components:
         external_id:
           type: string
           description: External ID of discount
+          readOnly: true
         amount:
           type: integer
           description: Amount of discount
@@ -2991,7 +3019,11 @@ components:
       nullable: true
     BagFulfillment:
       required:
+      - bag_id
+      - carrier_status
       - id
+      - skus
+      - status
       type: object
       properties:
         id:
@@ -3003,13 +3035,18 @@ components:
           type: integer
           description: ID of the bag the fulfillment belongs to.
           format: int64
+          readOnly: true
         external_id:
           type: string
           description: ID of the fulfillment on the external commerce platform.
+          nullable: true
+          readOnly: true
         carrier:
           type: string
           description: Carrier responsible for the fulfillment. Will be OTHER if raw
             carrier is not recognized.
+          nullable: true
+          readOnly: true
           enum:
           - OTHER
           - UPS
@@ -3025,9 +3062,12 @@ components:
         raw_carrier:
           type: string
           description: Raw name of carrier from the external commerce platform.
+          nullable: true
+          readOnly: true
         status:
           type: string
           description: Status of the bag fullfillment.
+          readOnly: true
           enum:
           - PENDING
           - PROCESSING
@@ -3039,6 +3079,7 @@ components:
         carrier_status:
           type: string
           description: Status provided by the carrier.
+          readOnly: true
           enum:
           - PENDING
           - LABEL_PURCHASED
@@ -3054,20 +3095,28 @@ components:
         tracking_number:
           type: string
           description: Tracking number provided by the carrier.
+          nullable: true
+          readOnly: true
         tracking_url:
           type: string
           description: Tracking URL provided by the carrier.
+          nullable: true
+          readOnly: true
         skus:
           uniqueItems: true
           type: array
           description: SKUs fulfilled by this fulfillment.
+          readOnly: true
           items:
             $ref: '#/components/schemas/BagFulfillmentSku'
       description: A Bag Fulfillment
       nullable: true
     BagFulfillmentSku:
       required:
+      - fulfillment_id
       - id
+      - order_sku_id
+      - quantity_fulfilled
       type: object
       properties:
         id:
@@ -3079,18 +3128,37 @@ components:
           type: integer
           description: ID of the fulfillment that contains this item.
           format: int64
+          readOnly: true
         order_sku_id:
           type: integer
           description: ID of the SKU in the Bag.
           format: int64
+          readOnly: true
         quantity_fulfilled:
           type: integer
           description: Quantity of the this item fulfilled by this fulfillment.
           format: int32
+          readOnly: true
       description: A bag fulfillment sku
+      readOnly: true
     Order:
       required:
+      - app_id
+      - bags
+      - currency
+      - date_created
+      - date_last_modified
+      - developer_id
+      - discount_total
       - id
+      - is_guest
+      - priced
+      - shipping_total
+      - status
+      - sub_total
+      - tax_total
+      - total
+      - wallet_based_checkout
       type: object
       properties:
         id:
@@ -3113,23 +3181,27 @@ components:
             \ so you must always check the response for errors in this list to know\
             \ if there was an issue on the order."
           nullable: true
+          readOnly: true
           items:
             $ref: '#/components/schemas/OrderError'
         user_id:
           type: integer
           description: ID of the User placing the order
           format: int64
+          readOnly: true
           deprecated: true
         app_id:
           type: integer
           description: ID of the App responsible for the creation and submission of
             this Order.
           format: int32
+          readOnly: true
         developer_id:
           type: integer
           description: ID of the Developer responsible for the creation and submission
             of this Order.
           format: int32
+          readOnly: true
         customer:
           $ref: '#/components/schemas/OrderCustomer'
         bags:
@@ -3137,6 +3209,7 @@ components:
           description: "One or more Bags that make up the Order. Each Bag will contain\
             \ the Sku's, shipping methods, and totals unique to a merchant. Each merchant\
             \ in an Order will have their own Bag."
+          readOnly: true
           items:
             $ref: '#/components/schemas/Bag'
         shipping_address:
@@ -3262,6 +3335,8 @@ components:
           type: string
           description: Payment intent client secret. Use for payment intent based
             payment capture and external captures
+          nullable: true
+          readOnly: true
         payment_transactions:
           uniqueItems: true
           type: array
@@ -3376,6 +3451,11 @@ components:
       description: Details of the customer placing the order.
       nullable: true
     OrderError:
+      required:
+      - date_created
+      - id
+      - order_id
+      - type
       type: object
       properties:
         id:
@@ -3387,19 +3467,25 @@ components:
           type: integer
           description: ID of the parent Order this error occurred in.
           format: int64
+          readOnly: true
         bag_id:
           type: integer
           description: ID of the parent Bag this error occurred in.
           format: int64
+          nullable: true
+          readOnly: true
         entity_id:
           type: string
           description: ID of the entity that caused the error. See the `entity_type`
             property to determine which entity this ID is associated with.
+          nullable: true
+          readOnly: true
         entity_type:
           type: string
           description: Type of entity that caused the error. See the `entity_id` property
             to determine which entity of this type is related to the error.
           nullable: true
+          readOnly: true
           enum:
           - ORDER
           - BAG
@@ -3408,6 +3494,7 @@ components:
           type: string
           description: "Type of error, indicates which action was being taken when\
             \ the error occurred."
+          readOnly: true
           enum:
           - EXTERNAL_CREATE_CART
           - EXTERNAL_ADD_ITEM
@@ -3436,13 +3523,17 @@ components:
           type: string
           description: A string message providing more details about the error.
           nullable: true
+          readOnly: true
         date_created:
           type: string
           description: Date the error was first created in Violet.
           format: date-time
+          readOnly: true
         platform:
           type: string
           description: The external commerce platform the error occurred in.
+          nullable: true
+          readOnly: true
           enum:
           - OTHER
           - SHOPIFY
@@ -3490,6 +3581,7 @@ components:
           - SHOPTET
       description: Order Error
       nullable: true
+      readOnly: true
     OrderPaymentMethod:
       required:
       - payment_method_id
@@ -3498,47 +3590,66 @@ components:
         brand:
           type: string
           description: Brand of Card
+          nullable: true
+          readOnly: true
         last_four:
           type: string
           description: Last Four Numbers on Card
+          nullable: true
+          readOnly: true
         exp_month:
           type: integer
           description: Card Expiration Month
           format: int32
+          nullable: true
+          readOnly: true
         exp_year:
           type: integer
           description: Card Expiration Year
           format: int32
+          nullable: true
+          readOnly: true
         cardholder_name:
           type: string
           description: Name as it appears on Card
+          nullable: true
+          readOnly: true
         payment_method_id:
           type: integer
           description: ID of the referenced Payment Method
           format: int64
+          readOnly: true
         default:
           type: boolean
           description: Is Default Method
+          nullable: true
+          readOnly: true
       description: Payment Method belonging to an Order
       nullable: true
     OrderShippingMethod:
       required:
+      - Carrier
       - bag_id
+      - custom
       - id
+      - label
       - merchant_id
       - price
       - shipping_method_id
+      - type
       type: object
       properties:
         type:
           type: string
           description: Type of Shipping Method
+          readOnly: true
           enum:
           - CALCULATED
           - FLAT_RATE_PRICE
           - FLAT_RATE_WEIGHT
         Carrier:
           type: string
+          nullable: true
           enum:
           - OTHER
           - UPS
@@ -3562,6 +3673,7 @@ components:
           type: boolean
           description: Is the shipping method custom. True when the price has been
             overridden.
+          readOnly: true
         min_subtotal:
           type: integer
           description: Minimum Subtotal. In Cents. Only applies to Flat Rate by Price
@@ -3581,6 +3693,8 @@ components:
         external_id:
           type: string
           description: ID(s) on external ecommerce platform
+          nullable: true
+          readOnly: true
         id:
           type: integer
           description: Unique ID of the OrderShippingMethod.
@@ -3593,21 +3707,31 @@ components:
           type: integer
           description: ID of the Bag the Shipping Method applies to
           format: int64
+          readOnly: true
         merchant_id:
           type: integer
           description: ID of the merchant the bag belongs to
           format: int32
+          readOnly: true
         tracking_number:
           type: string
           description: "Carrier Tracking Number. Deprecated: Use `fulfillments` on\
             \ the Bag object instead."
+          nullable: true
+          readOnly: true
           deprecated: true
       description: Shipping Methods belonging to an Order
       nullable: true
     OrderSku:
       required:
+      - app_id
+      - available
       - id
+      - merchant_id
+      - offer_id
+      - quantity
       - sku_id
+      - status
       type: object
       properties:
         id:
@@ -3636,36 +3760,43 @@ components:
           default: 1
         price:
           type: integer
-          description: "Price of the individual SKU, in cents."
+          description: "Price of the individual SKU, in cents. If not provided, the\
+            \ value from the catalog will be used."
           format: int32
         weight:
           type: number
           description: Weight of Sku.
           format: double
           nullable: true
+          readOnly: true
         height:
           type: number
           description: Height of Sku.
           format: double
           nullable: true
+          readOnly: true
         width:
           type: number
           description: Width of Sku.
           format: double
           nullable: true
+          readOnly: true
         length:
           type: number
           description: Length of Sku.
           format: double
           nullable: true
+          readOnly: true
         available:
           type: boolean
           description: Is the product still available for purchase. If a Sku becomes
             unavailable it likely means that the product became out of stock after
             it was added to the cart. Unavailable Sku's cannot be purchased.
+          readOnly: true
         status:
           type: string
           description: Current status of the Sku.
+          readOnly: true
           enum:
           - IN_PROGRESS
           - PROCESSING
@@ -3682,10 +3813,14 @@ components:
         custom:
           type: boolean
           description: Is the Sku custom. Is `true` when the price has been overridden.
+          nullable: true
+          readOnly: true
         rates:
           type: array
           description: "Rates that apply specifically to this Sku such as taxes, fees,\
             \ or duties."
+          nullable: true
+          readOnly: true
           items:
             $ref: '#/components/schemas/OrderSkuRate'
         discount:
@@ -3694,18 +3829,23 @@ components:
           type: integer
           description: ID of the parent Offer that this Sku is a child of.
           format: int64
+          readOnly: true
         merchant_id:
           type: integer
           description: ID of the Merchant this Sku belongs to.
           format: int32
+          readOnly: true
         app_id:
           type: integer
           description: ID of the App responsible for the creation and submission of
             this Order.
           format: int32
+          readOnly: true
         product_id:
           type: string
           description: ID of the parent product the offer is a child off.
+          nullable: true
+          readOnly: true
           deprecated: true
         sku_id:
           type: integer
@@ -3714,9 +3854,13 @@ components:
         external_id:
           type: string
           description: ID of the SKU on the external commerce platform.
+          nullable: true
+          readOnly: true
         product_type:
           type: string
           description: Product type that describes the Sku.
+          nullable: true
+          readOnly: true
           enum:
           - PHYSICAL
           - DIGITAL
@@ -3736,11 +3880,15 @@ components:
           type: integer
           description: "Price of the Sku multiplied by the quantity, in Cents"
           format: int32
+          readOnly: true
         quantity_fulfilled:
           type: integer
           description: The quantity of this item that has been fulfilled by the merchant.
           format: int32
+          nullable: true
+          readOnly: true
       description: SKUs belonging to an Order
+      readOnly: true
     OrderSkuCustomProperty:
       required:
       - name
@@ -3773,17 +3921,22 @@ components:
           type: integer
           description: ID of the Order SKU the Rate belongs to
           format: int64
+          readOnly: true
         amount:
           type: integer
           description: Total Tax amount on Bag. In Cents
           format: int32
+          readOnly: true
         rate:
           type: number
           description: Rate
           format: double
+          nullable: true
+          readOnly: true
         type:
           type: string
           description: Rate Type
+          readOnly: true
           enum:
           - TAX
           - SHIPPING
@@ -3792,13 +3945,18 @@ components:
         name:
           type: string
           description: Rate Name
+          readOnly: true
         decimal_rate:
           type: number
           format: double
+          readOnly: true
         dollar_amount:
           type: number
           format: double
+          readOnly: true
       description: Rates belonging to Order SKUs
+      nullable: true
+      readOnly: true
     OrderTax:
       required:
       - amount
@@ -3812,91 +3970,124 @@ components:
           type: integer
           description: ID of the Order the Tax belongs to
           format: int64
+          readOnly: true
         merchant_id:
           type: integer
           description: ID of the Merchant the Bag belongs to
           format: int32
+          readOnly: true
         skus:
           type: array
           description: SKUs covered by the Tax
+          nullable: true
+          readOnly: true
           items:
             type: string
             description: SKUs covered by the Tax
+            nullable: true
+            readOnly: true
         state:
           type: string
           description: State abbreviation
+          readOnly: true
         postal_code:
           type: string
           description: Postal/Zip Code
+          nullable: true
+          readOnly: true
         rate:
           type: number
           description: Tax Rate
           format: double
+          readOnly: true
         amount:
           type: integer
           description: Total Tax amount on Bag. In Cents
           format: int32
+          readOnly: true
         description:
           maxLength: 255
           minLength: 0
           type: string
           description: Description of the Tax
+          nullable: true
+          readOnly: true
       description: Taxes belonging to an Order Bag
       nullable: true
     PaymentTransaction:
       required:
       - amount
+      - capture_method
+      - capture_status
       - currency
+      - date_created
+      - date_last_modified
+      - errors
+      - id
       - order_id
       - payment_provider
       - payment_provider_transaction_id
+      - related_bags
       type: object
       properties:
         id:
           type: integer
           description: Unique identifier for the object
           format: int64
+          readOnly: true
         order_id:
           type: integer
           description: Identifier of the Order entity that this payment transaction
             is associated with
           format: int64
+          readOnly: true
         payment_provider:
           type: string
           description: Payment Provider that this transaction is executed against.
             This is the provider that handles payment processing for this transaction.
+          readOnly: true
         payment_provider_transaction_id:
           type: string
           description: Identifier of the payment transaction in the underlying payment
             provider system.
+          readOnly: true
         payment_method_id:
           type: integer
           description: 'Identifier of the payment method associated with this payment
             transaction in Violet. '
           format: int64
+          nullable: true
+          readOnly: true
         payment_provider_payment_method_id:
           type: string
           description: 'Identifier of the payment method associated with this payment
             transaction in the underlying payment provider system. '
+          nullable: true
+          readOnly: true
         payment_intent_client_secret:
           type: string
           description: Client secret for the payment intent associated to this payment
             transaction
+          nullable: true
+          readOnly: true
         amount:
           type: integer
           description: 'Amount of this payment in the fractional currency unit of
             this transaction (e.g. cents). This is the amount charged to the shopper. '
           format: int32
+          readOnly: true
         currency:
           type: string
           description: Currency that the amount of this payment transaction is reflected
             in. This is the currency that the payment provider uses to charge the
             shopper payment method.
+          readOnly: true
         capture_status:
           type: string
           description: Underlying status of the payment capture in the payment provider
             system and should be used to determine what action to take next against
             this payment transaction.
+          readOnly: true
           enum:
           - PROCESSING
           - CAPTURED
@@ -3912,9 +4103,9 @@ components:
           - NOT_REQUIRED
         capture_method:
           type: string
-          description: Underlying status of the payment in the payment provider system
-            and should be used to determine what action to take next against this
-            payment transaction.
+          description: Method used to capture the payment in the payment provider
+            system. Determines how and when the payment is captured.
+          readOnly: true
           enum:
           - AUTOMATIC
           - CUSTOM
@@ -3924,6 +4115,8 @@ components:
           type: string
           description: Status of the transfer of distributions associated with this
             payment transaction.
+          nullable: true
+          readOnly: true
           enum:
           - SENT
           - REVERSED
@@ -3935,9 +4128,10 @@ components:
           - QUEUED
         transfer_method:
           type: string
-          description: Underlying status of the payment in the payment provider system
-            and should be used to determine what action to take next against this
-            payment transaction.
+          description: Method used for transferring distributions associated with
+            this payment transaction.
+          nullable: true
+          readOnly: true
           enum:
           - AUTOMATIC
           - CUSTOM
@@ -3949,46 +4143,59 @@ components:
             type: object
             description: Metadata from the payment provider associated to this payment
               transaction
+            nullable: true
+            readOnly: true
           description: Metadata from the payment provider associated to this payment
             transaction
+          nullable: true
+          readOnly: true
         related_bags:
           uniqueItems: true
           type: array
           description: 'Identifiers of the Bags in Violet that are associated with
             this payment transaction. The amount of this payment transaction is directly
             computed from the total amounts on the related bags. '
+          readOnly: true
           items:
             type: string
             description: 'Identifiers of the Bags in Violet that are associated with
               this payment transaction. The amount of this payment transaction is
               directly computed from the total amounts on the related bags. '
+            readOnly: true
         related_refunds:
           uniqueItems: true
           type: array
           description: Identifiers of the Refunds in Violet that are associated with
             this payment transaction. Refund amounts are not reflected in the amount
             on this payment transaction.
+          nullable: true
+          readOnly: true
           items:
             type: string
             description: Identifiers of the Refunds in Violet that are associated
               with this payment transaction. Refund amounts are not reflected in the
               amount on this payment transaction.
+            nullable: true
+            readOnly: true
         errors:
           uniqueItems: true
           type: array
           description: List of errors associated to this payment transaction during
             processing.. This value will only be populated if there are errors during
             processing
+          readOnly: true
           items:
             $ref: '#/components/schemas/PaymentTransactionError'
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
           format: date-time
+          readOnly: true
         date_last_modified:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+          readOnly: true
         status:
           type: string
           enum:
@@ -4042,6 +4249,7 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
+      readOnly: true
     SkuDiscount:
       required:
       - type
@@ -4074,6 +4282,7 @@ components:
           - PERCENTAGE
       description: "Discount that should be applied to this SKU, if any. Only `CUSTOM`\
         \ discounts can be passed to be applied at the SKU-level."
+      nullable: true
     communication_preference_detail:
       type: object
       properties:
