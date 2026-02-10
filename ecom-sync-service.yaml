@@ -4196,6 +4196,14 @@ components:
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
           readOnly: true
+        payment_platform_connection_id:
+          type: integer
+          description: 'Identifier of the PaymentPlatformConnection used for this
+            transaction. This is the immutable reference to the connection configuration
+            at the time of payment. '
+          format: int64
+          nullable: true
+          readOnly: true
         status:
           type: string
           enum:
