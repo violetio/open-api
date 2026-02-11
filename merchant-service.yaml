@@ -1269,7 +1269,67 @@ components:
       properties:
         addon_sku_config:
           $ref: '#/components/schemas/AddonSkuConfig'
-      description: Order conventions including addon SKU rules.
+        custom_tag_config:
+          $ref: '#/components/schemas/CustomTagConfig'
+      description: Order conventions including addon SKU rules and custom tag rules.
+    CustomTagConfig:
+      type: object
+      properties:
+        rules:
+          type: array
+          description: List of conditional order tagging rules.
+          items:
+            $ref: '#/components/schemas/CustomTagRule'
+      description: Configuration for rule-based order tagging.
+    CustomTagRule:
+      type: object
+      properties:
+        tag:
+          type: string
+          description: The tag string to apply to the order when conditions are met.
+        enabled:
+          type: boolean
+          description: "Whether this rule is active. Default: true"
+        reason:
+          type: string
+          description: "Optional descriptor for why this tag is applied (e.g., 'high-value-order')."
+        rule_name:
+          type: string
+          description: Human-readable name for this rule (for logging/debugging).
+        min_order_price:
+          type: integer
+          description: "Minimum order price (inclusive, in cents) for this tag to\
+            \ apply. Null means no minimum."
+          format: int32
+        max_order_price:
+          type: integer
+          description: "Maximum order price (inclusive, in cents) for this tag to\
+            \ apply. Null means no maximum."
+          format: int32
+        app_ids:
+          uniqueItems: true
+          type: array
+          description: "Set of application IDs. If specified, the tag applies only\
+            \ when the order is placed by one of these apps."
+          items:
+            type: integer
+            description: "Set of application IDs. If specified, the tag applies only\
+              \ when the order is placed by one of these apps."
+            format: int64
+        has_custom_properties:
+          type: boolean
+          description: "If true, the tag applies only when at least one SKU in the\
+            \ order has custom properties."
+        match_tags:
+          uniqueItems: true
+          type: array
+          description: "Offer tags that trigger this rule. If an Offer has ANY of\
+            \ these tags, the tag is applied."
+          items:
+            type: string
+            description: "Offer tags that trigger this rule. If an Offer has ANY of\
+              \ these tags, the tag is applied."
+      description: A rule defining when to apply a custom tag to an order.
     ExclusionRule:
       type: object
       properties:
@@ -1329,24 +1389,116 @@ components:
           type: object
           additionalProperties:
             type: boolean
-            description: "Feature flags that apply to a merchant globally, regardless\
-              \ of their commerce platform."
-          description: "Feature flags that apply to a merchant globally, regardless\
-            \ of their commerce platform."
+            description: |
+              Feature flags that apply to a merchant globally, regardless of their commerce platform.
+
+              **Allowed Keys:**
+              - `sync_metadata` - When enabled, synchronizes product-level metadata (custom fields, tags, vendor info) from the commerce platform. Requires explicit `true`. Default: disabled.
+              - `sync_sku_metadata` - When enabled, synchronizes SKU-level metadata including variant-specific custom fields. Also triggers expanded SKU data collection for richer variant information. Requires explicit `true`. Default: disabled.
+              - `sync_taxonomy` - When enabled, synchronizes product taxonomy and category hierarchies from the commerce platform. Enabled by default; set to `false` to disable.
+              - `sync_collections` - When enabled, synchronizes product collections/groupings (e.g., Shopify collections, Wix collections). Requires explicit `true`. Default: disabled.
+              - `truify_offer_visibility` - When enabled, forces offer visibility to true during catalog sync, overriding the source platform's visibility settings. Requires explicit `true`. Default: disabled.
+              - `disable_hidden_offers` - When enabled, sets hidden/draft products to disabled status rather than syncing their original visibility. Requires explicit `true`. Default: disabled.
+              - `auto_publish_offers` - When enabled, automatically publishes offers after creation or update. Enabled by default; set to `false` to require manual publishing.
+              - `sync_offer_sale_price` - When enabled, synchronizes sale/promotional prices alongside regular prices. Enabled by default; set to `false` to ignore sale prices.
+              - `sync_offer_shipping` - When enabled, synchronizes product-level shipping data including weight, dimensions, and shipping class. Requires explicit `true`. Default: disabled.
+              - `use_contextual_prices` - When enabled, fetches and stores region or customer-segment specific pricing. Also triggers expanded SKU data collection. Requires explicit `true`. Default: disabled.
+              - `log_ecom_service_client` - When enabled, activates detailed trace logging for all commerce platform API calls including request/response bodies. Useful for debugging. Requires explicit `true`. Default: disabled.
+              - `exclude_hidden_offers` - When enabled, completely excludes hidden/draft products from catalog sync rather than syncing them as disabled. Requires explicit `true`. Default: disabled.
+              - `bypass_inventory_policies` - When enabled, ignores commerce platform inventory policies and availability rules. Products are considered in-stock if purchasable, regardless of inventory tracking settings. Requires explicit `true`. Default: disabled.
+              - `proxy_original_customer_email` - When enabled, forwards the original customer email address during order submission rather than using a proxy email. Requires explicit `true`. Default: disabled.
+              - `enable_addon_sku_injection` - When enabled, automatically injects addon SKUs into orders based on configured rules in `orders_config.conventions.addon_sku_config`. Requires explicit `true`. Default: disabled.
+              - `fallback_tax_calculation_enabled` - When enabled, Violet will attempt to calculate fallback taxes when the ecommerce platform fails to return tax information. Requires explicit `true`. Default: disabled.
+              - `enable_custom_tag_rules` - When enabled, evaluates rule-based custom tag conditions from `orders_config.conventions.custom_tag_config` to conditionally tag orders. Requires explicit `true`. Default: disabled.
+          description: |
+            Feature flags that apply to a merchant globally, regardless of their commerce platform.
+
+            **Allowed Keys:**
+            - `sync_metadata` - When enabled, synchronizes product-level metadata (custom fields, tags, vendor info) from the commerce platform. Requires explicit `true`. Default: disabled.
+            - `sync_sku_metadata` - When enabled, synchronizes SKU-level metadata including variant-specific custom fields. Also triggers expanded SKU data collection for richer variant information. Requires explicit `true`. Default: disabled.
+            - `sync_taxonomy` - When enabled, synchronizes product taxonomy and category hierarchies from the commerce platform. Enabled by default; set to `false` to disable.
+            - `sync_collections` - When enabled, synchronizes product collections/groupings (e.g., Shopify collections, Wix collections). Requires explicit `true`. Default: disabled.
+            - `truify_offer_visibility` - When enabled, forces offer visibility to true during catalog sync, overriding the source platform's visibility settings. Requires explicit `true`. Default: disabled.
+            - `disable_hidden_offers` - When enabled, sets hidden/draft products to disabled status rather than syncing their original visibility. Requires explicit `true`. Default: disabled.
+            - `auto_publish_offers` - When enabled, automatically publishes offers after creation or update. Enabled by default; set to `false` to require manual publishing.
+            - `sync_offer_sale_price` - When enabled, synchronizes sale/promotional prices alongside regular prices. Enabled by default; set to `false` to ignore sale prices.
+            - `sync_offer_shipping` - When enabled, synchronizes product-level shipping data including weight, dimensions, and shipping class. Requires explicit `true`. Default: disabled.
+            - `use_contextual_prices` - When enabled, fetches and stores region or customer-segment specific pricing. Also triggers expanded SKU data collection. Requires explicit `true`. Default: disabled.
+            - `log_ecom_service_client` - When enabled, activates detailed trace logging for all commerce platform API calls including request/response bodies. Useful for debugging. Requires explicit `true`. Default: disabled.
+            - `exclude_hidden_offers` - When enabled, completely excludes hidden/draft products from catalog sync rather than syncing them as disabled. Requires explicit `true`. Default: disabled.
+            - `bypass_inventory_policies` - When enabled, ignores commerce platform inventory policies and availability rules. Products are considered in-stock if purchasable, regardless of inventory tracking settings. Requires explicit `true`. Default: disabled.
+            - `proxy_original_customer_email` - When enabled, forwards the original customer email address during order submission rather than using a proxy email. Requires explicit `true`. Default: disabled.
+            - `enable_addon_sku_injection` - When enabled, automatically injects addon SKUs into orders based on configured rules in `orders_config.conventions.addon_sku_config`. Requires explicit `true`. Default: disabled.
+            - `fallback_tax_calculation_enabled` - When enabled, Violet will attempt to calculate fallback taxes when the ecommerce platform fails to return tax information. Requires explicit `true`. Default: disabled.
+            - `enable_custom_tag_rules` - When enabled, evaluates rule-based custom tag conditions from `orders_config.conventions.custom_tag_config` to conditionally tag orders. Requires explicit `true`. Default: disabled.
         platform_feature_flags:
           type: object
           additionalProperties:
             type: boolean
-            description: Feature flags that apply to a merchant depending on their
-              commerce platform.
-          description: Feature flags that apply to a merchant depending on their commerce
-            platform.
+            description: |
+              Feature flags that apply to a merchant depending on their commerce platform.
+
+              **Shopify Flags:**
+              - `use_custom_shipping_rates` - When enabled, allows custom shipping rates via the DraftOrders API. Enabled by default; set to `false` to disable.
+              - `filter_by_collections` - When enabled, filters product sync to only include products from collections specified in `shopify_config.enabled_collection_ids`. Also applies to Wix. Requires explicit `true`. Default: disabled.
+              - `use_graph_products` - Legacy flag for GraphQL product sync. As of 2025.06.22, GraphQL is always used regardless of this setting.
+              - `populate_order_note_field` - When enabled, populates the Shopify order note field with the platform Order ID for merchant reference. Enabled by default; set to `false` to disable.
+              - `filter_inventory_by_locations` - When enabled, filters inventory to only include stock from locations specified in `shopify_config.enabled_location_ids`. Also applies to BigCommerce. Requires explicit `true`. Default: disabled.
+              - `disable_offline_offers` - When enabled, disables offers that are not published to the Shopify Online Store sales channel. Requires explicit `true`. Default: disabled.
+              - `use_native_order_name` - When enabled, uses Shopify's native order naming convention during order writeback instead of the platform's order ID. Requires explicit `true`. Default: disabled.
+              - `use_storefront_api` - When enabled, uses the Shopify Storefront API for product sync and order writeback, allowing merchants to control product availability via Product Listings. Requires explicit `true`. Default: disabled.
+              - `use_cart_estimation` - When enabled, creates a draft order for shipping rate estimation instead of using draft order calculation. Requires explicit `true`. Default: disabled.
+              - `redistribute_taxes` - When enabled, requests tax distribution from Shopify during order creation and assigns taxes as line items. Requires explicit `true`. Default: disabled.
+
+              **WooCommerce Flags:**
+              - `use_short_description` - When enabled, syncs the WooCommerce short description field instead of the full product description. Also applies to Prestashop. Requires explicit `true`. Default: disabled (uses full description).
+              - `sync_duplicate_sku_media` - When enabled, syncs media for products with duplicate SKUs. Requires explicit `true`. Default: disabled.
+              - `use_basic_auth` - When enabled, uses HTTP Basic Authentication instead of OAuth for WooCommerce API calls. Requires explicit `true`. Default: disabled.
+              - `filter_by_categories` - When enabled, filters product sync to only include products from categories specified in the platform config. Also applies to BigCommerce, SFCC, Ecwid, and Magento. Requires explicit `true`. Default: disabled.
+
+              **SFCC (Salesforce Commerce Cloud) Flags:**
+              - `filter_by_catalog` - When enabled, filters products and collections to only those in catalogs specified in `sfcc_config.enabled_catalog_ids`. Requires explicit `true`. Default: disabled.
+
+              **BigCommerce Flags:**
+              - `use_price_lists` - When enabled, uses BigCommerce price lists for pricing from `bigcommerce_config.enabled_price_list_ids`. Requires explicit `true`. Default: disabled.
+
+              **CommerceTools Flags:**
+              - `filter_inventory_by_channels` - When enabled, filters inventory to only include stock from channels specified in `commercetools_config.enabled_channel_ids`. Requires explicit `true`. Default: disabled.
+          description: |
+            Feature flags that apply to a merchant depending on their commerce platform.
+
+            **Shopify Flags:**
+            - `use_custom_shipping_rates` - When enabled, allows custom shipping rates via the DraftOrders API. Enabled by default; set to `false` to disable.
+            - `filter_by_collections` - When enabled, filters product sync to only include products from collections specified in `shopify_config.enabled_collection_ids`. Also applies to Wix. Requires explicit `true`. Default: disabled.
+            - `use_graph_products` - Legacy flag for GraphQL product sync. As of 2025.06.22, GraphQL is always used regardless of this setting.
+            - `populate_order_note_field` - When enabled, populates the Shopify order note field with the platform Order ID for merchant reference. Enabled by default; set to `false` to disable.
+            - `filter_inventory_by_locations` - When enabled, filters inventory to only include stock from locations specified in `shopify_config.enabled_location_ids`. Also applies to BigCommerce. Requires explicit `true`. Default: disabled.
+            - `disable_offline_offers` - When enabled, disables offers that are not published to the Shopify Online Store sales channel. Requires explicit `true`. Default: disabled.
+            - `use_native_order_name` - When enabled, uses Shopify's native order naming convention during order writeback instead of the platform's order ID. Requires explicit `true`. Default: disabled.
+            - `use_storefront_api` - When enabled, uses the Shopify Storefront API for product sync and order writeback, allowing merchants to control product availability via Product Listings. Requires explicit `true`. Default: disabled.
+            - `use_cart_estimation` - When enabled, creates a draft order for shipping rate estimation instead of using draft order calculation. Requires explicit `true`. Default: disabled.
+            - `redistribute_taxes` - When enabled, requests tax distribution from Shopify during order creation and assigns taxes as line items. Requires explicit `true`. Default: disabled.
+
+            **WooCommerce Flags:**
+            - `use_short_description` - When enabled, syncs the WooCommerce short description field instead of the full product description. Also applies to Prestashop. Requires explicit `true`. Default: disabled (uses full description).
+            - `sync_duplicate_sku_media` - When enabled, syncs media for products with duplicate SKUs. Requires explicit `true`. Default: disabled.
+            - `use_basic_auth` - When enabled, uses HTTP Basic Authentication instead of OAuth for WooCommerce API calls. Requires explicit `true`. Default: disabled.
+            - `filter_by_categories` - When enabled, filters product sync to only include products from categories specified in the platform config. Also applies to BigCommerce, SFCC, Ecwid, and Magento. Requires explicit `true`. Default: disabled.
+
+            **SFCC (Salesforce Commerce Cloud) Flags:**
+            - `filter_by_catalog` - When enabled, filters products and collections to only those in catalogs specified in `sfcc_config.enabled_catalog_ids`. Requires explicit `true`. Default: disabled.
+
+            **BigCommerce Flags:**
+            - `use_price_lists` - When enabled, uses BigCommerce price lists for pricing from `bigcommerce_config.enabled_price_list_ids`. Requires explicit `true`. Default: disabled.
+
+            **CommerceTools Flags:**
+            - `filter_inventory_by_channels` - When enabled, filters inventory to only include stock from channels specified in `commercetools_config.enabled_channel_ids`. Requires explicit `true`. Default: disabled.
         store_config:
           $ref: '#/components/schemas/StoreConfig'
         catalog_config:
           $ref: '#/components/schemas/CatalogConfig'
         shipping_config:
-          $ref: '#/components/schemas/ShippingConfig'
+          $ref: '#/components/schemas/shipping_config'
         orders_config:
           $ref: '#/components/schemas/OrdersConfig'
       description: A Container for Merchant Configuration info
@@ -1774,25 +1926,6 @@ components:
           description: "Maximum price (inclusive, in cents)."
           format: int32
       description: A price range with min and max bounds.
-    ShippingConfig:
-      type: object
-      properties:
-        fallback_methods:
-          uniqueItems: true
-          type: array
-          description: Fallback methods to be used when the merchant's system provides
-            no shipping methods.
-          items:
-            $ref: '#/components/schemas/ShippingMethod'
-        exclude_external_free_shipping:
-          type: boolean
-          description: Should external free shipping methods be excluded.
-        exclude_external_methods:
-          type: boolean
-          description: Should all external shipping methods be excluded.
-        shipping_exclusions:
-          $ref: '#/components/schemas/ShippingExclusionsConfig'
-      description: Configurations for the merchants shipping behaviors.
     ShippingExclusionRule:
       type: object
       properties:
@@ -2284,6 +2417,25 @@ components:
       description: "The inclusive maximum weight of the order, if any, that if reached\
         \ will make this shipping method inapplicable."
       nullable: true
+    shipping_config:
+      type: object
+      properties:
+        fallback_methods:
+          uniqueItems: true
+          type: array
+          description: Fallback methods to be used when the merchant's system provides
+            no shipping methods.
+          items:
+            $ref: '#/components/schemas/ShippingMethod'
+        exclude_external_free_shipping:
+          type: boolean
+          description: Should external free shipping methods be excluded.
+        exclude_external_methods:
+          type: boolean
+          description: Should all external shipping methods be excluded.
+        shipping_exclusions:
+          $ref: '#/components/schemas/ShippingExclusionsConfig'
+      description: Configurations for the merchants shipping behaviors.
     GenericToggleSettingRequest:
       type: object
       properties:
@@ -2374,6 +2526,8 @@ components:
           type: integer
           format: int32
         merchant_name:
+          maxLength: 191
+          minLength: 1
           type: string
           description: The name of the merchants business
         email:
@@ -2898,8 +3052,6 @@ components:
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2912,6 +3064,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2957,8 +3111,6 @@ components:
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2971,6 +3123,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
