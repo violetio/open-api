@@ -9372,6 +9372,14 @@ components:
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
           readOnly: true
+        payment_platform_connection_id:
+          type: integer
+          description: 'Identifier of the PaymentPlatformConnection used for this
+            transaction. This is the immutable reference to the connection configuration
+            at the time of payment. '
+          format: int64
+          nullable: true
+          readOnly: true
         status:
           type: string
           enum:
@@ -9613,6 +9621,12 @@ components:
           type: string
           description: "Payment provider that this payment method was created on,\
             \ if any."
+        platform_code:
+          type: string
+          description: "Developer-specified identifier for the payment platform to\
+            \ use (e.g., 'ACME_UK', 'ACME_US').Required for multi-platform developers;\
+            \ optional and ignored for single-platform developers. Must be 6-50 characters,\
+            \ alphanumeric with underscores and hyphens allowed."
         ip_v4:
           type: string
           description: IP address of the device from which this Payment Method originates.
