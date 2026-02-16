@@ -1065,6 +1065,19 @@ components:
           - GREATER_THAN_OR_EQUAL_TO
       description: Conditions that must be met for the method to be available.
       nullable: true
+    CountryHarmonizedSystemCode:
+      type: object
+      properties:
+        country_code:
+          type: string
+          description: Destination country code (ISO 3166-1 alpha-2).
+          example: US
+        harmonized_system_code:
+          type: string
+          description: HS code specific to this destination country (6-13 digits).
+          example: 6109.10.00.12
+      description: Destination-specific HS code for a SKU
+      nullable: true
     Media:
       required:
       - album_id
@@ -1984,6 +1997,8 @@ components:
           $ref: '#/components/schemas/SkuDimensions'
         shipping_dimensions:
           $ref: '#/components/schemas/SkuDimensions'
+        trade_compliance:
+          $ref: '#/components/schemas/TradeCompliance'
         metadata:
           uniqueItems: true
           type: array
@@ -2043,6 +2058,41 @@ components:
           type: string
           description: Variant Value
       description: Individual Variation Value for a Sku
+      nullable: true
+    TradeCompliance:
+      type: object
+      properties:
+        harmonized_system_code:
+          type: string
+          description: The default Harmonized System (HS) code for this SKU. 6-13
+            digit code used for international tariff classification. First 6 digits
+            follow the international HS standard. Used as a fallback when no country-specific
+            code exists for a destination.
+          nullable: true
+          example: 6109.10.00
+        country_code_of_origin:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the product was manufactured
+            or substantially transformed. Critical for determining applicable tariff
+            rates and trade agreement eligibility.
+          nullable: true
+          example: US
+        province_code_of_origin:
+          type: string
+          description: ISO 3166-2 subdivision code for the province/state of origin.
+            Used for more specific origin tracking.
+          nullable: true
+          example: CA
+        country_harmonized_system_codes:
+          uniqueItems: true
+          type: array
+          description: "Destination-specific HS codes. When calculating duties for\
+            \ a particular destination country, use the matching country code entry\
+            \ if present; otherwise fall back to the default harmonized_system_code."
+          nullable: true
+          items:
+            $ref: '#/components/schemas/CountryHarmonizedSystemCode'
+      description: Trade compliance and customs information for a SKU
       nullable: true
     Variant:
       type: object
