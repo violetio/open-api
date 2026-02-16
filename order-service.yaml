@@ -8907,6 +8907,12 @@ components:
           description: Payment Transactions associated to the bags on this Cart
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        guest:
+          type: boolean
+        intent_based_checkout:
+          type: boolean
+          description: Boolean indicating if the cart/order will be payed using a
+            payment intent.
         order_id:
           type: integer
           format: int64
@@ -8920,12 +8926,6 @@ components:
           - PARTIALLY_REFUNDED
           - REFUNDED
           - REQUIRES_ACTION
-        guest:
-          type: boolean
-        intent_based_checkout:
-          type: boolean
-          description: Boolean indicating if the cart/order will be payed using a
-            payment intent.
       description: Violet Order Entity
     OrderAddress:
       required:
