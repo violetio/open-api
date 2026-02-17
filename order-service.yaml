@@ -2163,6 +2163,10 @@ paths:
                         requires_shipping: true
                         product_type: PHYSICAL
                         line_price: 19998
+                        trade_compliance:
+                          harmonized_system_code: 6109.10.00
+                          country_code_of_origin: US
+                          province_code_of_origin: CA
                       available_shipping_methods:
                       - label: Free Shipping
                         carrier: OTHER
@@ -4361,6 +4365,10 @@ paths:
                         requires_shipping: true
                         product_type: PHYSICAL
                         line_price: 19998
+                        trade_compliance:
+                          harmonized_system_code: 6109.10.00
+                          country_code_of_origin: US
+                          province_code_of_origin: CA
                       available_shipping_methods:
                       - label: Free Shipping
                         carrier: OTHER
@@ -9859,6 +9867,8 @@ components:
           type: integer
           description: "Price of the Sku multiplied by the quantity, in cents."
           format: int32
+        trade_compliance:
+          $ref: '#/components/schemas/TradeCompliance'
       description: Calculated Cart Sku
       readOnly: true
     CalculatedCartTotals:
@@ -10155,6 +10165,33 @@ components:
           nullable: true
           readOnly: true
       description: "BETA: Details regarding the available inventory for this Sku."
+      nullable: true
+      readOnly: true
+    TradeCompliance:
+      type: object
+      properties:
+        harmonized_system_code:
+          type: string
+          description: The default Harmonized System (HS) code for this SKU. 6-13
+            digit code used for international tariff classification. First 6 digits
+            follow the international HS standard. Used as a fallback when no country-specific
+            code exists for a destination.
+          nullable: true
+          example: 6109.10.00
+        country_code_of_origin:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the product was manufactured
+            or substantially transformed. Critical for determining applicable tariff
+            rates and trade agreement eligibility.
+          nullable: true
+          example: US
+        province_code_of_origin:
+          type: string
+          description: ISO 3166-2 subdivision code for the province/state of origin.
+            Used for more specific origin tracking.
+          nullable: true
+          example: CA
+      description: Trade compliance and customs information for a SKU
       nullable: true
       readOnly: true
     BaseSku:
