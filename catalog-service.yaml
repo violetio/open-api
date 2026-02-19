@@ -1349,7 +1349,7 @@ components:
         metadata:
           uniqueItems: true
           type: array
-          description: Additional Meta Data of the Offer
+          description: Additional Meta Data of the Offer. Use `?include=metadata`
           nullable: true
           items:
             $ref: '#/components/schemas/MetaObject'
@@ -1454,7 +1454,7 @@ components:
         collections:
           uniqueItems: true
           type: array
-          description: Collections this offer belongs to
+          description: Collections this offer belongs to. Use `?include=collections`.
           items:
             $ref: '#/components/schemas/Collection'
         shipping:
@@ -1886,7 +1886,7 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/Method'
-      description: "[BETA] - Shipping data for the Offer."
+      description: "[BETA] - Shipping data for the Offer. Use `?include=shipping`."
       nullable: true
       readOnly: true
     Sku:
