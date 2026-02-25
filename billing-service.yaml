@@ -17,6 +17,8 @@ tags:
 - name: Payments - Payment Integration Health
 - name: Payments - Payout Accounts
 - name: Payments - Payout Methods
+- name: Payments - Platform Configurations
+- name: Payments - Platform Connections
 - name: Payments - Transfers
 - name: Payments - Payouts
 - name: Payments - Payment Transactions
@@ -28,6 +30,568 @@ tags:
 - name: Payments - Supported Country Codes
 - name: Payments - Webhooks
 paths:
+  /payments/payment_platform_configurations:
+    post:
+      tags:
+      - Payments - Platform Configurations
+      summary: Create Payment Platform Configuration
+      description: Creates a new PaymentPlatformConfiguration for an existing PaymentPlatformConnection.
+        Only one configuration is allowed per connection. The connection must exist
+        and belong to the specified developer.
+      operationId: createConfiguration
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentPlatformConfigurationRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConfiguration'
+  /payments/payment_platform_configurations/{configuration_id}:
+    get:
+      tags:
+      - Payments - Platform Configurations
+      summary: Get Payment Platform Configuration by ID
+      description: Retrieves a PaymentPlatformConfiguration by its primary key ID.
+      operationId: getConfigurationById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: configuration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConfiguration'
+    put:
+      tags:
+      - Payments - Platform Configurations
+      summary: Update Payment Platform Configuration
+      description: "Updates a PaymentPlatformConfiguration. Immutable fields (connectionId,\
+        \ developerId, appId) cannot be changed."
+      operationId: updateConfiguration
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: configuration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentPlatformConfiguration'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConfiguration'
+    delete:
+      tags:
+      - Payments - Platform Configurations
+      summary: Delete Payment Platform Configuration
+      description: Deletes a PaymentPlatformConfiguration. This is a hard delete.
+      operationId: deleteConfiguration
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: configuration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /payments/payment_platform_configurations/developer/{developer_id}:
+    get:
+      tags:
+      - Payments - Platform Configurations
+      summary: Get Payment Platform Configuration
+      description: Retrieves a PaymentPlatformConfiguration by developer and app.
+      operationId: getConfiguration
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: developer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConfiguration'
+  /payments/payment_platform_configurations/connection/{connection_id}:
+    get:
+      tags:
+      - Payments - Platform Configurations
+      summary: Get Payment Platform Configuration by Connection ID
+      description: Retrieves a PaymentPlatformConfiguration by its owning connection
+        ID.
+      operationId: getConfigurationByConnectionId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConfiguration'
+  /payments/payment_platform_configurations/developer/{developer_id}/list:
+    get:
+      tags:
+      - Payments - Platform Configurations
+      summary: List Payment Platform Configurations
+      description: Lists all PaymentPlatformConfigurations for a developer.
+      operationId: listConfigurations
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: developer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentPlatformConfiguration'
+  /payments/payment_platform_connections:
+    post:
+      tags:
+      - Payments - Platform Connections
+      summary: Create Payment Platform Connection
+      description: "Creates a new PaymentPlatformConnection for a developer using\
+        \ platform payments. The developer must have isUsingPlatformPayments = true.\
+        \ Only one active connection is allowed per platformCode. If credential_id\
+        \ is provided, enables direct credential lookup for transfers."
+      operationId: createConnection
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentPlatformConnectionRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConnection'
+  /payments/payment_platform_connections/{connection_id}:
+    get:
+      tags:
+      - Payments - Platform Connections
+      summary: Get Payment Platform Connection by ID
+      description: Retrieves a PaymentPlatformConnection by its primary key ID.
+      operationId: getConnectionById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConnection'
+    delete:
+      tags:
+      - Payments - Platform Connections
+      summary: Deactivate Payment Platform Connection
+      description: Deactivates a PaymentPlatformConnection by setting isActive = false.
+        Does NOT delete the record to preserve audit trail. A new connection can be
+        created for the same platformCode after deactivation.
+      operationId: deactivateConnection
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: connection_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConnection'
+  /payments/payment_platform_connections/developer/{developer_id}:
+    get:
+      tags:
+      - Payments - Platform Connections
+      summary: Get Payment Platform Connection
+      description: "Retrieves an active PaymentPlatformConnection for a developer.\
+        \ If app_id is provided, looks up by developer + app. Falls back to developer-level\
+        \ connection with null platformCode."
+      operationId: getConnection
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: developer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConnection'
+  /payments/payment_platform_connections/developer/{developer_id}/code/{platform_code}:
+    get:
+      tags:
+      - Payments - Platform Connections
+      summary: Get Payment Platform Connection by Platform Code
+      description: "Retrieves an active PaymentPlatformConnection by developer and\
+        \ platform code. Platform code is the developer-defined vanity name (e.g.,\
+        \ 'ACME_UK', 'ACME_US')."
+      operationId: getConnectionByPlatformCode
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: developer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: platform_code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConnection'
+  /payments/payment_platform_connections/developer/{developer_id}/is_multi_platform:
+    get:
+      tags:
+      - Payments - Platform Connections
+      summary: Check if Developer is Multi-Platform
+      description: Checks if a developer has more than one active PaymentPlatformConnection.
+        Used during checkout to determine if platform_code is required.
+      operationId: isMultiPlatformDeveloperEndpoint
+      parameters:
+      - name: developer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /payments/payment_platform_connections/developer/{developer_id}/list:
+    get:
+      tags:
+      - Payments - Platform Connections
+      summary: List Payment Platform Connections
+      description: Lists all active PaymentPlatformConnections for a developer. Returns
+        connections for all platform codes.
+      operationId: listConnections
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: developer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentPlatformConnection'
+  /payments/payment_platform_connections/developer/{developer_id}/validate:
+    get:
+      tags:
+      - Payments - Platform Connections
+      summary: Validate and Resolve Platform Code
+      description: "Validates a platform code for checkout and returns the resolved\
+        \ PaymentPlatformConnection. For single-platform developers, platform code\
+        \ is optional. For multi-platform developers, platform code is required. Returns\
+        \ 400 if platform code is required but missing or invalid."
+      operationId: validateAndResolvePlatformCodeEndpoint
+      parameters:
+      - name: developer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: platform_code
+        in: query
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlatformConnection'
   /payments/{account_type}/{account_id}/distributions/{distribution_id}:
     get:
       tags:
@@ -1014,6 +1578,21 @@ paths:
         schema:
           type: integer
           format: int32
+      - name: payment_platform_connection_id
+        in: query
+        description: PaymentPlatformConnection ID to target a specific platform's
+          payout account. Required for multi-platform developers with multiple active
+          payout accounts per merchant.
+        schema:
+          type: integer
+          format: int64
+      - name: platform_code
+        in: query
+        description: "Platform code (e.g., SHOPIFY, BIGCOMMERCE) to target a specific\
+          \ platform's payout account. Alternative to payment_platform_connection_id\
+          \ for multi-platform developers."
+        schema:
+          type: string
       responses:
         default:
           description: default response
@@ -1078,6 +1657,277 @@ paths:
                   $ref: '#/components/schemas/MerchantPayoutAccountWrapper'
 components:
   schemas:
+    PaymentPlatformConfiguration:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for this configuration.
+          format: int64
+        developer_id:
+          type: integer
+          description: Unique identifier of the developer who owns this configuration.
+          format: int32
+        payment_platform_connection_id:
+          type: integer
+          description: Unique identifier of the PaymentPlatformConnection this configuration
+            belongs to. 1:1 relationship.
+          format: int64
+        app_id:
+          type: integer
+          description: Unique identifier of the Violet application. Optional - connection
+            can apply to multiple apps.
+          format: int32
+        capture_method:
+          type: string
+          description: "How payments are captured. AUTOMATIC captures immediately,\
+            \ CUSTOM allows manual capture."
+          enum:
+          - AUTOMATIC
+          - CUSTOM
+          - DISABLED
+          - EXTERNAL
+        transfer_method:
+          type: string
+          description: "How transfers to merchants are initiated. AUTOMATIC triggers\
+            \ on payment capture, CUSTOM allows manual control."
+          enum:
+          - AUTOMATIC
+          - CUSTOM
+          - DISABLED
+          - EXTERNAL
+        distributions_algorithm:
+          type: string
+          description: "Name of the algorithm used to calculate distributions. Examples:\
+            \ COMMISSION_DEDUCTED_TOTALS_ALGORITHM_V3, CHANNEL_PAYS_PAYMENT_PROVIDER_FEES_ALGORITHM_V2."
+        tax_remitter:
+          type: string
+          description: "Who is responsible for remitting taxes. APP means the channel\
+            \ remits, MERCHANT means the merchant remits."
+          enum:
+          - APP
+          - MERCHANT
+        transfer_mechanism:
+          type: string
+          description: "How transfers are executed. STANDARD_TRANSFERS uses Stripe\
+            \ /v1/transfers, DESTINATION_PAYMENTS uses Payment Intent with transfer_data.destination."
+          enum:
+          - STANDARD_TRANSFERS
+          - DESTINATION_PAYMENTS
+        destination_payment_method_id:
+          type: string
+          description: Stripe payment method ID (pm_xxx) for destination payments.
+            Required when transferMechanism is DESTINATION_PAYMENTS.
+        destination_payment_customer_id:
+          type: string
+          description: "Stripe customer ID (cus_xxx) for destination payments. Optional,\
+            \ used with destinationPaymentMethodId."
+        date_created:
+          type: string
+          description: Time at which this configuration was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which this configuration was last modified. In ISO-8601
+            format.
+          format: date-time
+        transfer_schedule:
+          $ref: '#/components/schemas/TransferSchedule'
+      description: "Configuration for payment processing behavior, including capture\
+        \ method, transfer settings, and distribution algorithm. Owned by a PaymentPlatformConnection."
+    TransferSchedule:
+      type: object
+      properties:
+        require_fulfillment:
+          type: boolean
+          description: "Whether bags must be in SHIPPED or DELIVERED status before\
+            \ transfers are executed. When true, only distributions for fulfilled\
+            \ bags are included in transfer calculations. When false (default), transfers\
+            \ execute immediately after payment capture regardless of fulfillment\
+            \ status."
+          default: false
+        time_interval_seconds:
+          type: integer
+          description: "Minimum time interval in seconds between transfers for a merchant.\
+            \ When 0 (default), transfers execute immediately. When > 0, transfers\
+            \ are batched and executed at the specified interval. Example: 86400 =\
+            \ daily transfers, 604800 = weekly transfers."
+          format: int64
+          default: 0
+        allow_weekend_transfers:
+          type: boolean
+          description: "When false (default), eligible dates are adjusted to fall\
+            \ on business days (Mon-Fri) only. Distributions that would be eligible\
+            \ on weekends are deferred to the next Monday. When true, transfers can\
+            \ be processed on any day including weekends."
+          default: false
+    CreatePaymentPlatformConfigurationRequest:
+      type: object
+      properties:
+        payment_platform_connection_id:
+          type: integer
+          format: int64
+        developer_id:
+          type: integer
+          format: int32
+        app_id:
+          type: integer
+          format: int32
+        capture_method:
+          type: string
+          enum:
+          - AUTOMATIC
+          - CUSTOM
+          - DISABLED
+          - EXTERNAL
+        transfer_method:
+          type: string
+          enum:
+          - AUTOMATIC
+          - CUSTOM
+          - DISABLED
+          - EXTERNAL
+        distributions_algorithm:
+          type: string
+        tax_remitter:
+          type: string
+          enum:
+          - APP
+          - MERCHANT
+        transfer_mechanism:
+          type: string
+          enum:
+          - STANDARD_TRANSFERS
+          - DESTINATION_PAYMENTS
+        require_fulfillment:
+          type: boolean
+        time_interval_seconds:
+          type: integer
+          format: int64
+        allow_weekend_transfers:
+          type: boolean
+        destination_payment_method_id:
+          type: string
+        destination_payment_customer_id:
+          type: string
+    PaymentPlatformConnection:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the payment platform connection.
+          format: int64
+        developer_id:
+          type: integer
+          description: Unique identifier of the developer who owns this connection.
+          format: int32
+        app_id:
+          type: integer
+          description: Unique identifier of the Violet application associated with
+            this connection. Nullable - connection can apply to multiple apps.
+          format: int32
+        platform_code:
+          type: string
+          description: "Developer-defined identifier for this platform connection\
+            \ (e.g., 'ACME_UK', 'ACME_US').Must be unique per developer. Used for\
+            \ routing orders to the correct payment platform."
+        payment_provider:
+          type: string
+          description: "Payment provider for this connection. Currently supports STRIPE,\
+            \ NUVEI, CREDOVA, EXTERNAL."
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        payment_provider_account_id:
+          type: string
+          description: "Identifier of the platform account in the payment provider\
+            \ (e.g., acct_xxx for Stripe). Links to StripePlatformAccount via string\
+            \ lookup."
+        credential_id:
+          type: integer
+          description: "Identifier of the credential in CredentialService. Nullable\
+            \ for backwards compatibility. Future enhancement: used for direct credential\
+            \ lookup without developerId."
+          format: int64
+        is_active:
+          type: boolean
+          description: "Whether this connection is active and can be used for payment\
+            \ processing. Only one active connection per (developer, platformCode)\
+            \ combination."
+        date_created:
+          type: string
+          description: Time at which this connection was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which this connection was last modified. In ISO-8601
+            format.
+          format: date-time
+        date_deactivated:
+          type: string
+          description: Time at which this connection was deactivated. In ISO-8601
+            format.
+          format: date-time
+        stripe_platform_account:
+          $ref: '#/components/schemas/StripePlatformAccount'
+      description: "Represents a developer's connection to a payment platform account\
+        \ (e.g., Stripe). Used for payment capture, distribution tracking, and transfer\
+        \ processing."
+    StripePlatformAccount:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Unique identifier for this account in Stripe.
+        account_type:
+          type: string
+          description: "The type of Stripe Connect account, either EXPRESS or STANDARD."
+          enum:
+          - STANDARD
+        banking_country:
+          type: string
+          description: "Banking country of the Stripe account, taken directly from\
+            \ the Stripe account object."
+        banking_currency:
+          type: string
+          description: "Banking currency of the Stripe account, taken directly from\
+            \ the Stripe account object."
+        charges_enabled:
+          type: boolean
+          description: Whether the Stripe account can create charges and facilitate
+            payments. Taken directly from the Stripe account object.
+        payouts_enabled:
+          type: boolean
+          description: Whether the Stripe account can receive payouts. Taken directly
+            from the Stripe account object.
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+      description: Violet entity representing a Stripe account for Violet channels
+        using their own platform Stripe account to facilitate payments.
+    CreatePaymentPlatformConnectionRequest:
+      type: object
+      properties:
+        developer_id:
+          type: integer
+          format: int32
+        app_id:
+          type: integer
+          format: int32
+        payment_provider_account_id:
+          type: string
+        platform_code:
+          type: string
+        credential_id:
+          type: integer
+          format: int64
     Distribution:
       type: object
       properties:
@@ -1296,6 +2146,13 @@ components:
           description: "Unique identifier of the BagAdjustment associated with this\
             \ Distribution, if any."
           format: int64
+        platform_code:
+          type: string
+          description: "Developer-specified identifier for the payment platform that\
+            \ processed this Distribution (e.g., 'ACME_UK', 'ACME_US'). Populated\
+            \ at runtime from the associated PaymentPlatformConnection. Null for distributions\
+            \ created before multi-platform support."
+          readOnly: true
         refund_discrepancy:
           type: integer
           description: "Discrepancy amount, if any, associated with this Refund. In\
@@ -2446,57 +3303,77 @@ components:
     PaymentTransaction:
       required:
       - amount
+      - capture_method
+      - capture_status
       - currency
+      - date_created
+      - date_last_modified
+      - errors
+      - id
       - order_id
       - payment_provider
       - payment_provider_transaction_id
+      - related_bags
       type: object
       properties:
         id:
           type: integer
           description: Unique identifier for the object
           format: int64
+          readOnly: true
         order_id:
           type: integer
           description: Identifier of the Order entity that this payment transaction
             is associated with
           format: int64
+          readOnly: true
         payment_provider:
           type: string
           description: Payment Provider that this transaction is executed against.
             This is the provider that handles payment processing for this transaction.
+          readOnly: true
         payment_provider_transaction_id:
           type: string
           description: Identifier of the payment transaction in the underlying payment
             provider system.
+          readOnly: true
         payment_method_id:
           type: integer
           description: 'Identifier of the payment method associated with this payment
             transaction in Violet. '
           format: int64
+          nullable: true
+          readOnly: true
         payment_provider_payment_method_id:
           type: string
           description: 'Identifier of the payment method associated with this payment
             transaction in the underlying payment provider system. '
+          nullable: true
+          readOnly: true
         payment_intent_client_secret:
           type: string
           description: Client secret for the payment intent associated to this payment
             transaction
+          nullable: true
+          readOnly: true
         amount:
           type: integer
           description: 'Amount of this payment in the fractional currency unit of
             this transaction (e.g. cents). This is the amount charged to the shopper. '
           format: int32
+          readOnly: true
         currency:
           type: string
           description: Currency that the amount of this payment transaction is reflected
             in. This is the currency that the payment provider uses to charge the
             shopper payment method.
+          readOnly: true
         capture_status:
           type: string
           description: Underlying status of the payment capture in the payment provider
             system and should be used to determine what action to take next against
             this payment transaction.
+          readOnly: true
           enum:
           - PROCESSING
           - CAPTURED
@@ -2512,9 +3389,9 @@ components:
           - NOT_REQUIRED
         capture_method:
           type: string
-          description: Underlying status of the payment in the payment provider system
-            and should be used to determine what action to take next against this
-            payment transaction.
+          description: Method used to capture the payment in the payment provider
+            system. Determines how and when the payment is captured.
+          readOnly: true
           enum:
           - AUTOMATIC
           - CUSTOM
@@ -2524,6 +3401,8 @@ components:
           type: string
           description: Status of the transfer of distributions associated with this
             payment transaction.
+          nullable: true
+          readOnly: true
           enum:
           - SENT
           - REVERSED
@@ -2535,9 +3414,10 @@ components:
           - QUEUED
         transfer_method:
           type: string
-          description: Underlying status of the payment in the payment provider system
-            and should be used to determine what action to take next against this
-            payment transaction.
+          description: Method used for transferring distributions associated with
+            this payment transaction.
+          nullable: true
+          readOnly: true
           enum:
           - AUTOMATIC
           - CUSTOM
@@ -2549,46 +3429,67 @@ components:
             type: object
             description: Metadata from the payment provider associated to this payment
               transaction
+            nullable: true
+            readOnly: true
           description: Metadata from the payment provider associated to this payment
             transaction
+          nullable: true
+          readOnly: true
         related_bags:
           uniqueItems: true
           type: array
           description: 'Identifiers of the Bags in Violet that are associated with
             this payment transaction. The amount of this payment transaction is directly
             computed from the total amounts on the related bags. '
+          readOnly: true
           items:
             type: string
             description: 'Identifiers of the Bags in Violet that are associated with
               this payment transaction. The amount of this payment transaction is
               directly computed from the total amounts on the related bags. '
+            readOnly: true
         related_refunds:
           uniqueItems: true
           type: array
           description: Identifiers of the Refunds in Violet that are associated with
             this payment transaction. Refund amounts are not reflected in the amount
             on this payment transaction.
+          nullable: true
+          readOnly: true
           items:
             type: string
             description: Identifiers of the Refunds in Violet that are associated
               with this payment transaction. Refund amounts are not reflected in the
               amount on this payment transaction.
+            nullable: true
+            readOnly: true
         errors:
           uniqueItems: true
           type: array
           description: List of errors associated to this payment transaction during
             processing.. This value will only be populated if there are errors during
             processing
+          readOnly: true
           items:
             $ref: '#/components/schemas/PaymentTransactionError'
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
           format: date-time
+          readOnly: true
         date_last_modified:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+          readOnly: true
+        payment_platform_connection_id:
+          type: integer
+          description: 'Identifier of the PaymentPlatformConnection used for this
+            transaction. This is the immutable reference to the connection configuration
+            at the time of payment. '
+          format: int64
+          nullable: true
+          readOnly: true
         status:
           type: string
           enum:
@@ -2642,6 +3543,7 @@ components:
             is associated with
           format: int64
       description: Error associated to a payment transaction
+      readOnly: true
     PayoutAccount:
       type: object
       properties:
@@ -2672,11 +3574,27 @@ components:
           description: Identifier of the app entity in Violet that this Payout Account
             is associated with.
           format: int32
+        payment_platform_connection_id:
+          type: integer
+          description: "Identifier of the PaymentPlatformConnection this payout account\
+            \ is scoped to. For multi-platform developers, each platform connection\
+            \ has its own payout account. Null for legacy single-platform payout accounts."
+          format: int64
+          nullable: true
+          readOnly: true
+        credential_id:
+          type: integer
+          description: Identifier of the credential used by the PaymentPlatformConnection
+            at the time this payout account was created. Used for audit and credential
+            resolution.
+          format: int64
+          nullable: true
+          readOnly: true
         is_active:
           type: boolean
           description: Field that denotes whether or not this Payout Account is active
             and being used for transactions. Only one Payout Account may be active
-            for a merchant-app combination at a given point in time.
+            for a merchant-app-connection combination at a given point in time.
         country_code:
           type: string
           description: Two-letter country code of the bank that this Payout Account
@@ -2818,6 +3736,19 @@ components:
           format: int32
         payout_account:
           $ref: '#/components/schemas/PayoutAccount'
+        platform_code:
+          type: string
+          description: "Developer-specified identifier for the payment platform associated\
+            \ with this pending transfer (e.g., 'ACME_UK', 'ACME_US'). For multi-platform\
+            \ developers, this indicates which Stripe platform account processed these\
+            \ distributions. Null for single-platform developers."
+        payment_platform_connection_id:
+          type: integer
+          description: "Unique identifier of the PaymentPlatformConnection associated\
+            \ with this pending transfer. This is the immutable reference to the connection\
+            \ configuration. Use this ID for lookups rather than platform_code, as\
+            \ codes can be renamed."
+          format: int64
     ErrorDetails:
       type: object
       properties:
