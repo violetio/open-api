@@ -1002,6 +1002,7 @@ components:
         primary_media:
           $ref: '#/components/schemas/Media'
       description: Product Image Container
+      readOnly: true
     Collection:
       required:
       - id
@@ -1221,9 +1222,24 @@ components:
       nullable: true
     Offer:
       required:
+      - available
+      - currency
+      - date_created
+      - date_last_modified
+      - external_currency
       - external_id
       - id
+      - max_price
       - merchant_id
+      - min_price
+      - name
+      - publishing_status
+      - skus
+      - source
+      - status
+      - type
+      - variants
+      - visible
       type: object
       properties:
         id:
@@ -1247,6 +1263,7 @@ components:
         name:
           type: string
           description: Name of the offer.
+          example: Blue Running Sneakers
         description:
           maxLength: 65000
           type: string
@@ -1256,6 +1273,7 @@ components:
         source:
           type: string
           description: Commerce platform the offer was sourced from.
+          readOnly: true
           enum:
           - OTHER
           - SHOPIFY
@@ -1319,33 +1337,48 @@ components:
           type: boolean
           description: Is the product currently available for purchase in the merchants
             system.
+          readOnly: true
         visible:
           type: boolean
           description: "Is the product visible or hidden in the merchants storefront.\
             \ Note: a product can be hidden while still being available for purchase."
+          readOnly: true
         min_price:
           type: integer
-          description: Minimum price the Offer sells for. This is the lowest of the
-            Sku sale prices.
+          description: Minimum price the Offer sells for in cents. This is the lowest
+            of the SKU sale prices (e.g. 2999 = $29.99).
           format: int32
+          readOnly: true
+          example: 2999
         max_price:
           type: integer
-          description: Maximum price the Offer sells for. This is the highest of the
-            Sku sale prices.
+          description: Maximum price the Offer sells for in cents. This is the highest
+            of the SKU sale prices (e.g. 5999 = $59.99).
           format: int32
+          readOnly: true
+          example: 5999
         currency:
+          maxLength: 3
+          minLength: 3
           type: string
-          description: The currency of the Offer. By default this value will be the
-            merchants currency but can be changed by the API user using a `base_currency`
-            parameter.
+          description: ISO 4217 currency code for the Offer. By default this value
+            will be the merchants currency but can be changed by the API user using
+            a `base_currency` parameter.
+          example: USD
         external_currency:
+          maxLength: 3
+          minLength: 3
           type: string
-          description: The external currency of the Offer. This value is the associated
-            merchants default currency.
+          description: ISO 4217 currency code representing the merchants default currency
+            in their external commerce platform.
+          readOnly: true
+          example: USD
         source_category_name:
           type: string
-          description: Original Category on Source Platform
+          description: Original category name from the merchants external commerce
+            platform.
           nullable: true
+          readOnly: true
         metadata:
           uniqueItems: true
           type: array
@@ -1356,29 +1389,38 @@ components:
         variants:
           uniqueItems: true
           type: array
-          description: "Product variations configured by the merchant in their external\
-            \ store. Note: Variations can have any name the merchant chooses to use.\
-            \ There is no pre-defined set of possible variants or variant values."
+          description: "Product option dimensions (e.g. Size, Color) configured by\
+            \ the merchant. Each Variant contains a set of VariantValues (e.g. Size\
+            \ → Small, Medium, Large). These dimensions combine to form unique SKUs.\
+            \ Variant names are merchant-defined and have no pre-defined set of possible\
+            \ values."
+          readOnly: true
           items:
             $ref: '#/components/schemas/Variant'
         skus:
           uniqueItems: true
           type: array
-          description: Sku's are unique combinations of Variants the compose a purchasable
-            entity. When placing orders a Sku is the item that will be purchased.
+          description: "The purchasable items within this Offer. Each SKU represents\
+            \ a unique combination of Variant values (e.g. Size=Medium + Color=Blue).\
+            \ When placing orders, use the SKU `id` to specify which item to purchase.\
+            \ Each SKU has its own price, inventory, and availability."
+          readOnly: true
           items:
             $ref: '#/components/schemas/Sku'
         albums:
           uniqueItems: true
           type: array
-          description: "Grouped of media for the Offer. Note: For most commerce platforms\
-            \ there will only be a single album per Offer."
+          description: "Grouped media (images, videos) for the Offer. For most commerce\
+            \ platforms there will only be a single album per Offer."
+          readOnly: true
           items:
             $ref: '#/components/schemas/Album'
         type:
           type: string
-          description: "Type of product. Note: Offers with a type of `BUNDLED` cannot\
-            \ be purchased through the API at this time due to ecom platform limitations."
+          description: Type of product. PHYSICAL products require shipping; DIGITAL
+            products do not. Offers with a type of `BUNDLED` cannot be purchased through
+            the API at this time due to ecom platform limitations.
+          readOnly: true
           enum:
           - PHYSICAL
           - DIGITAL
@@ -1387,6 +1429,7 @@ components:
         status:
           type: string
           description: Current status of the Offer.
+          readOnly: true
           enum:
           - UNAVAILABLE
           - AVAILABLE
@@ -1396,7 +1439,11 @@ components:
           - ARCHIVED
         publishing_status:
           type: string
-          description: Publishing Status
+          description: Whether this Offer has been published to the Violet catalog
+            and is discoverable via the Search API. An Offer can be NOT_PUBLISHED
+            if the merchant has not yet completed onboarding or has chosen to hide
+            it from the catalog.
+          readOnly: true
           enum:
           - NOT_PUBLISHED
           - PUBLISHED
@@ -1404,10 +1451,12 @@ components:
           type: string
           description: Date of offer creation in ISO 8601 format.
           format: date-time
+          readOnly: true
         date_last_modified:
           type: string
           description: Date of last offer update in ISO 8601 format.
           format: date-time
+          readOnly: true
         date_last_consolidated:
           type: string
           description: Date of last consolidation in ISO 8601 format. Consolidation
@@ -1415,6 +1464,7 @@ components:
             still exists. This date is jittered for performance reasons and can be
             in the future.
           format: date-time
+          readOnly: true
         three_d_enabled:
           type: boolean
           description: Is the product 3D Enabled
@@ -1426,15 +1476,25 @@ components:
           nullable: true
         commission_rate:
           type: number
-          description: Amount given by merchant
+          description: "The commission rate the merchant has agreed to share with\
+            \ the app on sales of this Offer, expressed as a decimal (e.g. 0.15 =\
+            \ 15%)."
           format: double
+          readOnly: true
+          example: 0.15
         currency_symbol:
           type: string
           description: Symbol representing the desired currency
           nullable: true
         presented_currency:
+          maxLength: 3
+          minLength: 3
           type: string
-          description: The presented currency of this SKU
+          description: ISO 4217 currency code representing the currency that prices
+            are displayed in to the end user. May differ from `currency` if currency
+            conversion is active.
+          readOnly: true
+          example: USD
         default_image_url:
           type: string
           description: The default image for this Offer. Only present on responses
@@ -1442,7 +1502,10 @@ components:
             primary media object.
         subscription_status:
           type: string
-          description: Subscription status
+          description: Indicates whether the current app is subscribed to this Offer.
+            Subscribed offers can be purchased through the API and will appear in
+            the app's catalog.
+          readOnly: true
           enum:
           - NOT_SUBSCRIBED
           - SUBSCRIBED
@@ -1463,7 +1526,12 @@ components:
           type: array
           items:
             type: string
-      description: Product Offer
+      description: "A merchant's product listing synced from an external commerce\
+        \ platform. An Offer is the top-level catalog entity and contains one or more\
+        \ SKUs (purchasable variations), Variants (product option dimensions like\
+        \ Size or Color), and Albums (grouped media/images). Hierarchy: Offer → SKU\
+        \ → VariantValues. Use the SKU ID when placing orders. All monetary values\
+        \ are in the smallest currency unit (e.g. cents for USD)."
     Price:
       type: object
       properties:
@@ -1891,11 +1959,15 @@ components:
       readOnly: true
     Sku:
       required:
+      - currency
+      - date_created
+      - date_last_modified
       - id
       - merchant_id
       - name
       - offer_id
       - sale_price
+      - status
       - type
       type: object
       properties:
@@ -1943,8 +2015,10 @@ components:
           type: boolean
           description: Is the Sku in stock in the merchants external store.
         qty_available:
+          maximum: 30000
+          minimum: 0
           type: integer
-          description: The total quantity of this Sku available for purchase.
+          description: The total quantity of this SKU available for purchase.
           format: int32
         inventory_tracked:
           type: boolean
@@ -1952,24 +2026,40 @@ components:
             inventory can be oversold even when the available quantity is 0.
         sale_price:
           type: integer
-          description: Sale Price of the Sku. This is the actual sale cost when the
-            Sku is purchased.
+          description: Sale price of the SKU in cents (e.g. 2999 = $29.99). This is
+            the actual price the customer will be charged when this SKU is purchased.
           format: int32
+          example: 2999
         retail_price:
           type: integer
-          description: Retail Price of the Sku. This is often a "Compare-To" or "MSRP"
-            type price and is typically not what the customer will be charged.
+          description: Retail price of the SKU in cents (e.g. 3999 = $39.99). This
+            is often a "Compare-To" or "MSRP" type price and is typically not what
+            the customer will be charged.
           format: int32
+          example: 3999
         currency:
+          maxLength: 3
+          minLength: 3
           type: string
-          description: The base currency of this Sku.
+          description: ISO 4217 currency code for this SKU.
+          example: USD
         external_currency:
+          maxLength: 3
+          minLength: 3
           type: string
-          description: The external currency of the Offer. This value is the associated
-            merchants default currency.
+          description: ISO 4217 currency code representing the merchants default currency
+            in their external commerce platform.
+          readOnly: true
+          example: USD
         presented_currency:
+          maxLength: 3
+          minLength: 3
           type: string
-          description: The presented currency of this Sku.
+          description: ISO 4217 currency code representing the currency that prices
+            are displayed in to the end user. May differ from `currency` if currency
+            conversion is active.
+          readOnly: true
+          example: USD
         taxable:
           type: boolean
           description: Is the Sku taxable.
@@ -1996,6 +2086,8 @@ components:
             $ref: '#/components/schemas/SkuVariantValue'
         type:
           type: string
+          description: Product type of this SKU. PHYSICAL products require a shipping
+            address and shipping method; DIGITAL products do not.
           enum:
           - PHYSICAL
           - DIGITAL
@@ -2003,7 +2095,8 @@ components:
           - BUNDLED
         status:
           type: string
-          description: SKU Status
+          description: Current status of the SKU.
+          readOnly: true
           enum:
           - UNAVAILABLE
           - AVAILABLE
@@ -2013,12 +2106,14 @@ components:
           - ARCHIVED
         date_created:
           type: string
-          description: Date when the Sku was first created in Violet.
+          description: Date when the SKU was first created in Violet.
           format: date-time
+          readOnly: true
         date_last_modified:
           type: string
-          description: Date when the Sku was last updated in Violet.
+          description: Date when the SKU was last updated in Violet.
           format: date-time
+          readOnly: true
         sku_dimensions:
           $ref: '#/components/schemas/SkuDimensions'
         shipping_dimensions:
@@ -2039,7 +2134,12 @@ components:
           description: The order that the merchant has chosen to display this Sku
             in relation to other Sku's that are children of the same Offer.
           format: int32
-      description: Stock Keeping Unit
+      description: "A purchasable variant of an Offer (product). Each SKU represents\
+        \ a unique combination of Variant values (e.g. Size=Medium + Color=Blue) and\
+        \ has its own price, inventory, and availability. Use the SKU `id` when adding\
+        \ items to a cart or placing orders. All monetary values are in the smallest\
+        \ currency unit (e.g. cents for USD)."
+      readOnly: true
     SkuDimensions:
       type: object
       properties:
@@ -2143,6 +2243,7 @@ components:
           description: The order the variants are displayed in.
           format: int32
       description: Variation Data
+      readOnly: true
     VariantValue:
       type: object
       properties:
