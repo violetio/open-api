@@ -1164,6 +1164,12 @@ components:
       properties:
         available:
           type: boolean
+          description: Whether the offer is available for purchase.
+          default: false
+        published:
+          type: boolean
+          description: Whether the offer is published and visible.
+          default: false
       description: Configurations for the merchants inventory behaviors.
     AvailabilityRules:
       type: object
@@ -1329,6 +1335,11 @@ components:
             type: string
             description: "Offer tags that trigger this rule. If an Offer has ANY of\
               \ these tags, the tag is applied."
+        sku_name_contains:
+          type: string
+          description: "Substring to match against Order SKU names. If specified,\
+            \ the tag applies only when at least one SKU name in the order contains\
+            \ this string (case-insensitive)."
       description: A rule defining when to apply a custom tag to an order.
     ExclusionRule:
       type: object
@@ -1499,6 +1510,10 @@ components:
           $ref: '#/components/schemas/CatalogConfig'
         shipping_config:
           $ref: '#/components/schemas/shipping_config'
+        locked:
+          type: boolean
+          description: "When true, prevents any changes from being made to the merchant\
+            \ configuration."
         orders_config:
           $ref: '#/components/schemas/OrdersConfig'
       description: A Container for Merchant Configuration info
@@ -3043,6 +3058,19 @@ components:
           - EXTERNAL
         set_primary:
           type: boolean
+        payment_platform_connection_id:
+          type: integer
+          description: PaymentPlatformConnection ID to scope this payout account to
+            a specific platform. Required for multi-platform developers. Omit for
+            single-platform channels.
+          format: int64
+          nullable: true
+        platform_code:
+          type: string
+          description: "Human-readable platform code (e.g., 'ACME_UK'). Alternative\
+            \ to payment_platform_connection_id for REST callers who know the platform\
+            \ code. If both are provided, payment_platform_connection_id takes precedence."
+          nullable: true
     Page:
       type: object
       properties:
@@ -3052,6 +3080,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3064,8 +3094,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3111,6 +3139,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3123,8 +3153,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
