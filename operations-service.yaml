@@ -1353,11 +1353,27 @@ components:
           description: Identifier of the app entity in Violet that this Payout Account
             is associated with.
           format: int32
+        payment_platform_connection_id:
+          type: integer
+          description: "Identifier of the PaymentPlatformConnection this payout account\
+            \ is scoped to. For multi-platform developers, each platform connection\
+            \ has its own payout account. Null for legacy single-platform payout accounts."
+          format: int64
+          nullable: true
+          readOnly: true
+        credential_id:
+          type: integer
+          description: Identifier of the credential used by the PaymentPlatformConnection
+            at the time this payout account was created. Used for audit and credential
+            resolution.
+          format: int64
+          nullable: true
+          readOnly: true
         is_active:
           type: boolean
           description: Field that denotes whether or not this Payout Account is active
             and being used for transactions. Only one Payout Account may be active
-            for a merchant-app combination at a given point in time.
+            for a merchant-app-connection combination at a given point in time.
         country_code:
           type: string
           description: Two-letter country code of the bank that this Payout Account
