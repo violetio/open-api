@@ -2747,6 +2747,8 @@ components:
       - taxes_included
       type: object
       properties:
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
@@ -2761,8 +2763,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         id:
           type: integer
           description: Unique ID of the Bag.
