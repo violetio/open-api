@@ -2211,12 +2211,12 @@ components:
     PageDistribution:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -2248,16 +2248,16 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
     Sort:
       type: object
       properties:
@@ -2363,8 +2363,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -2398,6 +2396,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
@@ -2661,12 +2661,12 @@ components:
     PageTransferReversal:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -2808,12 +2808,12 @@ components:
     PageMerchant Transfer Reversal:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -2997,8 +2997,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -3032,6 +3030,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
@@ -3133,12 +3133,12 @@ components:
     PageMerchantTransfer:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3165,12 +3165,12 @@ components:
     PagePayoutTransfer:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3271,12 +3271,12 @@ components:
     PagePaymentTransaction:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
