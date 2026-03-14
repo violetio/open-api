@@ -502,6 +502,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentPlatformConnection'
+  /payments/developer/{developer_id}/banking_country:
+    get:
+      tags:
+      - Payments - Platform Connections
+      summary: Get Developer Banking Country
+      description: "Returns the banking country for a developer. If platform_code\
+        \ is provided, resolves via PaymentPlatformConnection. Otherwise falls back\
+        \ to the developer's PayoutAccount country code."
+      operationId: getDeveloperBankingCountry
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: developer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: platform_code
+        in: query
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankingCountryResponse'
   /payments/payment_platform_connections/developer/{developer_id}/is_multi_platform:
     get:
       tags:
@@ -1928,6 +1971,13 @@ components:
         credential_id:
           type: integer
           format: int64
+    BankingCountryResponse:
+      type: object
+      properties:
+        banking_country:
+          type: string
+          description: Two-letter country code of the banking country for the developer's
+            platform.
     Distribution:
       type: object
       properties:
