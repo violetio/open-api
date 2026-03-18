@@ -11865,9 +11865,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        first_name:
-          type: string
         last_name:
+          type: string
+        first_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
@@ -14151,7 +14151,39 @@ components:
             default to 1000. If a value is not provided will be defaulted to 1.
           format: int32
           example: 1
+        tax_rates:
+          type: array
+          description: "Tax rates that apply specifically to this SKU such as taxes,\
+            \ fees, or duties."
+          items:
+            $ref: '#/components/schemas/TaxRateDTO'
       description: SKUs being purchased in this bag.
+    TaxRateDTO:
+      required:
+      - amount
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Total tax amount on SKU. In Cents.
+          format: int32
+        rate:
+          type: number
+          description: Tax rate as a percentage (e.g. 8.5 for 8.5%).
+          format: double
+        type:
+          type: string
+          description: Rate type.
+          enum:
+          - TAX
+          - SHIPPING
+          - FEE
+          - DUTY
+        name:
+          type: string
+          description: Rate name.
+      description: "Tax rates that apply specifically to this SKU such as taxes, fees,\
+        \ or duties."
     shipping_address:
       title: shipping_address
       required:
@@ -14724,6 +14756,12 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         externalId:
           type: string
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
         payoutExternalId:
           type: string
         paymentService:
@@ -14733,12 +14771,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        effectiveRelatedOrderIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
         effectiveRelatedBagIds:
           uniqueItems: true
           type: array
