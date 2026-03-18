@@ -4121,6 +4121,41 @@ paths:
                       country: US
                       postal_code: "98121"
                     currency: USD
+              Line Item Duty - Rate Based:
+                summary: Order with rate-based line item duty
+                description: Direct Order Submission with line item duty using rate-based
+                  approach
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: order-with-duty-rate-001
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                        rates:
+                        - name: Import Duty
+                          type: DUTY
+                          rate: 5.0
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 5000
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
               Line Item Tax - Amount Based:
                 summary: Order with amount-based line item taxes
                 description: Direct Order Submission with line item taxes using amount-based
