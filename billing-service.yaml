@@ -344,7 +344,8 @@ paths:
       tags:
       - Payments - Platform Connections
       summary: Get Payment Platform Connection by ID
-      description: Retrieves a PaymentPlatformConnection by its primary key ID.
+      description: "Retrieves a PaymentPlatformConnection by its primary key ID. When\
+        \ extended=true, syncs with Stripe and populates stripePlatformAccount."
       operationId: getConnectionById
       parameters:
       - name: X-Violet-Token
@@ -369,6 +370,11 @@ paths:
         schema:
           type: integer
           format: int64
+      - name: extended
+        in: query
+        schema:
+          type: boolean
+          default: false
       responses:
         default:
           description: default response
@@ -572,8 +578,9 @@ paths:
       tags:
       - Payments - Platform Connections
       summary: List Payment Platform Connections
-      description: Lists all active PaymentPlatformConnections for a developer. Returns
-        connections for all platform codes.
+      description: "Lists all active PaymentPlatformConnections for a developer. Returns\
+        \ connections for all platform codes. When extended=true, populates stripePlatformAccount\
+        \ from the database."
       operationId: listConnections
       parameters:
       - name: X-Violet-Token
@@ -598,6 +605,11 @@ paths:
         schema:
           type: integer
           format: int32
+      - name: extended
+        in: query
+        schema:
+          type: boolean
+          default: false
       responses:
         default:
           description: default response
@@ -2313,9 +2325,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PayoutTransfer:
       type: object
