@@ -2749,9 +2749,6 @@ components:
       properties:
         communicationPreferencesInternal:
           $ref: '#/components/schemas/communication_preferences'
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -2763,6 +2760,9 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
+        bag_id:
+          type: integer
+          format: int64
         id:
           type: integer
           description: Unique ID of the Bag.
