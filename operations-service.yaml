@@ -1487,7 +1487,13 @@ components:
         error:
           $ref: '#/components/schemas/Error'
         results:
-          $ref: '#/components/schemas/PayoutAccount'
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/PayoutAccount'
+          description: "Map of payment platform connection ID to payout account. For\
+            \ single-platform merchants, the map contains one entry. For multi-platform\
+            \ merchants, each entry represents a payout account scoped to a specific\
+            \ payment platform connection."
       description: The status object for the merchant payout account
     ScopeValidation:
       type: object
