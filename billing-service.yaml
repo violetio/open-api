@@ -2427,8 +2427,6 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         payoutExternalId:
           type: string
-        externalId:
-          type: string
         paymentService:
           type: string
           enum:
@@ -2460,6 +2458,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
@@ -3061,8 +3061,6 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         payoutExternalId:
           type: string
-        externalId:
-          type: string
         paymentService:
           type: string
           enum:
@@ -3094,6 +3092,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
