@@ -2425,9 +2425,9 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
+          type: string
+        externalId:
           type: string
         paymentService:
           type: string
@@ -3059,9 +3059,9 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
+          type: string
+        externalId:
           type: string
         paymentService:
           type: string
