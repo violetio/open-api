@@ -2273,12 +2273,12 @@ components:
     PageDistribution:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -2325,9 +2325,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PayoutTransfer:
       type: object
@@ -2723,12 +2723,12 @@ components:
     PageTransferReversal:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -2870,12 +2870,12 @@ components:
     PageMerchant Transfer Reversal:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3195,12 +3195,12 @@ components:
     PageMerchantTransfer:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3227,12 +3227,12 @@ components:
     PagePayoutTransfer:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3333,12 +3333,12 @@ components:
     PagePaymentTransaction:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
