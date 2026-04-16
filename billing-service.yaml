@@ -2273,12 +2273,12 @@ components:
     PageDistribution:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -2293,11 +2293,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -2314,10 +2314,10 @@ components:
           type: boolean
         unpaged:
           type: boolean
-        pageNumber:
+        pageSize:
           type: integer
           format: int32
-        pageSize:
+        pageNumber:
           type: integer
           format: int32
     Sort:
@@ -2325,9 +2325,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PayoutTransfer:
       type: object
@@ -2723,12 +2723,12 @@ components:
     PageTransferReversal:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -2743,11 +2743,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -2870,12 +2870,12 @@ components:
     PageMerchant Transfer Reversal:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -2890,11 +2890,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -3195,12 +3195,12 @@ components:
     PageMerchantTransfer:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3215,11 +3215,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -3227,12 +3227,12 @@ components:
     PagePayoutTransfer:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3247,11 +3247,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -3333,12 +3333,12 @@ components:
     PagePaymentTransaction:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3353,11 +3353,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
