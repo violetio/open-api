@@ -4123,11 +4123,11 @@ components:
           type: string
           description: Rate Name
           readOnly: true
-        decimal_rate:
+        dollar_amount:
           type: number
           format: double
           readOnly: true
-        dollar_amount:
+        decimal_rate:
           type: number
           format: double
           readOnly: true
