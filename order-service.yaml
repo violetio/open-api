@@ -11958,9 +11958,9 @@ components:
         address_2:
           type: string
           description: Second line of the address
-        last_name:
-          type: string
         first_name:
+          type: string
+        last_name:
           type: string
       description: The shipping or billing address of a user placing an order
       nullable: true
@@ -12579,6 +12579,7 @@ components:
           type: string
           description: "Optional customer email address, possibly necessary for once-per-customer\
             \ discounts."
+          nullable: true
       description: Details of the discount being applied to a cart.
       nullable: true
     PaymentMethodRequest:
@@ -12598,6 +12599,7 @@ components:
           description: "Unique identifier of the Customer in the payment provider\
             \ that the payment method is associated to. When a customer_id is provided,\
             \ payment_provider must also be specified in the request."
+          nullable: true
         intent_based_capture:
           type: boolean
           description: Trigger payment intent based capture
@@ -12611,9 +12613,11 @@ components:
             \ use (e.g., 'ACME_UK', 'ACME_US').Required for multi-platform developers;\
             \ optional and ignored for single-platform developers. Must be 6-50 characters,\
             \ alphanumeric with underscores and hyphens allowed."
+          nullable: true
         ip_v4:
           type: string
           description: IP address of the device from which this Payment Method originates.
+          nullable: true
         type:
           type: string
           description: Type of the payment method being passed in.
@@ -12626,28 +12630,35 @@ components:
         card_number:
           type: string
           description: Number on the credit or debit card.
+          nullable: true
         card_cvc:
           type: integer
           description: CVC code on the credit or debit card.
           format: int32
+          nullable: true
         card_exp_month:
           type: integer
           description: Expiration month of the credit or debit card.
           format: int32
+          nullable: true
         card_exp_year:
           type: integer
           description: Expiration year of the credit or debit card.
           format: int32
+          nullable: true
         card_postal_code:
           type: string
           description: Postal Code of the credit or debit card.
+          nullable: true
         complete_checkout:
           type: boolean
           description: Submit cart immediately after applying the payment method.
             Cannot be combined with intent_based_checkout.
+          nullable: true
         app_order_id:
           type: string
           description: Map the order in Violet to an order record within your system.
+          nullable: true
       description: The payment method request for a cart. If the token is provided
         no card data is required.
     BagShippingMethod:
@@ -13606,10 +13617,12 @@ components:
           maxLength: 255
           type: string
           description: Custom message describing the reason for the cancellation.
+          nullable: true
         reason_code:
           maxLength: 255
           type: string
           description: Code that best represents the reason for the cancellation.
+          nullable: true
           default: OTHER
           enum:
           - OTHER
@@ -13621,11 +13634,13 @@ components:
           type: boolean
           description: Should the items be restocked. In most cases this should be
             `true` since only unfulfilled orders can be cancelled.
+          nullable: true
           default: true
         notify_customer:
           type: boolean
           description: Should the customer be notified by the merchants system that
             a cancellation has occurred.
+          nullable: true
           default: false
       description: "Request to cancel an Order. Only orders that have not yet been\
         \ fulfilled can be canceled. By default, items will be restocked and the customer\
@@ -13823,6 +13838,7 @@ components:
         address_2:
           type: string
           description: Second line of the address.
+          nullable: true
         city:
           type: string
           description: City of the address.
@@ -13831,6 +13847,7 @@ components:
           type: string
           description: The ISO2 (Alpha 2) code for the state or province. Recommended
             for accurate tax calculation and delivery.
+          nullable: true
           example: WA
         country:
           type: string
@@ -13841,8 +13858,17 @@ components:
           description: "Postal or Zip code to be applied to the address. This value\
             \ is required for all countries that have postal codes. **For countries\
             \ that do not have postal codes, this value is optional.**"
+        name:
+          type: string
+          description: Full name of the address recipient.
+          nullable: true
+        email:
+          type: string
+          description: Email address associated with this address.
+          nullable: true
       description: "Billing address for the order. **Note: When not provided the provided\
         \ shipping address will be used.**"
+      nullable: true
     BagDTO:
       required:
       - shipping_method
@@ -13850,6 +13876,11 @@ components:
       - tax_total
       type: object
       properties:
+        merchant_id:
+          type: integer
+          description: ID of the merchant. Resolved from SKU if omitted.
+          format: int32
+          nullable: true
         skus:
           type: array
           description: SKUs being purchased in this bag.
@@ -13868,19 +13899,23 @@ components:
           description: The sum of the line item totals for all Sku's in the Bag. In
             the Order currency. In Cents.
           format: int32
+          nullable: true
         shipping_total:
           type: integer
           description: The amount for the shipping method applied to the Bag. In the
             Order currency. In Cents.
           format: int32
+          nullable: true
         discount_total:
           type: integer
           description: The total discounts applied to the price of the Bag in the
             base currency. In Cents
           format: int32
+          nullable: true
         discounts:
           type: array
           description: List of discounts to apply to the bag
+          nullable: true
           items:
             $ref: '#/components/schemas/DiscountDTO'
         communication_preferences:
@@ -13892,6 +13927,7 @@ components:
         email_preferences:
           $ref: '#/components/schemas/EmailCommunicationRequestPreferencesDTO'
       description: Communication preferences requested for this Bag.
+      nullable: true
     CustomerDTO:
       required:
       - email
@@ -13901,11 +13937,13 @@ components:
           type: string
           description: "First name of the customer. While not strictly required by\
             \ the API, most ecommerce platforms require this value for order processing."
+          nullable: true
           example: Super
         last_name:
           type: string
           description: "Last name of the customer. While not strictly required by\
             \ the API, most ecommerce platforms require this value for order processing."
+          nullable: true
           example: Mario
         email:
           type: string
@@ -13921,9 +13959,11 @@ components:
           type: string
           description: Code of discount in the merchant platform. Required when type
             is `CODE`.
+          nullable: true
         external_id:
           type: string
           description: ID of discount in the merchant platform.
+          nullable: true
         type:
           type: string
           description: Type of discount. Can be `CODE` or `CUSTOM`.
@@ -13934,6 +13974,7 @@ components:
           type: string
           description: Value type of discount (AMOUNT or PERCENTAGE). Required when
             type is `CUSTOM`.
+          nullable: true
           enum:
           - AMOUNT
           - PERCENTAGE
@@ -13941,6 +13982,7 @@ components:
           type: string
           description: "Specifies where the discount is applied. This can be at the\
             \ ORDER, SKU, or SHIPPING level. Required when type is `CUSTOM`."
+          nullable: true
           enum:
           - ORDER
           - SKU
@@ -13950,19 +13992,23 @@ components:
           description: "Amount of discount, in fractional currency units (e.g. cents).\
             \ Required when value_type is AMOUNT."
           format: int32
+          nullable: true
         percentage:
           type: number
           description: Percentage of discount. Required when value_type is PERCENTAGE.
           format: double
+          nullable: true
         amount_total:
           type: integer
           description: Total amount of discount applied to bag in fractional currency
             units (e.g. cents). Required when type is `CUSTOM`.
           format: int32
+          nullable: true
         status:
           type: string
           description: "Status of discount. This can be one of: PENDING, APPLIED,\
             \ INVALID, NOT_SUPPORTED, ERROR, or EXPIRED."
+          nullable: true
           readOnly: true
           enum:
           - PENDING
@@ -13976,37 +14022,45 @@ components:
           description: ID of the SKU this discount belongs to. Required when target_type
             is SKU.
           format: int64
+          nullable: true
         email:
           type: string
           description: "Customer email address, possibly necessary for once-per-customer\
             \ discounts."
+          nullable: true
         merchant_id:
           type: integer
           description: "Merchant ID this discount belongs to, if applicable."
           format: int32
+          nullable: true
       description: List of discounts to apply to the bag
+      nullable: true
     EmailCommunicationRequestPreferencesDTO:
       type: object
       properties:
         marketing:
           type: string
           description: Marketing email opt-in request.
+          nullable: true
           enum:
           - NO_OPT_IN
           - OPT_IN
         order_confirmation:
           type: string
           description: Order confirmation email opt-in request.
+          nullable: true
           enum:
           - NO_OPT_IN
           - OPT_IN
         order_fulfillment:
           type: string
           description: Order fulfillment email opt-in request.
+          nullable: true
           enum:
           - NO_OPT_IN
           - OPT_IN
       description: Email communication preferences for this bag.
+      nullable: true
     OrderDTO:
       required:
       - app_order_id
@@ -14199,6 +14253,7 @@ components:
           type: string
           description: Token representing the payment method.
       description: Payment method that will be charged for this Order.
+      nullable: true
     ShippingMethodDTO:
       required:
       - label
@@ -14217,6 +14272,14 @@ components:
           description: Price of the shipping method. In the Order currency. In Cents.
           format: int32
           example: 500
+        carrier:
+          type: string
+          description: Carrier providing the shipping service.
+          nullable: true
+        shipping_method_id:
+          type: string
+          description: Unique identifier of the shipping method.
+          nullable: true
       description: "Shipping method for the bag. **Note: this value is not required\
         \ when all items in the order are digital.**"
     SkuDTO:
@@ -14243,11 +14306,13 @@ components:
           description: Quantity of the Sku being purchased. Quantities over 1000 will
             default to 1000. If a value is not provided will be defaulted to 1.
           format: int32
+          nullable: true
           example: 1
         tax_rates:
           type: array
           description: "Tax rates that apply specifically to this SKU such as taxes,\
             \ fees, or duties."
+          nullable: true
           items:
             $ref: '#/components/schemas/TaxRateDTO'
       description: SKUs being purchased in this bag.
@@ -14264,9 +14329,11 @@ components:
           type: number
           description: Tax rate as a percentage (e.g. 8.5 for 8.5%).
           format: double
+          nullable: true
         type:
           type: string
           description: Rate type.
+          nullable: true
           enum:
           - TAX
           - SHIPPING
@@ -14275,8 +14342,10 @@ components:
         name:
           type: string
           description: Rate name.
+          nullable: true
       description: "Tax rates that apply specifically to this SKU such as taxes, fees,\
         \ or duties."
+      nullable: true
     shipping_address:
       title: shipping_address
       required:
@@ -14292,6 +14361,7 @@ components:
         address_2:
           type: string
           description: Second line of the address.
+          nullable: true
         city:
           type: string
           description: City of the address.
@@ -14300,6 +14370,7 @@ components:
           type: string
           description: The ISO2 (Alpha 2) code for the state or province. Recommended
             for accurate tax calculation and delivery.
+          nullable: true
           example: WA
         country:
           type: string
@@ -14310,11 +14381,20 @@ components:
           description: "Postal or Zip code to be applied to the address. This value\
             \ is required for all countries that have postal codes. **For countries\
             \ that do not have postal codes, this value is optional.**"
+        name:
+          type: string
+          description: Full name of the address recipient.
+          nullable: true
+        email:
+          type: string
+          description: Email address associated with this address.
+          nullable: true
         phone:
           type: string
           description: "Phone number related to the address. **Note: Some external\
             \ commerce platforms require this value. For these platforms Violet will\
             \ use a faux number if no value is provided to ensure that the order succeeds.**"
+          nullable: true
       description: "Shipping address for the order. **Note: this value is not required\
         \ when all items in the order are digital.**"
     OrderShippingMethodWrapper:
@@ -14477,6 +14557,7 @@ components:
           description: Quantity of this item being refunded. If no value is provided
             then each quantity of this item will be refunded.
           format: int32
+          nullable: true
         amount_refunded:
           minimum: 0
           type: integer
@@ -14515,20 +14596,25 @@ components:
           type: integer
           description: Merchant ID
           format: int32
+          nullable: true
         order_id:
           type: integer
           description: Order ID
           format: int64
+          nullable: true
         id:
           type: integer
           description: Bag ID
           format: int64
+          nullable: true
         external_id:
           type: string
           description: Bag External ID
+          nullable: true
         bag_status:
           type: string
           description: Bag Status
+          nullable: true
           enum:
           - IN_PROGRESS
           - SUBMITTED
@@ -14541,6 +14627,7 @@ components:
         app_order_id:
           type: string
           description: Order ID in the Channels System
+          nullable: true
         before_date:
           type: string
           description: Use `date_last_modified:max`.
@@ -14564,9 +14651,11 @@ components:
         sort_by:
           type: string
           description: Property to sort by in camelCase
+          nullable: true
         sort_direction:
           type: string
           description: Direction to sort by
+          nullable: true
         date_last_modified:min:
           pattern: yyyy-MM-dd'T'HH:mm:ssZ
           type: string
@@ -14605,20 +14694,25 @@ components:
           type: integer
           description: User ID
           format: int64
+          nullable: true
         order_id:
           type: integer
           description: Order ID
           format: int64
+          nullable: true
         referral_id:
           type: string
           description: Referral ID
+          nullable: true
         bag_id:
           type: integer
           description: Bag ID
           format: int64
+          nullable: true
         bag_status:
           type: string
           description: Bag Status
+          nullable: true
           enum:
           - IN_PROGRESS
           - SUBMITTED
@@ -14632,6 +14726,7 @@ components:
           type: integer
           description: Merchant ID
           format: int32
+          nullable: true
         before_date:
           type: string
           description: Use `date_created:max`.
@@ -14645,22 +14740,28 @@ components:
         app_order_id:
           type: string
           description: Order ID in the Channels System
+          nullable: true
         customer_name:
           type: string
           description: Full customer name to search by - case insensitive.
+          nullable: true
         customer_email:
           type: string
           description: Customer email to search by - case insensitive.
+          nullable: true
         sku_name:
           type: string
           description: Name of an Sku present in the order - case insensitive.
+          nullable: true
         total:
           type: integer
           description: Exact total to search.
           format: int32
+          nullable: true
         status:
           type: string
           description: Order status to search.
+          nullable: true
           enum:
           - IN_PROGRESS
           - PROCESSING
@@ -14672,9 +14773,11 @@ components:
         sort_by:
           type: string
           description: Order property to sort by in camel case.
+          nullable: true
         sort_direction:
           type: string
           description: Direction to sort results by.
+          nullable: true
         date_last_modified:min:
           pattern: yyyy-MM-dd'T'HH:mm:ssZ
           type: string
