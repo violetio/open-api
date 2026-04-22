@@ -2883,10 +2883,16 @@ components:
           description: The total discounts applied to the price of the Bag in the
             base currency. In Cents
           format: int32
+        duty_total:
+          type: integer
+          description: "The sum of all duties applied to the Bag in the base currency.\
+            \ In Cents. If not provided, this value will be automatically calculated\
+            \ from DUTY-type rates on the Bag's SKUs."
+          format: int32
         total:
           type: integer
-          description: "The sum of all item prices, discounts, shipping, and taxes\
-            \ applied to the Bag in the base currency. In Cents"
+          description: "The sum of all item prices, discounts, shipping, duties, and\
+            \ taxes applied to the Bag in the base currency. In Cents"
           format: int32
         taxes_included:
           type: boolean
@@ -3407,10 +3413,17 @@ components:
             base currency. In Cents.
           format: int32
           default: 0
+        duty_total:
+          type: integer
+          description: "The sum of all duties applied to the Order in the base currency.\
+            \ In Cents. If not provided, this value will be automatically calculated\
+            \ from DUTY-type rates on the Order's SKUs."
+          format: int32
+          default: 0
         total:
           type: integer
-          description: "The sum of all item prices, discounts, shipping, and taxes\
-            \ applied to the Order in the base currency. In Cents."
+          description: "The sum of all item prices, discounts, shipping, duties, and\
+            \ taxes applied to the Order in the base currency. In Cents."
           format: int32
           default: 0
         app_customer_id:
@@ -4123,11 +4136,11 @@ components:
           type: string
           description: Rate Name
           readOnly: true
-        dollar_amount:
+        decimal_rate:
           type: number
           format: double
           readOnly: true
-        decimal_rate:
+        dollar_amount:
           type: number
           format: double
           readOnly: true
