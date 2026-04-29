@@ -654,10 +654,10 @@ paths:
           default: true
       - name: exclude_hidden
         in: query
+        description: Deprecated. Use the `visible` field in the request body instead.
         deprecated: true
         schema:
           type: boolean
-          default: true
       - name: extended
         in: query
         schema:
