@@ -972,6 +972,9 @@ components:
   schemas:
     Album:
       required:
+      - id
+      - media
+      - name
       - parent_id
       - type
       type: object
@@ -997,6 +1000,7 @@ components:
           uniqueItems: true
           type: array
           description: Album media
+          readOnly: true
           items:
             $ref: '#/components/schemas/Media'
         primary_media:
@@ -1005,8 +1009,13 @@ components:
       readOnly: true
     Collection:
       required:
+      - date_created
+      - date_last_modified
+      - external_id
       - id
       - merchant_id
+      - status
+      - type
       type: object
       properties:
         id:
@@ -1025,18 +1034,23 @@ components:
           description: Parent ID for platforms that have a parent-child collection
             structure.
           format: int64
+          nullable: true
         name:
           type: string
           description: Name of this collection
+          nullable: true
         handle:
           type: string
           description: Handle of this collection
+          nullable: true
         description:
           type: string
           description: Description of this collection
+          nullable: true
         status:
           type: string
           description: Status of this collection
+          readOnly: true
           enum:
           - INACTIVE
           - ACTIVE
@@ -1045,6 +1059,7 @@ components:
         type:
           type: string
           description: Type of this collection
+          readOnly: true
           enum:
           - CUSTOM
           - AUTOMATED
@@ -1054,10 +1069,12 @@ components:
           type: string
           description: Date of creation of this collection on platform
           format: date-time
+          readOnly: true
         date_last_modified:
           type: string
           description: Date of last update of this collection on platform
           format: date-time
+          readOnly: true
       description: Offers Collection
     CollectionMedia:
       type: object
@@ -1065,22 +1082,28 @@ components:
         source_url:
           type: string
           description: Source URL
+          nullable: true
         alt:
           type: string
           description: Alt
+          nullable: true
         height:
           type: integer
           description: Height
           format: int32
+          nullable: true
         width:
           type: integer
           description: Width
           format: int32
+          nullable: true
         date_created:
           type: string
           description: Date of media creation on platform
           format: date-time
+          nullable: true
       description: Collection Media
+      nullable: true
     Condition:
       type: object
       properties:
@@ -1108,6 +1131,12 @@ components:
     Media:
       required:
       - album_id
+      - display_order
+      - id
+      - primary
+      - source_url
+      - type
+      - url
       type: object
       properties:
         id:
@@ -1139,6 +1168,7 @@ components:
         type:
           type: string
           description: Media Type
+          readOnly: true
           enum:
           - IMAGE
           - VIDEO
@@ -1159,15 +1189,19 @@ components:
             details page.
       description: Product and SKU Media
     MetaObject:
+      required:
+      - key
       type: object
       properties:
         version:
           type: number
           description: Schema version
           format: double
+          nullable: true
         type:
           type: string
           description: Type of the value
+          nullable: true
           enum:
           - STRING
           - JSON
@@ -1178,20 +1212,24 @@ components:
         external_type:
           type: string
           description: Type of the value in the external commerce platform
+          nullable: true
         key:
           type: string
           description: The key of meta value
         value:
           type: object
           description: The meta value. Values of type JSON will be stringified
+          nullable: true
         external_id:
           type: string
           description: ID of the meta object in the external commerce platform
+          nullable: true
         source:
           type: string
           description: "The source the meta object originated from, either EXTERNAL\
             \ or INTERNAL, with EXTERNAL representing data from the external commerce\
             \ platform"
+          nullable: true
           enum:
           - INTERNAL
           - EXTERNAL
@@ -1226,7 +1264,6 @@ components:
       - currency
       - date_created
       - date_last_modified
-      - external_currency
       - external_id
       - id
       - max_price
@@ -1260,6 +1297,7 @@ components:
           description: "The URL to the product page in the merchants store. Note:\
             \ if the value for `visible` is `false` this URL will likely result in\
             \ a 404."
+          nullable: true
         name:
           type: string
           description: Name of the offer.
@@ -1371,6 +1409,7 @@ components:
           type: string
           description: ISO 4217 currency code representing the merchants default currency
             in their external commerce platform.
+          nullable: true
           readOnly: true
           example: USD
         source_category_name:
@@ -1464,6 +1503,7 @@ components:
             still exists. This date is jittered for performance reasons and can be
             in the future.
           format: date-time
+          nullable: true
           readOnly: true
         three_d_enabled:
           type: boolean
@@ -1480,6 +1520,7 @@ components:
             \ the app on sales of this Offer, expressed as a decimal (e.g. 0.15 =\
             \ 15%)."
           format: double
+          nullable: true
           readOnly: true
           example: 0.15
         currency_symbol:
@@ -1493,6 +1534,7 @@ components:
           description: ISO 4217 currency code representing the currency that prices
             are displayed in to the end user. May differ from `currency` if currency
             conversion is active.
+          nullable: true
           readOnly: true
           example: USD
         default_image_url:
@@ -1500,11 +1542,13 @@ components:
           description: The default image for this Offer. Only present on responses
             from the Search API. In other cases this value will be on the album's
             primary media object.
+          nullable: true
         subscription_status:
           type: string
           description: Indicates whether the current app is subscribed to this Offer.
             Subscribed offers can be purchased through the API and will appear in
             the app's catalog.
+          nullable: true
           readOnly: true
           enum:
           - NOT_SUBSCRIBED
@@ -1514,10 +1558,12 @@ components:
           description: The raw external product data from the external commerce platform.
             This data is not pre-processed by Violet and is only provided for reference
             when using using the Violet Relay API.
+          nullable: true
         collections:
           uniqueItems: true
           type: array
           description: Collections this offer belongs to. Use `?include=collections`.
+          nullable: true
           items:
             $ref: '#/components/schemas/Collection'
         shipping:
@@ -1962,12 +2008,17 @@ components:
       - currency
       - date_created
       - date_last_modified
+      - external_id
       - id
+      - in_stock
+      - inventory_tracked
       - merchant_id
       - name
       - offer_id
       - sale_price
       - status
+      - tax_type
+      - taxable
       - type
       type: object
       properties:
@@ -2014,6 +2065,7 @@ components:
         in_stock:
           type: boolean
           description: Is the Sku in stock in the merchants external store.
+          readOnly: true
         qty_available:
           maximum: 30000
           minimum: 0
@@ -2024,6 +2076,7 @@ components:
           type: boolean
           description: Is the Sku's inventory tracked in the merchants system. Untracked
             inventory can be oversold even when the available quantity is 0.
+          readOnly: true
         sale_price:
           type: integer
           description: Sale price of the SKU in cents (e.g. 2999 = $29.99). This is
@@ -2036,6 +2089,7 @@ components:
             is often a "Compare-To" or "MSRP" type price and is typically not what
             the customer will be charged.
           format: int32
+          nullable: true
           example: 3999
         currency:
           maxLength: 3
@@ -2049,6 +2103,7 @@ components:
           type: string
           description: ISO 4217 currency code representing the merchants default currency
             in their external commerce platform.
+          nullable: true
           readOnly: true
           example: USD
         presented_currency:
@@ -2058,6 +2113,7 @@ components:
           description: ISO 4217 currency code representing the currency that prices
             are displayed in to the end user. May differ from `currency` if currency
             conversion is active.
+          nullable: true
           readOnly: true
           example: USD
         taxable:
@@ -2134,6 +2190,7 @@ components:
           description: The order that the merchant has chosen to display this Sku
             in relation to other Sku's that are children of the same Offer.
           format: int32
+          nullable: true
       description: "A purchasable variant of an Offer (product). Each SKU represents\
         \ a unique combination of Variant values (e.g. Size=Medium + Color=Blue) and\
         \ has its own price, inventory, and availability. Use the SKU `id` when adding\
@@ -2141,6 +2198,8 @@ components:
         \ currency unit (e.g. cents for USD)."
       readOnly: true
     SkuDimensions:
+      required:
+      - type
       type: object
       properties:
         sku_id:
@@ -2151,18 +2210,22 @@ components:
           type: number
           description: Weight of SKU
           format: double
+          nullable: true
         height:
           type: number
           description: Height of SKU
           format: double
+          nullable: true
         width:
           type: number
           description: Width of SKU
           format: double
+          nullable: true
         length:
           type: number
           description: Length of SKU
           format: double
+          nullable: true
         type:
           type: string
           description: Dimensions Type
@@ -2212,6 +2275,11 @@ components:
       description: Trade compliance and customs information for a SKU
       nullable: true
     Variant:
+      required:
+      - id
+      - name
+      - values
+      - visual
       type: object
       properties:
         id:
@@ -2225,6 +2293,7 @@ components:
         external_id:
           type: string
           description: ID of the Variant on the External Ecommerce Platform
+          nullable: true
         name:
           type: string
           description: The name given to the Variant by the merchant.
@@ -2232,19 +2301,25 @@ components:
           type: boolean
           description: "Is the variant a visual characteristic. Common examples of\
             \ this would be Color, Pattern, or Material."
+          readOnly: true
         values:
           uniqueItems: true
           type: array
           description: Variant Values
+          readOnly: true
           items:
             $ref: '#/components/schemas/VariantValue'
         display_order:
           type: integer
           description: The order the variants are displayed in.
           format: int32
+          nullable: true
       description: Variation Data
       readOnly: true
     VariantValue:
+      required:
+      - id
+      - name
       type: object
       properties:
         id:
@@ -2257,6 +2332,7 @@ components:
         external_id:
           type: string
           description: ID of the Variant in the External Ecommerce Platform
+          nullable: true
         name:
           type: string
           description: Variant Value Name
@@ -2264,15 +2340,19 @@ components:
           uniqueItems: true
           type: array
           description: ID's of SKU's containing this Variant Value
+          nullable: true
           items:
             type: integer
             description: ID's of SKU's containing this Variant Value
             format: int64
+            nullable: true
         display_order:
           type: integer
           description: The order the variant values are displayed in.
           format: int32
+          nullable: true
       description: Individual Variation Value
+      readOnly: true
     Weight:
       type: object
       properties:
