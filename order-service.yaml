@@ -10471,6 +10471,7 @@ components:
       - currency
       - date_created
       - date_last_modified
+      - discount_total
       - dispute_status
       - external_checkout
       - external_currency
@@ -10481,9 +10482,13 @@ components:
       - merchant_name
       - order_id
       - platform
+      - shipping_total
       - skus
       - status
+      - sub_total
+      - tax_total
       - taxes_included
+      - total
       type: object
       properties:
         communicationPreferencesInternal:
@@ -10607,32 +10612,39 @@ components:
           description: "The price of the Bag in the base currency before discounts,\
             \ shipping, duties, taxes, and tips. In Cents."
           format: int32
+          default: 0
         shipping_total:
           type: integer
           description: The sum of all shipping methods applied to the Bag in the base
-            currency. In Cents
+            currency. In Cents.
           format: int32
+          default: 0
         tax_total:
           type: integer
           description: The sum of all the taxes applied to the Bag in the base currency.
-            In Cents
+            In Cents.
           format: int32
+          default: 0
         discount_total:
           type: integer
           description: The total discounts applied to the price of the Bag in the
-            base currency. In Cents
+            base currency. In Cents.
           format: int32
+          default: 0
         duty_total:
           type: integer
           description: "The sum of all duties applied to the Bag in the base currency.\
             \ In Cents. If not provided, this value will be automatically calculated\
             \ from DUTY-type rates on the Bag's SKUs."
           format: int32
+          nullable: true
+          default: 0
         total:
           type: integer
           description: "The sum of all item prices, discounts, shipping, duties, and\
-            \ taxes applied to the Bag in the base currency. In Cents"
+            \ taxes applied to the Bag in the base currency. In Cents."
           format: int32
+          default: 0
         taxes_included:
           type: boolean
           description: Are taxes included in the cart subtotal. When `true` the taxes
@@ -11053,7 +11065,6 @@ components:
       readOnly: true
     OrderShippingMethod:
       required:
-      - Carrier
       - bag_id
       - custom
       - id
@@ -11072,9 +11083,11 @@ components:
           - CALCULATED
           - FLAT_RATE_PRICE
           - FLAT_RATE_WEIGHT
-        Carrier:
+        carrier:
           type: string
+          description: The carrier for this shipping method.
           nullable: true
+          readOnly: true
           enum:
           - OTHER
           - UPS
@@ -11688,6 +11701,7 @@ components:
       - app_id
       - bags
       - currency
+      - currency_symbol
       - date_created
       - date_last_modified
       - developer_id
@@ -11880,13 +11894,18 @@ components:
         currency_symbol:
           type: string
           description: Symbol representing the currency the Order operates in.
+          readOnly: true
         app_name:
           type: string
           description: Name of app that originated the order. Use the "extended" query
             param when looking up orders to include this value.
+          nullable: true
+          readOnly: true
         stripe_key:
           type: string
           description: Stripe publishable key. Use for tokenizing payment methods.
+          nullable: true
+          readOnly: true
         payment_intent_client_secret:
           type: string
           description: Payment intent client secret. Use for payment intent based
@@ -11896,7 +11915,9 @@ components:
         payment_transactions:
           uniqueItems: true
           type: array
-          description: Payment Transactions associated to the bags on this Cart
+          description: Payment Transactions associated to the bags on this Cart.
+          nullable: true
+          readOnly: true
           items:
             $ref: '#/components/schemas/PaymentTransaction'
         order_id:
@@ -12393,6 +12414,8 @@ components:
           - PARTIALLY_REFUNDED
           - NOT_REQUIRED
       description: Payment Transaction
+      nullable: true
+      readOnly: true
     PaymentTransactionError:
       required:
       - error_message
@@ -12740,6 +12763,8 @@ components:
           nullable: true
       description: The address the items in the cart should be shipped to.
     CalculateCartResponse:
+      required:
+      - estimated_carts
       type: object
       properties:
         estimated_carts:
@@ -12754,6 +12779,11 @@ components:
         \ shipping methods, tax estimates, and discount breakdowns. All monetary values\
         \ are in the smallest currency unit (e.g. cents for USD)."
     CalculatedCartShippingMethod:
+      required:
+      - auxiliary_shipping_method
+      - label
+      - price
+      - shipping_method_id
       type: object
       properties:
         label:
@@ -12765,6 +12795,7 @@ components:
           description: The enumerate value of the carrier. Violet will attempt to
             match the raw carrier name to an enum. If no match is found the value
             will be OTHER.
+          nullable: true
           readOnly: true
           enum:
           - OTHER
@@ -12782,6 +12813,7 @@ components:
           type: string
           description: The raw name of the carrier provided by the merchant in the
             external commerce platform.
+          nullable: true
           readOnly: true
         price:
           type: integer
@@ -12796,6 +12828,7 @@ components:
           type: string
           description: "The description of the shipping method, when provided by the\
             \ merchant."
+          nullable: true
           readOnly: true
         auxiliary_shipping_method:
           type: boolean
@@ -12807,6 +12840,9 @@ components:
       readOnly: true
     CalculatedCartSku:
       required:
+      - available
+      - merchant_id
+      - product_type
       - sku_id
       type: object
       properties:
@@ -12831,6 +12867,7 @@ components:
         name:
           type: string
           description: Name of the Sku
+          nullable: true
           readOnly: true
         merchant_id:
           type: integer
@@ -12840,6 +12877,7 @@ components:
         external_id:
           type: string
           description: ID of the equivalent Sku in the external commerce platform.
+          nullable: true
           readOnly: true
         available:
           type: boolean
@@ -12851,6 +12889,7 @@ components:
         requires_shipping:
           type: boolean
           description: Does the Sku require shipping.
+          nullable: true
           readOnly: true
         product_type:
           type: string
@@ -12865,11 +12904,26 @@ components:
           type: integer
           description: "Price of the Sku multiplied by the quantity, in cents."
           format: int32
+          nullable: true
+          readOnly: true
         trade_compliance:
           $ref: '#/components/schemas/TradeCompliance'
       description: Calculated Cart Sku
       readOnly: true
     CalculatedCartTotals:
+      required:
+      - available_shipping_methods
+      - base_currency
+      - discount_total
+      - has_shipping_methods
+      - merchant_id
+      - platform
+      - shipping_address
+      - shipping_total
+      - skus
+      - sub_total
+      - tax_total
+      - total
       type: object
       properties:
         merchant_id:
@@ -12930,7 +12984,7 @@ components:
           maxLength: 3
           minLength: 3
           type: string
-          description: The base currency the cart should is calculated in.
+          description: The base currency the cart is calculated in.
           readOnly: true
           default: USD
           enum:
@@ -13074,6 +13128,7 @@ components:
         totals_in_base_currency:
           type: boolean
           description: Are the returned totals in the base currency.
+          nullable: true
           readOnly: true
           default: false
         sub_total:
@@ -13123,6 +13178,7 @@ components:
           uniqueItems: true
           type: array
           description: Discounts related to the cart if passed in during calculation.
+          nullable: true
           readOnly: true
           items:
             $ref: '#/components/schemas/BagDiscount'
@@ -13135,16 +13191,20 @@ components:
         external_error_messages:
           type: array
           description: Error messages from the external commerce platform.
+          nullable: true
           readOnly: true
           items:
             type: string
             description: Error messages from the external commerce platform.
+            nullable: true
             readOnly: true
         auxiliary_shipping_rates_applied:
           type: boolean
           description: Indicates if auxiliary shipping rates have been applied to
             this cart. These are rates that are calculated by the Violet system and
             not from the merchant's platform.
+          nullable: true
+          readOnly: true
           default: false
       description: Calculate Cart Response
       readOnly: true
@@ -14965,6 +15025,12 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         externalId:
           type: string
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
         payoutExternalId:
           type: string
         paymentService:
@@ -14974,12 +15040,6 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        effectiveRelatedOrderIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
         effectiveRelatedBagIds:
           uniqueItems: true
           type: array
