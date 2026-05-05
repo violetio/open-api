@@ -11165,6 +11165,7 @@ components:
       - app_id
       - available
       - id
+      - line_price
       - merchant_id
       - offer_id
       - quantity
@@ -11180,14 +11181,17 @@ components:
         name:
           type: string
           description: "Name of the Sku, as provided by the merchant."
+          nullable: true
           readOnly: true
         brand:
           type: string
           description: Name of the brand selling this Sku.
+          nullable: true
           readOnly: true
         thumbnail:
           type: string
           description: URL of the thumbnail image. Useful for order overview displays.
+          nullable: true
           readOnly: true
         quantity:
           maximum: 1000
@@ -11804,6 +11808,7 @@ components:
             \ In Cents. If not provided, this value will be automatically calculated\
             \ from DUTY-type rates on the Order's SKUs."
           format: int32
+          nullable: true
           default: 0
         total:
           type: integer
@@ -11920,9 +11925,6 @@ components:
           readOnly: true
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         order_status:
           type: string
           enum:
@@ -11939,6 +11941,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: "A Violet Order representing a shopping cart that progresses through\
         \ checkout to become a placed order. An Order contains one or more Bags (one\
         \ per merchant), a customer, shipping/billing addresses, and a payment method.\
@@ -11957,6 +11962,7 @@ components:
         name:
           type: string
           description: Name on Address
+          nullable: true
         city:
           type: string
           description: City
@@ -11976,6 +11982,7 @@ components:
           description: "Phone number related to the address. Note: Some external commerce\
             \ platforms require this value. For these platforms Violet will use a\
             \ fake number if no value is provided to ensure that the order succeeds."
+          nullable: true
         type:
           type: string
           description: Address Type
@@ -11992,6 +11999,7 @@ components:
         address_2:
           type: string
           description: Second line of the address
+          nullable: true
         first_name:
           type: string
         last_name:
@@ -12780,7 +12788,6 @@ components:
         \ are in the smallest currency unit (e.g. cents for USD)."
     CalculatedCartShippingMethod:
       required:
-      - auxiliary_shipping_method
       - label
       - price
       - shipping_method_id
@@ -12832,8 +12839,9 @@ components:
           readOnly: true
         auxiliary_shipping_method:
           type: boolean
-          description: Was this rate calculated by the Violet system and not provided
-            by the merchant's platform.
+          description: "Was this rate calculated by the Violet system and not provided\
+            \ by the merchant's platform. When null, assume false."
+          nullable: true
           readOnly: true
           default: false
       description: Calculated Cart Shipping Method
@@ -12841,6 +12849,7 @@ components:
     CalculatedCartSku:
       required:
       - available
+      - line_price
       - merchant_id
       - product_type
       - sku_id
@@ -12904,7 +12913,6 @@ components:
           type: integer
           description: "Price of the Sku multiplied by the quantity, in cents."
           format: int32
-          nullable: true
           readOnly: true
         trade_compliance:
           $ref: '#/components/schemas/TradeCompliance'
@@ -15023,14 +15031,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
-        effectiveRelatedOrderIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
         payoutExternalId:
           type: string
         paymentService:
@@ -15040,6 +15040,12 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
         effectiveRelatedBagIds:
           uniqueItems: true
           type: array
@@ -15058,6 +15064,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
