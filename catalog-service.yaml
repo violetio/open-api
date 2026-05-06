@@ -1271,6 +1271,7 @@ components:
       - min_price
       - name
       - publishing_status
+      - seller
       - skus
       - source
       - status
@@ -1300,7 +1301,7 @@ components:
           nullable: true
         name:
           type: string
-          description: Name of the offer.
+          description: Name of the offer as defined by the source merchant.
           example: Blue Running Sneakers
         description:
           maxLength: 65000
@@ -1361,11 +1362,13 @@ components:
           type: string
           description: Name of the merchant selling product.
           nullable: true
+          readOnly: true
           example: Foot Locker
         vendor:
           type: string
           description: Name of the source vendor or brand.
           nullable: true
+          readOnly: true
           example: Nike
         merchant_id:
           type: integer
@@ -2015,6 +2018,8 @@ components:
       - merchant_id
       - name
       - offer_id
+      - qty_available
+      - retail_price
       - sale_price
       - status
       - tax_type
@@ -2089,7 +2094,6 @@ components:
             is often a "Compare-To" or "MSRP" type price and is typically not what
             the customer will be charged.
           format: int32
-          nullable: true
           example: 3999
         currency:
           maxLength: 3
