@@ -1467,6 +1467,9 @@ components:
               - `use_basic_auth` - When enabled, uses HTTP Basic Authentication instead of OAuth for WooCommerce API calls. Requires explicit `true`. Default: disabled.
               - `filter_by_categories` - When enabled, filters product sync to only include products from categories specified in the platform config. Also applies to BigCommerce, SFCC, Ecwid, and Magento. Requires explicit `true`. Default: disabled.
 
+              **Magento Flags:**
+              - `has_violet_extension` - Legacy fallback for Magento extension capability when `magento_config.has_violet_extension` is unset. Explicit `false` disables extension behavior; otherwise defaults to enabled for backward compatibility.
+
               **SFCC (Salesforce Commerce Cloud) Flags:**
               - `filter_by_catalog` - When enabled, filters products and collections to only those in catalogs specified in `sfcc_config.enabled_catalog_ids`. Requires explicit `true`. Default: disabled.
 
@@ -1495,6 +1498,9 @@ components:
             - `sync_duplicate_sku_media` - When enabled, syncs media for products with duplicate SKUs. Requires explicit `true`. Default: disabled.
             - `use_basic_auth` - When enabled, uses HTTP Basic Authentication instead of OAuth for WooCommerce API calls. Requires explicit `true`. Default: disabled.
             - `filter_by_categories` - When enabled, filters product sync to only include products from categories specified in the platform config. Also applies to BigCommerce, SFCC, Ecwid, and Magento. Requires explicit `true`. Default: disabled.
+
+            **Magento Flags:**
+            - `has_violet_extension` - Legacy fallback for Magento extension capability when `magento_config.has_violet_extension` is unset. Explicit `false` disables extension behavior; otherwise defaults to enabled for backward compatibility.
 
             **SFCC (Salesforce Commerce Cloud) Flags:**
             - `filter_by_catalog` - When enabled, filters products and collections to only those in catalogs specified in `sfcc_config.enabled_catalog_ids`. Requires explicit `true`. Default: disabled.
@@ -3126,9 +3132,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PageMerchantOnboardingRecord:
       type: object
