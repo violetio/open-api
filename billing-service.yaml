@@ -2039,6 +2039,10 @@ components:
           type: integer
           description: The total tax amount included in the distribution.
           format: int32
+        duty_amount:
+          type: integer
+          description: The total duty amount included in the distribution.
+          format: int32
         shipping_amount:
           type: integer
           description: The total shipping charges included in the distribution.
@@ -2126,6 +2130,11 @@ components:
         bag_tax_total:
           type: integer
           description: The sum of all the taxes applied to the Bag in the base currency.
+            In fractional currency unit (e.g. cents).
+          format: int32
+        bag_duty_total:
+          type: integer
+          description: The sum of all the duties applied to the Bag in the base currency.
             In fractional currency unit (e.g. cents).
           format: int32
         bag_discount_total:
@@ -2233,6 +2242,13 @@ components:
           enum:
           - APP
           - MERCHANT
+        duty_remitter:
+          type: string
+          description: "Duty Remittance setting used to generate this Distribution.\
+            \ One of {APP} or {MERCHANT}."
+          enum:
+          - APP
+          - MERCHANT
         date_created:
           type: string
           description: Time at which the object was created. In ISO-8601 format.
@@ -2279,8 +2295,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2293,6 +2307,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2729,8 +2745,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2743,6 +2757,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2876,8 +2892,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2890,6 +2904,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3201,8 +3217,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3215,6 +3229,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3233,8 +3249,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3247,6 +3261,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3339,8 +3355,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3353,6 +3367,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
