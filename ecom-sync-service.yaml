@@ -1320,6 +1320,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
         seller:
           type: string
           description: Name of the merchant selling product.
@@ -2837,11 +2839,11 @@ components:
       - total
       type: object
       properties:
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_status:
           type: string
           enum:
@@ -3134,6 +3136,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
         fulfillments:
           uniqueItems: true
           type: array
@@ -3878,6 +3882,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
       description: Order Error
       nullable: true
       readOnly: true
