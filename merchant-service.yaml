@@ -2454,6 +2454,11 @@ components:
         exclude_external_methods:
           type: boolean
           description: Should all external shipping methods be excluded.
+        use_fallback_methods_on_empty:
+          type: boolean
+          description: "When true, fallback shipping methods are used only when the\
+            \ merchant's store returns zero shipping rates. External methods are fetched\
+            \ first; fallback is substituted only if the result is empty."
         shipping_exclusions:
           $ref: '#/components/schemas/ShippingExclusionsConfig'
       description: Configurations for the merchants shipping behaviors.
@@ -2606,6 +2611,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
         platform_plan:
           type: string
           description: The eCommerce platform plan of the store
