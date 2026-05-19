@@ -382,6 +382,94 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+  /catalog/offers/merchants/{merchant_id}/v1.1:
+    get:
+      tags:
+      - Catalog - Offers
+      summary: Get Merchant Offers - V1.1
+      description: "Lightweight version that returns offer data without SKUs, variants,\
+        \ or albums. Maximum size limit of 100 results."
+      operationId: getMerchantOffersV1_1
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: X-Violet-Api-Features
+        in: header
+        schema:
+          type: string
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        description: The total number of desired results. Any value over `100` will
+          default to `100`.
+        schema:
+          maximum: 100
+          type: integer
+          format: int32
+          default: 20
+      - name: base_currency
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        description: Comma-separated list of extra data to be included.
+        schema:
+          type: string
+          enum:
+          - metadata
+          - collections
+          - shipping
+      - name: date_last_modified:min
+        in: query
+        description: "Return only the published offers that have been modified after\
+          \ the given date time, using the standard Violet datetime format, ISO 8601.\
+          \ Example: `2017-06-15T01:01:01+0000`"
+        schema:
+          type: string
+          example: 2017-06-15T01:01:01+0000
+        example: 2017-06-15T01:01:01+0000
+      - name: date_last_modified:max
+        in: query
+        description: "Return only the published offers that have been modified before\
+          \ the given date time, using the standard Violet datetime format, ISO 8601.\
+          \ Example: `2017-06-25T01:01:01+0000`"
+        schema:
+          type: string
+          example: 2017-06-25T01:01:01+0000
+        example: 2017-06-25T01:01:01+0000
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageOffer'
   /catalog/offers/merchants/{merchant_id}/count:
     get:
       tags:
