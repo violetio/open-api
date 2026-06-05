@@ -357,6 +357,7 @@ paths:
           - collections
           - shipping
           - sku_metadata
+          - unpublished
       - name: date_last_modified:min
         in: query
         description: "Return only the published offers that have been modified after\
@@ -376,12 +377,279 @@ paths:
           example: 2017-06-25T01:01:01+0000
         example: 2017-06-25T01:01:01+0000
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+              examples:
+                Merchant offers:
+                  summary: A page of offers for a merchant.
+                  description: Merchant offers
+                  value:
+                    content:
+                    - id: 248519
+                      external_id: "8429610926344"
+                      external_url: https://foot-locker.myshopify.com/products/air-flex-runner
+                      name: Air Flex Runner
+                      description: Lightweight everyday running shoe with a cushioned
+                        midsole and breathable knit upper.
+                      source: SHOPIFY
+                      seller: Foot Locker
+                      vendor: Nike
+                      merchant_id: 4821
+                      available: true
+                      visible: true
+                      min_price: 8999
+                      max_price: 8999
+                      currency: USD
+                      source_category_name: Footwear > Running
+                      variants:
+                      - id: 71204
+                        external_id: "9015874281472"
+                        name: Size
+                        visual: false
+                        values:
+                        - id: 530118
+                          external_id: Medium
+                          name: Medium
+                          sku_ids:
+                          - 411203
+                          display_order: 1
+                        - id: 530119
+                          external_id: Large
+                          name: Large
+                          sku_ids:
+                          - 411204
+                          display_order: 2
+                        display_order: 1
+                      skus:
+                      - id: 411203
+                        offer_id: 248519
+                        merchant_id: 4821
+                        external_id: "44218309214"
+                        name: Air Flex Runner - Medium
+                        in_stock: true
+                        qty_available: 42
+                        inventory_tracked: true
+                        sale_price: 8999
+                        retail_price: 9999
+                        currency: USD
+                        taxable: true
+                        tax_type: APPAREL
+                        albums: []
+                        variant_values:
+                        - id: 530118
+                          external_id: Medium
+                          name: Medium
+                          display_order: 1
+                        type: PHYSICAL
+                        status: AVAILABLE
+                        date_created: 2024-01-15T10:30:00+0000
+                        date_last_modified: 2024-06-22T14:37:46+0000
+                      - id: 411204
+                        offer_id: 248519
+                        merchant_id: 4821
+                        external_id: "44218309215"
+                        name: Air Flex Runner - Large
+                        in_stock: true
+                        qty_available: 18
+                        inventory_tracked: true
+                        sale_price: 8999
+                        retail_price: 9999
+                        currency: USD
+                        taxable: true
+                        tax_type: APPAREL
+                        albums: []
+                        variant_values:
+                        - id: 530119
+                          external_id: Large
+                          name: Large
+                          display_order: 2
+                        type: PHYSICAL
+                        status: AVAILABLE
+                        date_created: 2024-01-15T10:30:00+0000
+                        date_last_modified: 2024-06-22T14:37:46+0000
+                      albums:
+                      - id: 312044
+                        parent_id: 248519
+                        type: OFFER
+                        name: Primary Album
+                        media:
+                        - id: 891022
+                          album_id: 312044
+                          external_id: "30250544889992"
+                          url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                          source_url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                          alt_text: Air Flex Runner side view
+                        primary_media:
+                          id: 891022
+                          album_id: 312044
+                          external_id: "30250544889992"
+                          url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                          source_url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                          alt_text: Air Flex Runner side view
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      publishing_status: PUBLISHED
+                      subscription_status: NOT_SUBSCRIBED
+                      date_created: 2024-01-15T10:30:00+0000
+                      date_last_modified: 2024-06-22T14:37:46+0000
+                      date_last_consolidated: 2024-06-22T14:37:46+0000
+                      three_d_enabled: false
+                    last: false
+                    total_pages: 287
+                    total_elements: 287
+                    first: true
+                    number_of_elements: 1
+                    size: 1
+                    number: 1
+                    empty: false
+                    pageable:
+                      page_number: 1
+                      page_size: 1
+                      sort:
+                        unsorted: false
+                        sorted: true
+                        empty: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    sort:
+                      unsorted: false
+                      sorted: true
+                      empty: false
+                Merchant offers including unpublished:
+                  summary: "A page including unpublished offers. Returned when the\
+                    \ caller is an admin or merchant, or when a developer passes `?include=unpublished`."
+                  description: Merchant offers including unpublished
+                  value:
+                    content:
+                    - id: 248611
+                      external_id: "8429610991880"
+                      external_url: https://foot-locker.myshopify.com/products/court-classic-low
+                      name: Court Classic Low
+                      description: Retro low-top sneaker. Currently hidden from the
+                        storefront while pricing and inventory are being finalized.
+                      source: SHOPIFY
+                      seller: Foot Locker
+                      vendor: Adidas
+                      merchant_id: 4821
+                      available: true
+                      visible: false
+                      min_price: 7499
+                      max_price: 7499
+                      currency: USD
+                      source_category_name: Footwear > Lifestyle
+                      variants:
+                      - id: 71311
+                        external_id: "9015874347008"
+                        name: Size
+                        visual: false
+                        values:
+                        - id: 530412
+                          external_id: Medium
+                          name: Medium
+                          sku_ids:
+                          - 411502
+                          display_order: 1
+                        display_order: 1
+                      skus:
+                      - id: 411502
+                        offer_id: 248611
+                        merchant_id: 4821
+                        external_id: "44218309512"
+                        name: Court Classic Low - Medium
+                        in_stock: true
+                        qty_available: 8
+                        inventory_tracked: true
+                        sale_price: 7499
+                        retail_price: 8999
+                        currency: USD
+                        taxable: true
+                        tax_type: APPAREL
+                        albums: []
+                        variant_values:
+                        - id: 530412
+                          external_id: Medium
+                          name: Medium
+                          display_order: 1
+                        type: PHYSICAL
+                        status: AVAILABLE
+                        date_created: 2024-05-02T09:12:00+0000
+                        date_last_modified: 2024-06-22T14:37:46+0000
+                      albums:
+                      - id: 312118
+                        parent_id: 248611
+                        type: OFFER
+                        name: Primary Album
+                        media:
+                        - id: 891204
+                          album_id: 312118
+                          external_id: "30250544988244"
+                          url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/court-classic-low.jpg
+                          source_url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/court-classic-low.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                          alt_text: Court Classic Low side view
+                        primary_media:
+                          id: 891204
+                          album_id: 312118
+                          external_id: "30250544988244"
+                          url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/court-classic-low.jpg
+                          source_url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/court-classic-low.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                          alt_text: Court Classic Low side view
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      publishing_status: NOT_PUBLISHED
+                      subscription_status: NOT_SUBSCRIBED
+                      date_created: 2024-05-02T09:12:00+0000
+                      date_last_modified: 2024-06-22T14:37:46+0000
+                      date_last_consolidated: 2024-06-22T14:37:46+0000
+                      three_d_enabled: false
+                    last: false
+                    total_pages: 312
+                    total_elements: 312
+                    first: true
+                    number_of_elements: 1
+                    size: 1
+                    number: 1
+                    empty: false
+                    pageable:
+                      page_number: 1
+                      page_size: 1
+                      sort:
+                        unsorted: false
+                        sorted: true
+                        empty: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    sort:
+                      unsorted: false
+                      sorted: true
+                      empty: false
+        "403":
+          description: insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
   /catalog/offers/merchants/{merchant_id}/v1.1:
     get:
       tags:
@@ -445,6 +713,7 @@ paths:
           - metadata
           - collections
           - shipping
+          - unpublished
       - name: date_last_modified:min
         in: query
         description: "Return only the published offers that have been modified after\
@@ -2873,22 +3142,6 @@ components:
           $ref: '#/components/schemas/VioletPageable'
         sort:
           $ref: '#/components/schemas/VioletSort'
-    ProductCount:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of products
-          format: int32
-        published_count:
-          type: integer
-          description: Number of published products
-          format: int32
-        not_published_count:
-          type: integer
-          description: Number of unpublished products
-          format: int32
-      description: Product count statistics for a catalog
     Error:
       type: object
       properties:
@@ -2938,6 +3191,22 @@ components:
         bagId:
           type: integer
           format: int64
+    ProductCount:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of products
+          format: int32
+        published_count:
+          type: integer
+          description: Number of published products
+          format: int32
+        not_published_count:
+          type: integer
+          description: Number of unpublished products
+          format: int32
+      description: Product count statistics for a catalog
     ScoredCategory:
       required:
       - depth
