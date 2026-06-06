@@ -170,12 +170,60 @@ paths:
           format: int32
           default: 20
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageCategory'
+              examples:
+                Categories:
+                  summary: A page of taxonomy categories.
+                  description: Categories
+                  value:
+                    content:
+                    - id: "187"
+                      name: Shoes
+                      slug: shoes
+                      parent_id: "166"
+                      depth: 2
+                    - id: "5697"
+                      name: Athletic Shoes
+                      slug: athletic_shoes
+                      parent_id: "187"
+                      depth: 3
+                    last: false
+                    total_pages: 3194
+                    total_elements: 6388
+                    first: true
+                    number_of_elements: 2
+                    size: 2
+                    number: 1
+                    empty: false
+                    pageable:
+                      page_number: 1
+                      page_size: 2
+                      sort:
+                        unsorted: false
+                        sorted: true
+                        empty: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    sort:
+                      unsorted: false
+                      sorted: true
+                      empty: false
+        "403":
+          description: insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
   /catalog/categories/{id}:
     get:
       tags:
@@ -733,12 +781,75 @@ paths:
           example: 2017-06-25T01:01:01+0000
         example: 2017-06-25T01:01:01+0000
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+              examples:
+                Merchant offers (lightweight):
+                  summary: "A page of offers for a merchant. The lightweight V1.1\
+                    \ shape omits skus, variants, and albums."
+                  description: Merchant offers (lightweight)
+                  value:
+                    content:
+                    - id: 248519
+                      external_id: "8429610926344"
+                      external_url: https://foot-locker.myshopify.com/products/air-flex-runner
+                      name: Air Flex Runner
+                      description: Lightweight everyday running shoe with a cushioned
+                        midsole and breathable knit upper.
+                      source: SHOPIFY
+                      seller: Foot Locker
+                      vendor: Nike
+                      merchant_id: 4821
+                      available: true
+                      visible: true
+                      min_price: 8999
+                      max_price: 8999
+                      currency: USD
+                      source_category_name: Footwear > Running
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      publishing_status: PUBLISHED
+                      subscription_status: NOT_SUBSCRIBED
+                      date_created: 2024-01-15T10:30:00+0000
+                      date_last_modified: 2024-06-22T14:37:46+0000
+                      date_last_consolidated: 2024-06-22T14:37:46+0000
+                      three_d_enabled: false
+                    last: false
+                    total_pages: 287
+                    total_elements: 287
+                    first: true
+                    number_of_elements: 1
+                    size: 1
+                    number: 1
+                    empty: false
+                    pageable:
+                      page_number: 1
+                      page_size: 1
+                      sort:
+                        unsorted: false
+                        sorted: true
+                        empty: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    sort:
+                      unsorted: false
+                      sorted: true
+                      empty: false
+        "403":
+          description: insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
   /catalog/offers/merchants/{merchant_id}/count:
     get:
       tags:
@@ -851,6 +962,126 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Offer'
+              examples:
+                Offer:
+                  summary: "A published, available offer with two SKU variants."
+                  description: Offer
+                  value:
+                    id: 248519
+                    external_id: "8429610926344"
+                    external_url: https://foot-locker.myshopify.com/products/air-flex-runner
+                    name: Air Flex Runner
+                    description: Lightweight everyday running shoe with a cushioned
+                      midsole and breathable knit upper.
+                    source: SHOPIFY
+                    seller: Foot Locker
+                    vendor: Nike
+                    merchant_id: 4821
+                    available: true
+                    visible: true
+                    min_price: 8999
+                    max_price: 8999
+                    currency: USD
+                    source_category_name: Footwear > Running
+                    variants:
+                    - id: 71204
+                      external_id: "9015874281472"
+                      name: Size
+                      visual: false
+                      values:
+                      - id: 530118
+                        external_id: Medium
+                        name: Medium
+                        sku_ids:
+                        - 411203
+                        display_order: 1
+                      - id: 530119
+                        external_id: Large
+                        name: Large
+                        sku_ids:
+                        - 411204
+                        display_order: 2
+                      display_order: 1
+                    skus:
+                    - id: 411203
+                      offer_id: 248519
+                      merchant_id: 4821
+                      external_id: "44218309214"
+                      name: Air Flex Runner - Medium
+                      in_stock: true
+                      qty_available: 42
+                      inventory_tracked: true
+                      sale_price: 8999
+                      retail_price: 9999
+                      currency: USD
+                      taxable: true
+                      tax_type: APPAREL
+                      albums: []
+                      variant_values:
+                      - id: 530118
+                        external_id: Medium
+                        name: Medium
+                        display_order: 1
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      date_created: 2024-01-15T10:30:00+0000
+                      date_last_modified: 2024-06-22T14:37:46+0000
+                    - id: 411204
+                      offer_id: 248519
+                      merchant_id: 4821
+                      external_id: "44218309215"
+                      name: Air Flex Runner - Large
+                      in_stock: true
+                      qty_available: 18
+                      inventory_tracked: true
+                      sale_price: 8999
+                      retail_price: 9999
+                      currency: USD
+                      taxable: true
+                      tax_type: APPAREL
+                      albums: []
+                      variant_values:
+                      - id: 530119
+                        external_id: Large
+                        name: Large
+                        display_order: 2
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      date_created: 2024-01-15T10:30:00+0000
+                      date_last_modified: 2024-06-22T14:37:46+0000
+                    albums:
+                    - id: 312044
+                      parent_id: 248519
+                      type: OFFER
+                      name: Primary Album
+                      media:
+                      - id: 891022
+                        album_id: 312044
+                        external_id: "30250544889992"
+                        url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                        source_url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                        type: IMAGE
+                        display_order: 1
+                        primary: true
+                        alt_text: Air Flex Runner side view
+                      primary_media:
+                        id: 891022
+                        album_id: 312044
+                        external_id: "30250544889992"
+                        url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                        source_url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                        type: IMAGE
+                        display_order: 1
+                        primary: true
+                        alt_text: Air Flex Runner side view
+                    type: PHYSICAL
+                    status: AVAILABLE
+                    publishing_status: PUBLISHED
+                    subscription_status: NOT_SUBSCRIBED
+                    date_created: 2024-01-15T10:30:00+0000
+                    date_last_modified: 2024-06-22T14:37:46+0000
+                    date_last_consolidated: 2024-06-22T14:37:46+0000
+                    three_d_enabled: false
         "404":
           description: offer not found
           content:
@@ -914,12 +1145,67 @@ paths:
           - sku_dimensions
           - sku_metadata
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Sku'
+              examples:
+                Sku:
+                  summary: "An available, in-stock SKU with one variant value."
+                  description: Sku
+                  value:
+                    id: 411203
+                    offer_id: 248519
+                    merchant_id: 4821
+                    external_id: "44218309214"
+                    name: Air Flex Runner - Medium
+                    in_stock: true
+                    qty_available: 42
+                    inventory_tracked: true
+                    sale_price: 8999
+                    retail_price: 9999
+                    currency: USD
+                    taxable: true
+                    tax_type: APPAREL
+                    albums: []
+                    variant_values:
+                    - id: 530118
+                      external_id: Medium
+                      name: Medium
+                      display_order: 1
+                    type: PHYSICAL
+                    status: AVAILABLE
+                    date_created: 2024-01-15T10:30:00+0000
+                    date_last_modified: 2024-06-22T14:37:46+0000
+                    sku_dimensions:
+                      sku_id: 411203
+                      weight: 0.85
+                      height: 12.5
+                      width: 31.0
+                      length: 21.0
+                      type: SKU
+        "404":
+          description: sku not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Sku not found.
+                error: sku_not_found
+                code: 2002
+        "403":
+          description: insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
   /catalog/categories/search/{query}:
     get:
       tags:
@@ -1026,17 +1312,191 @@ paths:
           type: boolean
           default: false
       requestBody:
+        description: Filters to apply to the offer search.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/OfferSearchRequest'
+            examples:
+              Filter by merchants, tags, and price range:
+                summary: "Search for available, visible offers across three merchants\
+                  \ matching the running/trail tags between $50 and $150."
+                description: "Filter by merchants, tags, and price range"
+                value:
+                  merchant_ids:
+                  - 4821
+                  - 4830
+                  - 5012
+                  tags:
+                  - running
+                  - trail
+                  min_price: 5000
+                  max_price: 15000
+                  available: true
+                  visible: true
+                  sort_by: dateLastModified
+                  sort_direction: desc
       responses:
-        default:
-          description: default response
+        "200":
+          description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+              examples:
+                Search results:
+                  summary: "A page of offers matching the search request. By default\
+                    \ the search is restricted to published, visible offers."
+                  description: Search results
+                  value:
+                    content:
+                    - id: 248519
+                      external_id: "8429610926344"
+                      external_url: https://foot-locker.myshopify.com/products/air-flex-runner
+                      name: Air Flex Runner
+                      description: Lightweight everyday running shoe with a cushioned
+                        midsole and breathable knit upper.
+                      source: SHOPIFY
+                      seller: Foot Locker
+                      vendor: Nike
+                      merchant_id: 4821
+                      available: true
+                      visible: true
+                      min_price: 8999
+                      max_price: 8999
+                      currency: USD
+                      source_category_name: Footwear > Running
+                      variants:
+                      - id: 71204
+                        external_id: "9015874281472"
+                        name: Size
+                        visual: false
+                        values:
+                        - id: 530118
+                          external_id: Medium
+                          name: Medium
+                          sku_ids:
+                          - 411203
+                          display_order: 1
+                        - id: 530119
+                          external_id: Large
+                          name: Large
+                          sku_ids:
+                          - 411204
+                          display_order: 2
+                        display_order: 1
+                      skus:
+                      - id: 411203
+                        offer_id: 248519
+                        merchant_id: 4821
+                        external_id: "44218309214"
+                        name: Air Flex Runner - Medium
+                        in_stock: true
+                        qty_available: 42
+                        inventory_tracked: true
+                        sale_price: 8999
+                        retail_price: 9999
+                        currency: USD
+                        taxable: true
+                        tax_type: APPAREL
+                        albums: []
+                        variant_values:
+                        - id: 530118
+                          external_id: Medium
+                          name: Medium
+                          display_order: 1
+                        type: PHYSICAL
+                        status: AVAILABLE
+                        date_created: 2024-01-15T10:30:00+0000
+                        date_last_modified: 2024-06-22T14:37:46+0000
+                      - id: 411204
+                        offer_id: 248519
+                        merchant_id: 4821
+                        external_id: "44218309215"
+                        name: Air Flex Runner - Large
+                        in_stock: true
+                        qty_available: 18
+                        inventory_tracked: true
+                        sale_price: 8999
+                        retail_price: 9999
+                        currency: USD
+                        taxable: true
+                        tax_type: APPAREL
+                        albums: []
+                        variant_values:
+                        - id: 530119
+                          external_id: Large
+                          name: Large
+                          display_order: 2
+                        type: PHYSICAL
+                        status: AVAILABLE
+                        date_created: 2024-01-15T10:30:00+0000
+                        date_last_modified: 2024-06-22T14:37:46+0000
+                      albums:
+                      - id: 312044
+                        parent_id: 248519
+                        type: OFFER
+                        name: Primary Album
+                        media:
+                        - id: 891022
+                          album_id: 312044
+                          external_id: "30250544889992"
+                          url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                          source_url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                          alt_text: Air Flex Runner side view
+                        primary_media:
+                          id: 891022
+                          album_id: 312044
+                          external_id: "30250544889992"
+                          url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                          source_url: https://cdn.shopify.com/s/files/1/0582/6022/6184/products/air-flex-runner.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                          alt_text: Air Flex Runner side view
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      publishing_status: PUBLISHED
+                      subscription_status: NOT_SUBSCRIBED
+                      date_created: 2024-01-15T10:30:00+0000
+                      date_last_modified: 2024-06-22T14:37:46+0000
+                      date_last_consolidated: 2024-06-22T14:37:46+0000
+                      three_d_enabled: false
+                    last: false
+                    total_pages: 287
+                    total_elements: 287
+                    first: true
+                    number_of_elements: 1
+                    size: 1
+                    number: 1
+                    empty: false
+                    pageable:
+                      page_number: 1
+                      page_size: 1
+                      sort:
+                        unsorted: false
+                        sorted: true
+                        empty: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    sort:
+                      unsorted: false
+                      sorted: true
+                      empty: false
+        "403":
+          description: insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
   /catalog/collections/{collection_id}:
     get:
       tags:
@@ -3093,55 +3553,6 @@ components:
           type: boolean
           description: Boolean indicating if the result set is empty
       description: Violet Wrapper for springframework sort
-    VioletPageOffer:
-      type: object
-      properties:
-        content:
-          type: array
-          description: The actual content of the response; A list of the result objects
-          items:
-            $ref: '#/components/schemas/Offer'
-        last:
-          type: boolean
-          description: Boolean indicating if this is the last page
-        total_pages:
-          type: integer
-          description: The total count of pages available
-          format: int32
-        total_elements:
-          type: integer
-          description: The total count of objects available
-          format: int32
-        first:
-          type: boolean
-          description: Boolean indicating if this is the first page of the response
-        number_of_elements:
-          type: integer
-          description: The total number of objects in this specific response
-          format: int32
-        size:
-          type: integer
-          description: The page size selected at request time
-          format: int32
-        number:
-          type: integer
-          description: The page number selected at request time
-          format: int32
-        empty:
-          type: boolean
-          description: Boolean indicating if the response content is empty
-        next_page_cursor:
-          type: string
-          description: Contains the cursor for the next page. This property will only
-            be used for situations where the API does not support the page number/page
-            size paradigm and it will mutually exclusive with the size/number fields
-            in the response. If this property is returned it must be passed when requesting
-            the next page from the API. Does not apply to endpoints that do not have
-            a next_page_cursor query param documented.
-        pageable:
-          $ref: '#/components/schemas/VioletPageable'
-        sort:
-          $ref: '#/components/schemas/VioletSort'
     Error:
       type: object
       properties:
@@ -3191,6 +3602,55 @@ components:
         bagId:
           type: integer
           format: int64
+    VioletPageOffer:
+      type: object
+      properties:
+        content:
+          type: array
+          description: The actual content of the response; A list of the result objects
+          items:
+            $ref: '#/components/schemas/Offer'
+        last:
+          type: boolean
+          description: Boolean indicating if this is the last page
+        total_pages:
+          type: integer
+          description: The total count of pages available
+          format: int32
+        total_elements:
+          type: integer
+          description: The total count of objects available
+          format: int32
+        first:
+          type: boolean
+          description: Boolean indicating if this is the first page of the response
+        number_of_elements:
+          type: integer
+          description: The total number of objects in this specific response
+          format: int32
+        size:
+          type: integer
+          description: The page size selected at request time
+          format: int32
+        number:
+          type: integer
+          description: The page number selected at request time
+          format: int32
+        empty:
+          type: boolean
+          description: Boolean indicating if the response content is empty
+        next_page_cursor:
+          type: string
+          description: Contains the cursor for the next page. This property will only
+            be used for situations where the API does not support the page number/page
+            size paradigm and it will mutually exclusive with the size/number fields
+            in the response. If this property is returned it must be passed when requesting
+            the next page from the API. Does not apply to endpoints that do not have
+            a next_page_cursor query param documented.
+        pageable:
+          $ref: '#/components/schemas/VioletPageable'
+        sort:
+          $ref: '#/components/schemas/VioletSort'
     ProductCount:
       type: object
       properties:
