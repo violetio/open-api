@@ -10094,6 +10094,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
         fulfillments:
           uniqueItems: true
           type: array
@@ -10375,6 +10377,7 @@ components:
       - bags
       - currency
       - currency_symbol
+      - customer
       - date_created
       - date_last_modified
       - developer_id
@@ -10708,7 +10711,6 @@ components:
           description: Full name of the customer.
           readOnly: true
       description: Details of the customer placing the order.
-      nullable: true
     OrderError:
       required:
       - date_created
@@ -10838,6 +10840,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
       description: Order Error
       nullable: true
       readOnly: true
@@ -12034,6 +12038,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
         base_currency:
           maxLength: 3
           minLength: 3
@@ -14212,6 +14218,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -14245,8 +14253,6 @@ components:
           items:
             type: integer
             format: int64
-        externalId:
-          type: string
         related_orders:
           uniqueItems: true
           type: array
