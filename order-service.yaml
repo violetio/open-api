@@ -9919,28 +9919,24 @@ components:
             \ shipping, duties, taxes, and tips. In Cents. *This value can be null\
             \ before the cart has been priced.*"
           format: int32
-          nullable: true
           default: 0
         shipping_total:
           type: integer
           description: The sum of all shipping methods applied to the Bag in the base
             currency. In Cents. May be null before the cart has been priced.
           format: int32
-          nullable: true
           default: 0
         tax_total:
           type: integer
           description: The sum of all the taxes applied to the Bag in the base currency.
             In Cents. May be null before the cart has been priced.
           format: int32
-          nullable: true
           default: 0
         discount_total:
           type: integer
           description: The total discounts applied to the price of the Bag in the
             base currency. In Cents. May be null before the cart has been priced.
           format: int32
-          nullable: true
           default: 0
         duty_total:
           type: integer
@@ -9948,7 +9944,6 @@ components:
             \ In Cents. If not provided, this value will be automatically calculated\
             \ from DUTY-type rates on the Bag's SKUs. *This value can be null.*"
           format: int32
-          nullable: true
           default: 0
         total:
           type: integer
@@ -9956,7 +9951,6 @@ components:
             \ taxes applied to the Bag in the base currency. In Cents. *This value\
             \ can be null before the cart has been priced.*"
           format: int32
-          nullable: true
           default: 0
         taxes_included:
           type: boolean
@@ -10478,7 +10472,6 @@ components:
             \ shipping, duties, taxes, and tips. In Cents. *This value can be null\
             \ before the cart has been priced.*"
           format: int32
-          nullable: true
           default: 0
         shipping_total:
           type: integer
@@ -10486,14 +10479,12 @@ components:
             base currency. In Cents. *This value can be null before the cart has been
             priced.*
           format: int32
-          nullable: true
           default: 0
         tax_total:
           type: integer
           description: The sum of all the taxes applied to the Order in the base currency.
             In Cents. *This value can be null before the cart has been priced.*
           format: int32
-          nullable: true
           default: 0
         discount_total:
           type: integer
@@ -10501,7 +10492,6 @@ components:
             base currency. In Cents. *This value can be null before the cart has been
             priced.*
           format: int32
-          nullable: true
           default: 0
         duty_total:
           type: integer
@@ -10509,7 +10499,6 @@ components:
             \ In Cents. If not provided, this value will be automatically calculated\
             \ from DUTY-type rates on the Order's SKUs. *This value can be null.*"
           format: int32
-          nullable: true
           default: 0
         total:
           type: integer
@@ -10517,7 +10506,6 @@ components:
             \ taxes applied to the Order in the base currency. In Cents. *This value\
             \ can be null before the cart has been priced.*"
           format: int32
-          nullable: true
           default: 0
         app_customer_id:
           maxLength: 191
@@ -11902,7 +11890,6 @@ components:
     CalculatedCartShippingMethod:
       required:
       - label
-      - price
       - shipping_method_id
       type: object
       properties:
@@ -11964,7 +11951,6 @@ components:
     CalculatedCartSku:
       required:
       - available
-      - line_price
       - merchant_id
       - product_type
       - sku_id
@@ -12042,16 +12028,11 @@ components:
       required:
       - available_shipping_methods
       - base_currency
-      - discount_total
       - has_shipping_methods
       - merchant_id
       - platform
       - shipping_address
-      - shipping_total
       - skus
-      - sub_total
-      - tax_total
-      - total
       type: object
       properties:
         merchant_id:
