@@ -9916,40 +9916,47 @@ components:
         sub_total:
           type: integer
           description: "The price of the Bag in the base currency before discounts,\
-            \ shipping, duties, taxes, and tips. In Cents."
+            \ shipping, duties, taxes, and tips. In Cents. *This value can be null\
+            \ before the cart has been priced.*"
           format: int32
+          nullable: true
           default: 0
         shipping_total:
           type: integer
           description: The sum of all shipping methods applied to the Bag in the base
-            currency. In Cents.
+            currency. In Cents. May be null before the cart has been priced.
           format: int32
+          nullable: true
           default: 0
         tax_total:
           type: integer
           description: The sum of all the taxes applied to the Bag in the base currency.
-            In Cents.
+            In Cents. May be null before the cart has been priced.
           format: int32
+          nullable: true
           default: 0
         discount_total:
           type: integer
           description: The total discounts applied to the price of the Bag in the
-            base currency. In Cents.
+            base currency. In Cents. May be null before the cart has been priced.
           format: int32
+          nullable: true
           default: 0
         duty_total:
           type: integer
           description: "The sum of all duties applied to the Bag in the base currency.\
             \ In Cents. If not provided, this value will be automatically calculated\
-            \ from DUTY-type rates on the Bag's SKUs."
+            \ from DUTY-type rates on the Bag's SKUs. *This value can be null.*"
           format: int32
           nullable: true
           default: 0
         total:
           type: integer
           description: "The sum of all item prices, discounts, shipping, duties, and\
-            \ taxes applied to the Bag in the base currency. In Cents."
+            \ taxes applied to the Bag in the base currency. In Cents. *This value\
+            \ can be null before the cart has been priced.*"
           format: int32
+          nullable: true
           default: 0
         taxes_included:
           type: boolean
@@ -9966,10 +9973,21 @@ components:
         commission_rate:
           type: number
           description: "The commission rate used to calculate the app's earnings for\
-            \ this Bag, expressed as a decimal (e.g. 0.15 = 15%)."
+            \ this Bag, expressed as a percentage (e.g. 15.0 = 15%). On order creation\
+            \ the channel may provide a rate at the bag or SKU level; this field then\
+            \ holds the line-total-weighted average of the resolved per-SKU rates."
           format: double
           readOnly: true
-          example: 0.15
+          example: 15.0
+        commission_rate_source:
+          type: string
+          description: Provenance of this Bag's commission rate.
+          nullable: true
+          readOnly: true
+          enum:
+          - SYSTEM
+          - BAG
+          - WEIGHTED
         date_created:
           maxLength: 24
           type: string
@@ -10207,20 +10225,24 @@ components:
         amount:
           type: integer
           description: Fixed discount amount in cents (e.g. 500 = $5.00). Used when
-            value_type is AMOUNT.
+            value_type is AMOUNT. *This value can be null.*
           format: int32
+          nullable: true
           example: 500
         percentage:
           type: number
           description: Discount percentage (e.g. 20.0 = 20% off). Used when value_type
-            is PERCENTAGE.
+            is PERCENTAGE. *This value can be null.*
           format: double
+          nullable: true
           example: 20.0
         amount_total:
           type: integer
           description: Total discount amount applied to the bag in cents (e.g. 1000
-            = $10.00). Computed by the system after the discount is applied.
+            = $10.00). Computed by the system after the discount is applied. *This
+            value can be null.*
           format: int32
+          nullable: true
           readOnly: true
           example: 1000
         date_created:
@@ -10453,40 +10475,49 @@ components:
         sub_total:
           type: integer
           description: "The price of the Order in the base currency before discounts,\
-            \ shipping, duties, taxes, and tips. In Cents."
+            \ shipping, duties, taxes, and tips. In Cents. *This value can be null\
+            \ before the cart has been priced.*"
           format: int32
+          nullable: true
           default: 0
         shipping_total:
           type: integer
           description: The sum of all shipping methods applied to the Order in the
-            base currency. In Cents.
+            base currency. In Cents. *This value can be null before the cart has been
+            priced.*
           format: int32
+          nullable: true
           default: 0
         tax_total:
           type: integer
           description: The sum of all the taxes applied to the Order in the base currency.
-            In Cents.
+            In Cents. *This value can be null before the cart has been priced.*
           format: int32
+          nullable: true
           default: 0
         discount_total:
           type: integer
           description: The total discounts applied to the price of the Order in the
-            base currency. In Cents.
+            base currency. In Cents. *This value can be null before the cart has been
+            priced.*
           format: int32
+          nullable: true
           default: 0
         duty_total:
           type: integer
           description: "The sum of all duties applied to the Order in the base currency.\
             \ In Cents. If not provided, this value will be automatically calculated\
-            \ from DUTY-type rates on the Order's SKUs."
+            \ from DUTY-type rates on the Order's SKUs. *This value can be null.*"
           format: int32
           nullable: true
           default: 0
         total:
           type: integer
           description: "The sum of all item prices, discounts, shipping, duties, and\
-            \ taxes applied to the Order in the base currency. In Cents."
+            \ taxes applied to the Order in the base currency. In Cents. *This value\
+            \ can be null before the cart has been priced.*"
           format: int32
+          nullable: true
           default: 0
         app_customer_id:
           maxLength: 191
@@ -10597,6 +10628,9 @@ components:
           readOnly: true
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -10613,9 +10647,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: "A Violet Order representing a shopping cart that progresses through\
         \ checkout to become a placed order. An Order contains one or more Bags (one\
         \ per merchant), a customer, shipping/billing addresses, and a payment method.\
@@ -10931,8 +10962,10 @@ components:
           description: Shipping method label. This is the name of the shipping method.
         price:
           type: integer
-          description: Total cost of the Shipping Method. In Cents.
+          description: Total cost of the Shipping Method. In Cents. *This value can
+            be null.*
           format: int32
+          nullable: true
         custom:
           type: boolean
           description: Is the shipping method custom. True when the price has been
@@ -11023,14 +11056,16 @@ components:
           maximum: 1000
           type: integer
           description: Quantity of the Sku being purchased. Quantities over 1000 will
-            default to 1000.
+            default to 1000. *This value can be null.*
           format: int32
+          nullable: true
           default: 1
         price:
           type: integer
           description: "Price of the individual SKU, in cents. If not provided, the\
-            \ value from the catalog will be used."
+            \ value from the catalog will be used. *This value can be null.*"
           format: int32
+          nullable: true
         weight:
           type: number
           description: Weight of Sku.
@@ -11144,10 +11179,32 @@ components:
             value: Happy Birthday!
           items:
             $ref: '#/components/schemas/OrderSkuCustomProperty'
+        commission_rate:
+          maximum: 100
+          minimum: 0
+          type: number
+          description: "The commission rate applied to this SKU, expressed as a percentage\
+            \ (e.g. 15.0 = 15%). On order creation this may be provided by the channel;\
+            \ when omitted it is resolved from the bag-level rate or the system rate.\
+            \ Null on orders created before per-SKU rates existed."
+          format: double
+          nullable: true
+          example: 15.0
+        commission_rate_source:
+          type: string
+          description: Provenance of this SKU's commission rate.
+          nullable: true
+          readOnly: true
+          enum:
+          - SYSTEM
+          - BAG
+          - SKU
         line_price:
           type: integer
-          description: "Price of the Sku multiplied by the quantity, in Cents"
+          description: "Price of the Sku multiplied by the quantity, in Cents. *This\
+            \ value can be null.*"
           format: int32
+          nullable: true
           readOnly: true
         quantity_fulfilled:
           type: integer
@@ -11191,12 +11248,13 @@ components:
           readOnly: true
         amount:
           type: integer
-          description: Total Tax amount on Bag. In Cents
+          description: Total Tax amount on Bag. In Cents. *This value can be null.*
           format: int32
+          nullable: true
           readOnly: true
         rate:
           type: number
-          description: Rate
+          description: Rate. *This value can be null.*
           format: double
           nullable: true
           readOnly: true
@@ -11264,13 +11322,15 @@ components:
           readOnly: true
         rate:
           type: number
-          description: Tax Rate
+          description: Tax Rate. *This value can be null.*
           format: double
+          nullable: true
           readOnly: true
         amount:
           type: integer
-          description: Total Tax amount on Bag. In Cents
+          description: Total Tax amount on Bag. In Cents. *This value can be null.*
           format: int32
+          nullable: true
           readOnly: true
         description:
           maxLength: 255
@@ -11545,12 +11605,14 @@ components:
           - CUSTOM
         amount:
           type: integer
-          description: Amount of discount
+          description: Amount of discount. *This value can be null.*
           format: int32
+          nullable: true
         percentage:
           type: number
-          description: Percentage of discount
+          description: Percentage of discount. *This value can be null.*
           format: double
+          nullable: true
         value_type:
           type: string
           description: Value Type of discount
@@ -11772,8 +11834,9 @@ components:
           description: Label of the Shipping Method
         shipping_method_price:
           type: integer
-          description: Price of the Shipping Method
+          description: Price of the Shipping Method. *This value can be null.*
           format: int32
+          nullable: true
         custom:
           type: boolean
           description: Is the shipping method custom. True when the price has been
@@ -11874,8 +11937,10 @@ components:
           readOnly: true
         price:
           type: integer
-          description: "The price of the shipping method, in cents."
+          description: "The price of the shipping method, in cents. *This value can\
+            \ be null.*"
           format: int32
+          nullable: true
           readOnly: true
         shipping_method_id:
           type: string
@@ -11909,8 +11974,9 @@ components:
           title: Quantity
           minimum: 1
           type: integer
-          description: Quantity of the Sku.
+          description: Quantity of the Sku. *This value can be null.*
           format: int32
+          nullable: true
           default: 1
         sku_id:
           title: Sku ID
@@ -11919,8 +11985,10 @@ components:
           format: int64
         price:
           type: integer
-          description: "Price of the individual Sku, in cents."
+          description: "Price of the individual Sku, in cents. *This value can be\
+            \ null.*"
           format: int32
+          nullable: true
         discount:
           $ref: '#/components/schemas/SkuDiscount'
         name:
@@ -11961,8 +12029,10 @@ components:
           - BUNDLED
         line_price:
           type: integer
-          description: "Price of the Sku multiplied by the quantity, in cents."
+          description: "Price of the Sku multiplied by the quantity, in cents. *This\
+            \ value can be null.*"
           format: int32
+          nullable: true
           readOnly: true
         trade_compliance:
           $ref: '#/components/schemas/TradeCompliance'
@@ -12194,33 +12264,43 @@ components:
         sub_total:
           minimum: 0
           type: integer
-          description: The subtotal of the cart in cents.
+          description: The subtotal of the cart in cents. *This value can be null
+            when an external error prevents calculation.*
           format: int32
+          nullable: true
           readOnly: true
         shipping_total:
           minimum: 0
           type: integer
-          description: The shipping total of the cart in cents.
+          description: The shipping total of the cart in cents. *This value can be
+            null when an external error prevents calculation.*
           format: int32
+          nullable: true
           readOnly: true
         tax_total:
           minimum: 0
           type: integer
-          description: The tax total of the cart in cents.
+          description: The tax total of the cart in cents. *This value can be null
+            when an external error prevents calculation.*
           format: int32
+          nullable: true
           readOnly: true
         discount_total:
           minimum: 0
           type: integer
-          description: The discount total of the cart in cents.
+          description: The discount total of the cart in cents. *This value can be
+            null when an external error prevents calculation.*
           format: int32
+          nullable: true
           readOnly: true
         total:
           minimum: 0
           type: integer
           description: "The grand total of the cart in cents. This is the sum of the\
-            \ subtotal, shipping total, and tax total, with the discount total subtracted."
+            \ subtotal, shipping total, and tax total, with the discount total subtracted.\
+            \ *This value can be null when an external error prevents calculation.*"
           format: int32
+          nullable: true
           readOnly: true
         skus:
           type: array
@@ -12321,8 +12401,9 @@ components:
           title: Quantity
           minimum: 1
           type: integer
-          description: Quantity of the Sku.
+          description: Quantity of the Sku. *This value can be null.*
           format: int32
+          nullable: true
           default: 1
         sku_id:
           title: Sku ID
@@ -12331,8 +12412,10 @@ components:
           format: int64
         price:
           type: integer
-          description: "Price of the individual Sku, in cents."
+          description: "Price of the individual Sku, in cents. *This value can be\
+            \ null.*"
           format: int32
+          nullable: true
         discount:
           $ref: '#/components/schemas/SkuDiscount'
       description: A list of one or more Violet Sku's. Sku's from the same merchant
@@ -12552,28 +12635,35 @@ components:
           description: ID of the Transaction in the Payment Gateway
         amount:
           type: integer
-          description: Amount being refunded. In Cents
+          description: Amount being refunded. In Cents. *This value can be null.*
           format: int32
+          nullable: true
         merchant_transfer_reversal_amount_usd:
           type: integer
           description: Amount being taken back from the associated transfer to the
-            merchant. In Cents
+            merchant. In Cents. *This value can be null.*
           format: int32
+          nullable: true
         developer_transfer_reversal_amount_usd:
           type: integer
           description: Amount being taken back from the associated transfer to the
-            developer. In Cents
+            developer. In Cents. *This value can be null.*
           format: int32
+          nullable: true
         merchant_transfer_reversal_amount_platform_currency:
           type: integer
           description: "Amount in fractional currency unit (e.g. cents) being taken\
-            \ back from the associated transfer to the merchant, in platform currency."
+            \ back from the associated transfer to the merchant, in platform currency.\
+            \ *This value can be null.*"
           format: int32
+          nullable: true
         developer_transfer_reversal_amount_platform_currency:
           type: integer
           description: "Amount in fractional currency unit (e.g. cents) being taken\
-            \ back from the associated transfer to the developer, in platform currency."
+            \ back from the associated transfer to the developer, in platform currency.\
+            \ *This value can be null.*"
           format: int32
+          nullable: true
         reason:
           type: string
           description: Reason for refund
@@ -12643,7 +12733,7 @@ components:
         tax_amount:
           minimum: 0
           type: integer
-          description: Tax amount being refunded. In Cents.
+          description: Tax amount being refunded. In Cents. *This value can be null.*
           format: int32
           nullable: true
       description: Order Refund
@@ -12722,13 +12812,14 @@ components:
           minimum: 0
           type: integer
           description: "Shipping amount, inclusive of any taxes, that was refunded\
-            \ in cents. If no value is provided the full shipping amount will be refunded."
+            \ in cents. If no value is provided the full shipping amount will be refunded.\
+            \ *This value can be null.*"
           format: int32
           nullable: true
         tax_amount:
           minimum: 0
           type: integer
-          description: Tax amount that was refunded in cents.
+          description: Tax amount that was refunded in cents. *This value can be null.*
           format: int32
           nullable: true
         full_refund:
@@ -13019,6 +13110,17 @@ components:
           description: SKUs being purchased in this bag.
           items:
             $ref: '#/components/schemas/SkuDTO'
+        commission_rate:
+          maximum: 100
+          minimum: 0
+          type: number
+          description: "Optional commission rate for this bag as a percentage (e.g.\
+            \ 15.0 = 15%), between 0 and 100 inclusive. Applies to every SKU in the\
+            \ bag that does not provide its own commission_rate. When omitted or null,\
+            \ SKUs fall back to the system rate from the merchant-app relationship."
+          format: double
+          nullable: true
+          example: 15.0
         shipping_method:
           $ref: '#/components/schemas/ShippingMethodDTO'
         tax_total:
@@ -13448,6 +13550,17 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/TaxRateDTO'
+        commission_rate:
+          maximum: 100
+          minimum: 0
+          type: number
+          description: "Optional commission rate for this SKU as a percentage (e.g.\
+            \ 15.0 = 15%), between 0 and 100 inclusive. Takes precedence over the\
+            \ bag-level commission_rate. When omitted or null, falls back to the bag-level\
+            \ rate, then the system rate."
+          format: double
+          nullable: true
+          example: 15.0
       description: SKUs being purchased in this bag.
     TaxRateDTO:
       required:
