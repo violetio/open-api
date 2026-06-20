@@ -52,7 +52,7 @@ paths:
   /merchants/{merchant_id}/configuration:
     get:
       tags:
-      - Merchant Configurations
+      - Merchants - Configuration
       summary: Get Merchant Configuration
       operationId: getMerchantConfiguration
       parameters:
@@ -99,7 +99,7 @@ paths:
   /merchants/{merchant_id}/configuration/global_feature_flags/{feature_flag}:
     put:
       tags:
-      - Merchant Configurations
+      - Merchants - Configuration
       summary: Toggle Merchant Config Global Feature Flag
       operationId: updateGlobalFeatureFlag
       parameters:
@@ -159,7 +159,7 @@ paths:
   /merchants/{merchant_id}/configuration/orders_config:
     put:
       tags:
-      - Merchant Configurations
+      - Merchants - Configuration
       summary: Update Merchants Orders Configuration
       operationId: updateOrdersConfig
       parameters:
@@ -555,6 +555,820 @@ paths:
           description: default response
           content:
             application/json: {}
+  /merchants/{merchant_id}/shipping-methods:
+    get:
+      tags:
+      - Merchants - Configuration
+      summary: List Merchant Fallback Shipping Methods
+      description: Lists the merchant's fallback shipping methods. Methods missing
+        a handle are assigned one (derived from the label) on read.
+      operationId: getShippingMethods
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: The merchant's fallback shipping methods.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShippingMethod'
+              example:
+              - label: Standard
+                description: 5-7 business days
+                price: 500
+                currency: USD
+                handle: standard
+                calculation_type: PER_ORDER
+                conditions:
+                  applicable_countries:
+                  - US
+                  - CA
+                  min_order_amount: 1000
+    post:
+      tags:
+      - Merchants - Configuration
+      summary: Create a Fallback Shipping Method
+      description: "Creates a method. If handle is omitted it is generated from the\
+        \ label; if supplied it must be unique for the merchant (otherwise 409). label,\
+        \ price, and currency are required."
+      operationId: createShippingMethod
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        description: "The shipping method to create. label, price and currency are\
+          \ required."
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShippingMethod'
+            example:
+              label: Standard
+              price: 500
+              currency: USD
+              calculation_type: PER_ORDER
+      responses:
+        "200":
+          description: "The created fallback shipping method, including its handle."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingMethod'
+              example:
+                label: Standard
+                description: 5-7 business days
+                price: 500
+                currency: USD
+                handle: standard
+                calculation_type: PER_ORDER
+  /merchants/{merchant_id}/catalog-rules/availability/{dimension}/{key}:
+    put:
+      tags:
+      - Merchants - Configuration
+      summary: Create or Replace a Catalog Availability Rule
+      description: Creates or replaces the availability rule for a given key. The
+        dimension must be 'tags' or 'vendors'; the key is URL-encoded.
+      operationId: putAvailabilityRule
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: dimension
+        in: path
+        description: '''tags'' or ''vendors'''
+        required: true
+        schema:
+          type: string
+      - name: key
+        in: path
+        description: The tag or vendor name (URL-encoded)
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvailabilityRule'
+            example:
+              available: true
+              published: true
+      responses:
+        "200":
+          description: The created or replaced availability rule.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityRule'
+              example:
+                available: true
+                published: true
+    delete:
+      tags:
+      - Merchants - Configuration
+      summary: Delete a Catalog Availability Rule
+      description: Deletes the availability rule for the given key. Returns 404 if
+        it is absent.
+      operationId: deleteAvailabilityRule
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: dimension
+        in: path
+        description: '''tags'' or ''vendors'''
+        required: true
+        schema:
+          type: string
+      - name: key
+        in: path
+        description: The tag or vendor name (URL-encoded)
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: The rule was deleted.
+  /merchants/{merchant_id}/catalog-rules/exclusions/{dimension}/{key}:
+    put:
+      tags:
+      - Merchants - Configuration
+      summary: Create or Replace a Catalog Exclusion Rule
+      description: "Creates or replaces the exclusion rule for a given key. The dimension\
+        \ must be 'tags' or 'vendors'; the key is URL-encoded. Note: excluded and\
+        \ unpublished are mutually exclusive — setting one to true clears the other."
+      operationId: putExclusionRule
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: dimension
+        in: path
+        description: '''tags'' or ''vendors'''
+        required: true
+        schema:
+          type: string
+      - name: key
+        in: path
+        description: The tag or vendor name (URL-encoded)
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExclusionRule'
+            example:
+              excluded: true
+              unpublished: false
+      responses:
+        "200":
+          description: The created or replaced exclusion rule.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExclusionRule'
+              example:
+                excluded: true
+                unpublished: false
+    delete:
+      tags:
+      - Merchants - Configuration
+      summary: Delete a Catalog Exclusion Rule
+      description: Deletes the exclusion rule for the given key. Returns 404 if it
+        is absent.
+      operationId: deleteExclusionRule
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: dimension
+        in: path
+        description: '''tags'' or ''vendors'''
+        required: true
+        schema:
+          type: string
+      - name: key
+        in: path
+        description: The tag or vendor name (URL-encoded)
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: The rule was deleted.
+  /merchants/{merchant_id}/shipping-methods/{handle}:
+    get:
+      tags:
+      - Merchants - Configuration
+      summary: Get a Fallback Shipping Method
+      description: Returns a single fallback shipping method by handle. Returns 404
+        if absent.
+      operationId: getShippingMethod
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: handle
+        in: path
+        description: The shipping method handle
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The fallback shipping method.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingMethod'
+              example:
+                label: Standard
+                description: 5-7 business days
+                price: 500
+                currency: USD
+                handle: standard
+                calculation_type: PER_ORDER
+    put:
+      tags:
+      - Merchants - Configuration
+      summary: Create or Replace a Fallback Shipping Method
+      description: "Create-or-replace by handle. A handle in the body, if present,\
+        \ must match the path handle (renames are delete + create). label, price and\
+        \ currency are required."
+      operationId: putShippingMethod
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: handle
+        in: path
+        description: The shipping method handle
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The shipping method to store at this handle.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShippingMethod'
+            example:
+              label: Standard
+              price: 500
+              currency: USD
+              calculation_type: PER_ORDER
+      responses:
+        "200":
+          description: The created or replaced fallback shipping method.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingMethod'
+              example:
+                label: Standard
+                description: 5-7 business days
+                price: 500
+                currency: USD
+                handle: standard
+                calculation_type: PER_ORDER
+    delete:
+      tags:
+      - Merchants - Configuration
+      summary: Delete a Fallback Shipping Method
+      description: Deletes the fallback shipping method with the given handle. 404
+        if absent.
+      operationId: deleteShippingMethod
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: handle
+        in: path
+        description: The shipping method handle
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: The method was deleted.
+  /merchants/{merchant_id}/catalog-rules:
+    get:
+      tags:
+      - Merchants - Configuration
+      summary: Get Merchant Catalog Rules
+      description: "Returns all catalog availability and exclusion rules, grouped\
+        \ by rule type and keyed by tag or vendor."
+      operationId: getCatalogRules
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: The merchant's catalog rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogRules'
+              example:
+                availability:
+                  tags:
+                    sale:
+                      available: true
+                      published: true
+                  vendors: {}
+                exclusions:
+                  tags: {}
+                  vendors:
+                    Pucci:
+                      excluded: true
+                      unpublished: false
+  /merchants/{merchant_id}/catalog-settings:
+    get:
+      tags:
+      - Merchants - Configuration
+      summary: Get Merchant Catalog Settings
+      description: "Returns the catalog-related toggles (truify offer visibility,\
+        \ auto-publish)."
+      operationId: getCatalogSettings
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: The merchant's catalog settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogSettings'
+              example:
+                truify_offer_visibility: true
+                auto_publish_offers: false
+    patch:
+      tags:
+      - Merchants - Configuration
+      summary: Update Merchant Catalog Settings
+      description: Partially updates the catalog toggles (JSON Merge Patch). truify_offer_visibility
+        is channel/admin-only; merchant tokens attempting to set it receive a 403.
+      operationId: updateCatalogSettings
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        description: The catalog toggles to change. Omitted fields are left untouched.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogSettings'
+            example:
+              auto_publish_offers: false
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/CatalogSettings'
+            example:
+              auto_publish_offers: false
+      responses:
+        "200":
+          description: The updated catalog settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogSettings'
+              example:
+                truify_offer_visibility: true
+                auto_publish_offers: false
+  /merchants/{merchant_id}/inventory-location-filters:
+    get:
+      tags:
+      - Merchants - Configuration
+      summary: Get Merchant Inventory Location Filters
+      description: Returns the enabled Shopify inventory location IDs and whether
+        location filtering is active. Only meaningful for Shopify merchants.
+      operationId: getInventoryLocationFilters
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: The merchant's inventory location filters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryLocationFilters'
+              example:
+                location_ids:
+                - "12345678"
+                - "87654321"
+                filtering_enabled: true
+    put:
+      tags:
+      - Merchants - Configuration
+      summary: Replace Merchant Inventory Location Filters
+      description: Replaces the full set of enabled Shopify location IDs. The filter_inventory_by_locations
+        platform flag is derived automatically (enabled when the list is non-empty).
+        Only supported for Shopify merchants; returns 400 otherwise. The filtering_enabled
+        field is read-only and ignored on write.
+      operationId: updateInventoryLocationFilters
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        description: The complete set of enabled location IDs (numeric strings).
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryLocationFilters'
+            example:
+              location_ids:
+              - "12345678"
+              - "87654321"
+      responses:
+        "200":
+          description: The updated inventory location filters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryLocationFilters'
+              example:
+                location_ids:
+                - "12345678"
+                - "87654321"
+                filtering_enabled: true
+  /merchants/{merchant_id}/shipping-settings:
+    get:
+      tags:
+      - Merchants - Configuration
+      summary: Get Merchant Shipping Settings
+      description: Returns the merchant's fallback shipping behavior toggles. Fallback
+        shipping methods and shipping exclusion rules are managed through their own
+        resources and are not included here.
+      operationId: getShippingSettings
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: The merchant's shipping settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingSettings'
+              example:
+                exclude_external_methods: true
+                exclude_external_free_shipping: false
+                use_fallback_methods_on_empty: true
+    patch:
+      tags:
+      - Merchants - Configuration
+      summary: Update Merchant Shipping Settings
+      description: "Partially updates the merchant's shipping toggles using JSON Merge\
+        \ Patch semantics: only the fields present in the request body are modified;\
+        \ omitted fields are left untouched."
+      operationId: updateShippingSettings
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        description: The shipping toggles to change. Omitted fields are left untouched.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShippingSettings'
+            example:
+              exclude_external_methods: true
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/ShippingSettings'
+            example:
+              exclude_external_methods: true
+      responses:
+        "200":
+          description: The updated shipping settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingSettings'
+              example:
+                exclude_external_methods: true
+                exclude_external_free_shipping: false
+                use_fallback_methods_on_empty: true
   /merchants:
     get:
       tags:
@@ -2165,8 +2979,6 @@ components:
           - PER_ITEM
         conditions:
           $ref: '#/components/schemas/Conditions'
-      description: Fallback methods to be used when the merchant's system provides
-        no shipping methods.
     StockRules:
       type: object
       properties:
@@ -2540,6 +3352,99 @@ components:
             from the Shopify Partner Dashboard. It is generated by Shopify after creating
             a custom app distribution.
       description: Request for pre-registering a Shopify merchant with partial credentials
+    CatalogAvailabilityRules:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AvailabilityRule'
+          description: Availability rules keyed by product tag.
+        vendors:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AvailabilityRule'
+          description: Availability rules keyed by vendor name.
+      description: "Availability rules, keyed by tag or vendor."
+    CatalogExclusionRules:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExclusionRule'
+          description: Exclusion rules keyed by product tag.
+        vendors:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExclusionRule'
+          description: Exclusion rules keyed by vendor name.
+      description: "Exclusion rules, keyed by tag or vendor."
+    CatalogRules:
+      type: object
+      properties:
+        availability:
+          $ref: '#/components/schemas/CatalogAvailabilityRules'
+        exclusions:
+          $ref: '#/components/schemas/CatalogExclusionRules'
+      description: "Catalog availability and exclusion rules, grouped by rule type\
+        \ and keyed by tag or vendor."
+    CatalogSettings:
+      type: object
+      properties:
+        truify_offer_visibility:
+          type: boolean
+          description: "When true, force all offer visibility to true during catalog\
+            \ sync. Channel/admin-only; cannot be set by merchant users."
+          nullable: true
+          example: true
+        auto_publish_offers:
+          type: boolean
+          description: "When true, auto-publish offers after creation or update."
+          nullable: true
+          example: false
+      description: Catalog-related toggles exposed as merchant configuration.
+    InventoryLocationFilters:
+      type: object
+      properties:
+        location_ids:
+          type: array
+          description: The enabled Shopify location IDs (numeric strings).
+          nullable: true
+          items:
+            type: string
+            example: "12345678"
+        filtering_enabled:
+          type: boolean
+          description: "Read-only. Derived from location_ids: true when at least one\
+            \ location ID is configured. To change it, add or remove location IDs."
+          nullable: true
+          readOnly: true
+          example: true
+      description: The set of Shopify inventory location IDs used to filter stock
+        availability. Only applicable to Shopify merchants.
+    ShippingSettings:
+      type: object
+      properties:
+        exclude_external_methods:
+          type: boolean
+          description: "When true, ignore all shipping rates returned by the merchant's\
+            \ e-commerce platform."
+          nullable: true
+          example: true
+        exclude_external_free_shipping:
+          type: boolean
+          description: "When true, hide free shipping options returned by the platform."
+          nullable: true
+          example: false
+        use_fallback_methods_on_empty:
+          type: boolean
+          description: "When true, use fallback methods only when the platform returns\
+            \ zero rates, rather than always."
+          nullable: true
+          example: true
+      description: Toggles that govern fallback shipping behavior. Does not manage
+        fallback shipping methods or shipping exclusion rules.
     Merchant:
       required:
       - email
@@ -3093,6 +3998,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3105,8 +4012,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3152,6 +4057,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3164,8 +4071,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
