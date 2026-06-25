@@ -3888,6 +3888,40 @@ paths:
                       country: US
                       postal_code: "98121"
                     currency: USD
+              Discount Code with Email:
+                summary: Order with a merchant discount code and customer email
+                description: Direct Order Submission with a bag-level discount code
+                  that includes an email address for customer-specific discount validation.
+                value:
+                  payment_method:
+                    type: SINGLE_USE_CARD_TOKEN
+                    payment_provider: STRIPE
+                    token: tok_i1s2h8a9nyg1ukrju12h31kj212kh
+                  order:
+                    app_order_id: order-with-discount-code-009
+                    customer:
+                      first_name: Ultra
+                      last_name: Violet
+                      email: customer@example.com
+                    bags:
+                    - skus:
+                      - sku_id: 80455
+                        price: 100000
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 5000
+                      tax_total: 10000
+                      discounts:
+                      - code: SUMMER20
+                        email: customer@example.com
+                    shipping_address:
+                      address_1: 2815 Elliott Ave
+                      address_2: Unit 100
+                      city: Seattle
+                      state: WA
+                      country: US
+                      postal_code: "98121"
+                    currency: USD
               Payment Intent:
                 summary: Order with pre-authorized Stripe Payment Intent
                 description: Direct Order Submission using pre-authorized Stripe Payment
@@ -4825,6 +4859,28 @@ paths:
                   discounts:
                   - code: SUMMER20
                     merchant_id: 11111
+              Estimate with Discounts and Email:
+                summary: Discount codes with customer email for validation
+                description: Estimation request with discount codes that include an
+                  email address. Some merchants require an email to validate customer-specific
+                  discount codes.
+                value:
+                  base_currency: USD
+                  skus:
+                  - sku_id: 10000
+                    quantity: 2
+                  shipping_address:
+                    address_1: 2815 Elliott Ave
+                    address_2: Unit 100
+                    city: Seattle
+                    state: WA
+                    country: US
+                    postal_code: "98121"
+                    phone: "1234567890"
+                  discounts:
+                  - code: SUMMER20
+                    merchant_id: 11111
+                    email: super@mar.io
               Estimate with Custom Pricing:
                 summary: SKUs with price overrides and SKU-level discounts
                 description: Estimation request where one SKU has a custom price override
@@ -9797,8 +9853,6 @@ components:
       - total
       type: object
       properties:
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
@@ -9813,6 +9867,8 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         id:
           type: integer
           description: Unique ID of the Bag.
@@ -10616,6 +10672,9 @@ components:
           readOnly: true
           items:
             $ref: '#/components/schemas/PaymentTransaction'
+        order_id:
+          type: integer
+          format: int64
         guest:
           type: boolean
         order_status:
@@ -10632,9 +10691,6 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
-        order_id:
-          type: integer
-          format: int64
       description: "A Violet Order representing a shopping cart that progresses through\
         \ checkout to become a placed order. An Order contains one or more Bags (one\
         \ per merchant), a customer, shipping/billing addresses, and a payment method.\
