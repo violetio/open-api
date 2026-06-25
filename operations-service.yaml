@@ -1130,6 +1130,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
         store_url:
           type: string
           description: The URL Of the Store
@@ -1814,6 +1816,8 @@ components:
             - SHOPRENTER
             - MANUAL
             - SHOPTET
+            - SHOPLAZZA
+            - CARTPANDA
         status:
           type: string
           description: Filter by ConnectionHealth Status
