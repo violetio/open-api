@@ -2175,6 +2175,8 @@ components:
           - SHOPRENTER
           - MANUAL
           - SHOPTET
+          - SHOPLAZZA
+          - CARTPANDA
         seller:
           type: string
           description: Name of the merchant selling product.
@@ -2337,12 +2339,12 @@ components:
         commission_rate:
           type: number
           description: "The commission rate the merchant has agreed to share with\
-            \ the app on sales of this Offer, expressed as a decimal (e.g. 0.15 =\
-            \ 15%)."
+            \ the app on sales of this Offer, expressed as a percentage (e.g. 15.0\
+            \ = 15%)."
           format: double
           nullable: true
           readOnly: true
-          example: 0.15
+          example: 15.0
         currency_symbol:
           type: string
           description: Symbol representing the desired currency
