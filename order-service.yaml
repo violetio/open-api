@@ -9943,6 +9943,7 @@ components:
           - REFUNDED
           - PARTIALLY_REFUNDED
           - VOIDED
+          - DISPUTED_REFUNDED
         dispute_status:
           type: string
           description: Dispute status of the Bag.
@@ -11393,6 +11394,7 @@ components:
       - currency
       - date_created
       - date_last_modified
+      - dispute_status
       - errors
       - id
       - order_id
@@ -11508,6 +11510,17 @@ components:
           - CUSTOM
           - DISABLED
           - EXTERNAL
+        dispute_status:
+          type: string
+          description: Dispute status of this payment transaction. Orthogonal to capture_status
+            — a transaction can be CAPTURED and IN_DISPUTE simultaneously.
+          readOnly: true
+          default: UNDISPUTED
+          enum:
+          - UNDISPUTED
+          - IN_DISPUTE
+          - DISPUTE_WON
+          - DISPUTE_LOST
         metadata:
           type: object
           additionalProperties:
