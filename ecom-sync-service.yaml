@@ -454,6 +454,41 @@ paths:
         in: query
         schema:
           type: string
+      - name: q
+        in: query
+        description: Text search query
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: "Sort field (e.g. created_at, updated_at)"
+        schema:
+          type: string
+      - name: sort_order
+        in: query
+        description: "Sort direction: asc or desc"
+        schema:
+          type: string
+      - name: updated_after
+        in: query
+        description: Filter by updated date (ISO 8601)
+        schema:
+          type: string
+      - name: updated_before
+        in: query
+        description: Filter by updated date (ISO 8601)
+        schema:
+          type: string
+      - name: created_after
+        in: query
+        description: Filter by created date (ISO 8601)
+        schema:
+          type: string
+      - name: created_before
+        in: query
+        description: Filter by created date (ISO 8601)
+        schema:
+          type: string
       responses:
         default:
           description: default response
@@ -559,6 +594,51 @@ paths:
         in: query
         schema:
           type: string
+      - name: q
+        in: query
+        description: Reserved for future offer text search support; currently unsupported
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: "Filter by product status (e.g. active, draft, archived)"
+        schema:
+          type: string
+      - name: category_id
+        in: query
+        description: Filter by category or collection ID
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: "Sort field (e.g. created_at, updated_at, title)"
+        schema:
+          type: string
+      - name: sort_order
+        in: query
+        description: "Sort direction: asc or desc"
+        schema:
+          type: string
+      - name: updated_after
+        in: query
+        description: Filter by updated date (ISO 8601)
+        schema:
+          type: string
+      - name: updated_before
+        in: query
+        description: Filter by updated date (ISO 8601)
+        schema:
+          type: string
+      - name: created_after
+        in: query
+        description: Filter by created date (ISO 8601)
+        schema:
+          type: string
+      - name: created_before
+        in: query
+        description: Filter by created date (ISO 8601)
+        schema:
+          type: string
       responses:
         default:
           description: default response
@@ -658,6 +738,56 @@ paths:
           type: string
       - name: include
         in: query
+        schema:
+          type: string
+      - name: q
+        in: query
+        description: Text search query
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: "Filter by order status (e.g. open, closed, cancelled)"
+        schema:
+          type: string
+      - name: financial_status
+        in: query
+        description: "Filter by financial status (e.g. paid, pending, refunded, voided)"
+        schema:
+          type: string
+      - name: fulfillment_status
+        in: query
+        description: "Filter by fulfillment status (e.g. shipped, unshipped, partial)"
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: "Sort field (e.g. created_at, updated_at)"
+        schema:
+          type: string
+      - name: sort_order
+        in: query
+        description: "Sort direction: asc or desc"
+        schema:
+          type: string
+      - name: updated_after
+        in: query
+        description: Filter by updated date (ISO 8601)
+        schema:
+          type: string
+      - name: updated_before
+        in: query
+        description: Filter by updated date (ISO 8601)
+        schema:
+          type: string
+      - name: created_after
+        in: query
+        description: Filter by created date (ISO 8601)
+        schema:
+          type: string
+      - name: created_before
+        in: query
+        description: Filter by created date (ISO 8601)
         schema:
           type: string
       responses:
@@ -2929,6 +3059,7 @@ components:
           - REFUNDED
           - PARTIALLY_REFUNDED
           - VOIDED
+          - DISPUTED_REFUNDED
         dispute_status:
           type: string
           description: Dispute status of the Bag.
@@ -3658,9 +3789,6 @@ components:
           readOnly: true
           items:
             $ref: '#/components/schemas/PaymentTransaction'
-        order_id:
-          type: integer
-          format: int64
         guest:
           type: boolean
         order_status:
@@ -3677,6 +3805,9 @@ components:
           type: boolean
           description: Boolean indicating if the cart/order will be payed using a
             payment intent.
+        order_id:
+          type: integer
+          format: int64
       description: "A Violet Order representing a shopping cart that progresses through\
         \ checkout to become a placed order. An Order contains one or more Bags (one\
         \ per merchant), a customer, shipping/billing addresses, and a payment method.\
@@ -4380,6 +4511,7 @@ components:
       - currency
       - date_created
       - date_last_modified
+      - dispute_status
       - errors
       - id
       - order_id
@@ -4495,6 +4627,17 @@ components:
           - CUSTOM
           - DISABLED
           - EXTERNAL
+        dispute_status:
+          type: string
+          description: Dispute status of this payment transaction. Orthogonal to capture_status
+            — a transaction can be CAPTURED and IN_DISPUTE simultaneously.
+          readOnly: true
+          default: UNDISPUTED
+          enum:
+          - UNDISPUTED
+          - IN_DISPUTE
+          - DISPUTE_WON
+          - DISPUTE_LOST
         metadata:
           type: object
           additionalProperties:
