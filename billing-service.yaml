@@ -2000,11 +2000,12 @@ components:
         type:
           type: string
           description: "Type of this Distribution record. Can be {PAYMENT}, {REFUND},\
-            \ or {ADJUSTMENT}."
+            \ {ADJUSTMENT}, or {DISPUTE_ADJUSTMENT}."
           enum:
           - PAYMENT
           - REFUND
           - ADJUSTMENT
+          - DISPUTE_ADJUSTMENT
         payout_account_id:
           type: integer
           description: Unique identifier of the Violet Payout Account that this Distribution
@@ -2326,9 +2327,9 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
-        unpaged:
-          type: boolean
         paged:
+          type: boolean
+        unpaged:
           type: boolean
         pageNumber:
           type: integer
@@ -2441,6 +2442,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -2474,8 +2477,6 @@ components:
           items:
             type: integer
             format: int64
-        externalId:
-          type: string
         related_orders:
           uniqueItems: true
           type: array
@@ -3075,6 +3076,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -3108,8 +3111,6 @@ components:
           items:
             type: integer
             format: int64
-        externalId:
-          type: string
         related_orders:
           uniqueItems: true
           type: array
@@ -3386,6 +3387,7 @@ components:
       - currency
       - date_created
       - date_last_modified
+      - dispute_status
       - errors
       - id
       - order_id
@@ -3501,6 +3503,17 @@ components:
           - CUSTOM
           - DISABLED
           - EXTERNAL
+        dispute_status:
+          type: string
+          description: Dispute status of this payment transaction. Orthogonal to capture_status
+            — a transaction can be CAPTURED and IN_DISPUTE simultaneously.
+          readOnly: true
+          default: UNDISPUTED
+          enum:
+          - UNDISPUTED
+          - IN_DISPUTE
+          - DISPUTE_WON
+          - DISPUTE_LOST
         metadata:
           type: object
           additionalProperties:
