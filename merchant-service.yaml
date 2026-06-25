@@ -2015,6 +2015,11 @@ components:
           $ref: '#/components/schemas/ExclusionsConfig'
         syncPolicy:
           $ref: '#/components/schemas/SyncPolicy'
+        sync_language:
+          type: string
+          description: "Language code (e.g., FR, ES, JA, DE) to use for product sync.\
+            \ When set, product queries fetch translated content in the specified\
+            \ language. If null or empty, products sync in the shop's default language."
       description: Configurations for the merchants catalog behaviors.
     Conditions:
       type: object
