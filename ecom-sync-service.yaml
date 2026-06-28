@@ -691,6 +691,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+  /relay/merchants/{merchant_id}/orders/{order_id}/refunds:
+    get:
+      tags:
+      - Relay
+      summary: Get refunds for an order directly from the merchant's ecom platform.
+      operationId: getOrderRefunds
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RelayRefund'
   /relay/merchants/{merchant_id}/orders:
     get:
       tags:
@@ -929,6 +972,168 @@ paths:
                     min_price: 5000
                     price_type: SUBTOTAL
                     exclude_products_with_custom_shipping: true
+  /relay/merchants/{merchant_id}/store:
+    get:
+      tags:
+      - Relay
+      summary: Get store profile information directly from the merchant's ecom platform.
+      operationId: getStoreInfo
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopProfile'
+  /relay/merchants/{merchant_id}/customers/search:
+    post:
+      tags:
+      - Relay
+      summary: Search customers on the merchant's ecom platform with advanced filters
+        including email address.
+      operationId: searchCustomers
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelayCustomerSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageRelayCustomer'
+  /relay/merchants/{merchant_id}/offers/search:
+    post:
+      tags:
+      - Relay
+      summary: Search products on the merchant's ecom platform with advanced filters.
+        Accepts a JSON body for richer query capabilities than the GET list endpoint.
+      operationId: searchOffers
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelayOfferSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageOffer'
+  /relay/merchants/{merchant_id}/orders/search:
+    post:
+      tags:
+      - Relay
+      summary: "Search orders on the merchant's ecom platform with advanced filters\
+        \ including customer email, financial status, and fulfillment status."
+      operationId: searchOrders
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelayOrderSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VioletPageOrder'
 components:
   schemas:
     InvalidProduct:
@@ -1326,7 +1531,7 @@ components:
           - INTERNAL
           - EXTERNAL
       description: Meta Object
-      readOnly: true
+      nullable: true
     Method:
       type: object
       properties:
@@ -4840,6 +5045,38 @@ components:
           $ref: '#/components/schemas/communication_preference_detail'
         order_fulfillment:
           $ref: '#/components/schemas/communication_preference_detail'
+    LineItem:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          format: int32
+        amount:
+          type: string
+        external_id:
+          type: string
+        sku_external_id:
+          type: string
+    RelayRefund:
+      type: object
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        reason:
+          type: string
+        external_id:
+          type: string
+        order_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
     VioletPageOrder:
       type: object
       properties:
@@ -5120,3 +5357,266 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RelayShippingZone'
+    ShopAddress:
+      type: object
+      properties:
+        city:
+          type: string
+          description: City name
+        state:
+          type: string
+          description: State or province
+        postal_code:
+          type: string
+          description: Postal or ZIP code
+        country:
+          type: string
+          description: Country name or code
+        phone:
+          type: string
+          description: Phone number
+        alias:
+          type: string
+          description: Alias or nickname for the address
+        address_line_1:
+          type: string
+          description: First line of the address
+        address_line_2:
+          type: string
+          description: Second line of the address
+      description: Address information for a store
+    ShopLocation:
+      type: object
+      properties:
+        external_id:
+          type: string
+          description: Location ID from the external platform
+        name:
+          type: string
+          description: Display name of the location
+      description: Physical location associated with a store
+    ShopProfile:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Contact email for the store
+        name:
+          type: string
+          description: Store name
+        external_id:
+          type: string
+          description: Store ID from the external platform
+        first_name:
+          type: string
+          description: First name of the store owner
+        last_name:
+          type: string
+          description: Last name of the store owner
+        plan:
+          type: string
+          description: Subscription plan for the store
+        version:
+          type: string
+          description: Platform version of the store
+        currency:
+          type: string
+          description: Default currency code for the store
+        url:
+          type: string
+          description: Primary URL of the store
+        custom_url:
+          type: string
+          description: Custom domain URL for the store
+        logo_url:
+          type: string
+          description: URL of the store logo
+        country_code:
+          type: string
+          description: ISO country code for the store location
+        state_code:
+          type: string
+          description: State/province code for the store location
+        language:
+          type: string
+          description: Default language for the store
+        timezone:
+          type: string
+          description: Timezone of the store
+        has_active_plan:
+          type: boolean
+          description: Whether the store has an active subscription plan
+        has_shipping_methods:
+          type: boolean
+          description: Whether the store has shipping methods configured
+        weight_unit:
+          type: string
+          description: Weight unit for the store
+          deprecated: true
+        dimensions_unit:
+          type: string
+          description: Dimensions unit for the store
+          deprecated: true
+        default_weight_unit:
+          type: string
+          description: Default weight unit of measure for the store
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+        default_size_unit:
+          type: string
+          description: Default size unit of measure for the store
+          enum:
+          - INCHES
+          - FEET
+          - CENTIMETERS
+          - OUNCES
+          - POUNDS
+          - GRAMS
+          - KILOGRAMS
+          - CARATS
+          - YARDS
+          - MILLIMETERS
+          - TONNES
+          - MILLIGRAMS
+          - LITERS
+          - MILLILITERS
+          - QUARTS
+          - QUARTERS
+          - GALLONS
+          - PINTS
+          - METERS
+        shop_locations:
+          type: array
+          description: Physical locations associated with the store
+          items:
+            $ref: '#/components/schemas/ShopLocation'
+        primary_address:
+          $ref: '#/components/schemas/ShopAddress'
+      description: Profile information for a merchant's online store
+    RelayCustomerSearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+        email:
+          type: string
+        ids:
+          type: array
+          items:
+            type: string
+        sort:
+          type: string
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        sort_order:
+          type: string
+        updated_after:
+          type: string
+        updated_before:
+          type: string
+        created_after:
+          type: string
+        created_before:
+          type: string
+        next_page_cursor:
+          type: string
+    RelayOfferSearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+        status:
+          type: string
+        ids:
+          type: array
+          items:
+            type: string
+        sort:
+          type: string
+        include:
+          type: array
+          items:
+            type: string
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        category_id:
+          type: string
+        sort_order:
+          type: string
+        updated_after:
+          type: string
+        updated_before:
+          type: string
+        created_after:
+          type: string
+        created_before:
+          type: string
+        next_page_cursor:
+          type: string
+    RelayOrderSearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+        status:
+          type: string
+        ids:
+          type: array
+          items:
+            type: string
+        sort:
+          type: string
+        include:
+          type: array
+          items:
+            type: string
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        financial_status:
+          type: string
+        fulfillment_status:
+          type: string
+        customer_email:
+          type: string
+        sort_order:
+          type: string
+        updated_after:
+          type: string
+        updated_before:
+          type: string
+        created_after:
+          type: string
+        created_before:
+          type: string
+        next_page_cursor:
+          type: string
