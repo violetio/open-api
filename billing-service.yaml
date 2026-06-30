@@ -2327,6 +2327,9 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        pageSize:
+          type: integer
+          format: int32
         paged:
           type: boolean
         unpaged:
@@ -2334,17 +2337,14 @@ components:
         pageNumber:
           type: integer
           format: int32
-        pageSize:
-          type: integer
-          format: int32
     Sort:
       type: object
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
     PayoutTransfer:
       type: object
