@@ -2726,6 +2726,152 @@ components:
           description: "When supported by the commerce platform, this prefix will\
             \ be used for orders."
           default: "null"
+        order_currency_override:
+          type: string
+          description: "ISO 4217 currency code (e.g., EUR, GBP) to force on all orders\
+            \ created via Direct Order Submission. When set, orders are written to\
+            \ the commerce platform in this currency regardless of the shop's default\
+            \ currency, with automatic exchange rate conversion applied. When null,\
+            \ orders use the shop's default currency (standard behavior)."
+          nullable: true
+          enum:
+          - USD
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BRL
+          - BSD
+          - BWP
+          - BZD
+          - CAD
+          - CDF
+          - CHF
+          - CLP
+          - CNY
+          - COP
+          - CRC
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - ISK
+          - JMD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KRW
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SZL
+          - THB
+          - TJS
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - UYU
+          - UZS
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - BTN
         conventions:
           $ref: '#/components/schemas/Conventions'
       description: Configurations for the merchants order behaviors.
@@ -4017,13 +4163,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     Pageable:
@@ -4034,16 +4180,16 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
     Sort:
       type: object
       properties:
@@ -4076,13 +4222,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     OnboardingStep:
