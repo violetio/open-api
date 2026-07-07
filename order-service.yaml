@@ -22,6 +22,73 @@ tags:
 - name: Checkout - Order Transfers
 - name: Checkout - Bag Transfers
 paths:
+  /bags/{bag_id}/transaction_fee:
+    put:
+      tags:
+      - Bags - Transaction Fees
+      summary: Submit Transaction Fee for Bag
+      description: "Submits a per-bag transaction fee on behalf of the authenticated\
+        \ channel. The fee submission is forwarded to BillingService, which resolves\
+        \ the bag context, validates ownership against the submitting app, and persists\
+        \ the record. Only source_type APP_PROVIDED is accepted for channel submissions."
+      operationId: submitBagTransactionFee
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        description: API token for authentication
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        description: Application secret key
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        description: Application ID
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: bag_id
+        in: path
+        description: ID of the bag to submit the transaction fee for
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BagTransactionFeeSubmissionRequest'
+      responses:
+        "200":
+          description: Fee submission accepted or duplicate accepted
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: "Validation error (missing fields, invalid source type, etc.)"
+          content:
+            application/json:
+              schema:
+                type: object
+        "403":
+          description: Bag not owned by the submitting app
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Bag not found
+          content:
+            application/json:
+              schema:
+                type: object
   /checkout/cart/{cart_id}/discounts:
     post:
       tags:
@@ -9825,6 +9892,49 @@ paths:
                     code: 9000
 components:
   schemas:
+    BagTransactionFeeSubmissionRequest:
+      type: object
+      properties:
+        transaction_fee_total_amount:
+          type: integer
+          description: Total transaction fee amount in minor units (e.g. cents)
+          format: int32
+        transaction_fee_percentage_amount:
+          type: integer
+          description: Percentage-based component of the transaction fee in minor
+            units (audit)
+          format: int32
+        transaction_fee_fixed_amount:
+          type: integer
+          description: Fixed component of the transaction fee in minor units (audit)
+          format: int32
+        currency:
+          type: string
+          description: Currency code for this fee (e.g. USD)
+        source_type:
+          type: string
+          description: Source type of this transaction fee
+          enum:
+          - APP_PROVIDED
+          - PAYMENT_PROVIDER_ACTUAL
+          - VIOLET_CONFIGURED
+          - VIOLET_CALCULATED
+          - MANUAL_ADJUSTMENT
+        source_provider:
+          type: string
+          description: Provider that supplied this fee (e.g. payment processor name)
+        source_reference_id:
+          type: string
+          description: External reference ID from the fee source
+        idempotency_key:
+          type: string
+          description: Unique key to prevent duplicate fee submissions
+        source_app_id:
+          type: integer
+          description: ID of the application that provided this fee data
+          format: int32
+      description: Request body for submitting an app-provided transaction fee for
+        a bag.
     Bag:
       required:
       - app_id
@@ -14381,8 +14491,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -14416,6 +14524,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
