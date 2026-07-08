@@ -60,35 +60,183 @@ paths:
           type: integer
           format: int64
       requestBody:
+        description: Per-bag transaction fee submission. Only source_type APP_PROVIDED
+          is accepted for channel submissions; idempotency_key de-duplicates retries.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/BagTransactionFeeSubmissionRequest'
+            examples:
+              App-Provided Fee:
+                summary: Channel-supplied transaction fee
+                description: "A fee sourced from the channel's own payment provider,\
+                  \ keyed for idempotent submission."
+                value:
+                  transaction_fee_total_amount: 250
+                  currency: USD
+                  source_type: APP_PROVIDED
+                  source_provider: stripe
+                  source_reference_id: ch_3Qx1a2b3c4d5e6f7
+                  idempotency_key: idem-key-001
+        required: true
       responses:
         "200":
-          description: Fee submission accepted or duplicate accepted
+          description: "Fee submission accepted, duplicate accepted, or config-conflict\
+            \ rejected"
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/BagTransactionFeeSubmissionResponse'
+              examples:
+                Accepted:
+                  summary: Fee accepted and persisted
+                  description: Returned when the submission is valid and a new transaction
+                    fee record is created for the bag.
+                  value:
+                    outcome: accepted
+                    error_code: null
+                    bag_transaction_fee:
+                      id: 50001
+                      bag_id: 11111
+                      order_id: 22222
+                      app_id: 12345
+                      merchant_id: 678
+                      currency: USD
+                      transaction_fee_total_amount: 250
+                      source_type: APP_PROVIDED
+                      source_app_id: 12345
+                      source_provider: stripe
+                      source_reference_id: ch_3Qx1a2b3c4d5e6f7
+                      status: ACCEPTED
+                      idempotency_key: idem-key-001
+                      date_created: 2026-07-07T12:00:00+0000
+                      date_last_modified: 2026-07-07T12:00:00+0000
+                Duplicate Accepted:
+                  summary: Idempotent resubmission of the same fee
+                  description: Returned when the same idempotency_key is resubmitted
+                    with matching fee data; the existing record is returned unchanged.
+                  value:
+                    outcome: duplicate_accepted
+                    error_code: null
+                    bag_transaction_fee:
+                      id: 50001
+                      bag_id: 11111
+                      order_id: 22222
+                      app_id: 12345
+                      merchant_id: 678
+                      currency: USD
+                      transaction_fee_total_amount: 250
+                      source_type: APP_PROVIDED
+                      source_app_id: 12345
+                      source_provider: stripe
+                      source_reference_id: ch_3Qx1a2b3c4d5e6f7
+                      status: ACCEPTED
+                      idempotency_key: idem-key-001
+                      date_created: 2026-07-07T12:00:00+0000
+                      date_last_modified: 2026-07-07T12:00:00+0000
+                Config Conflict Rejected:
+                  summary: Rejected due to a fee-source configuration conflict
+                  description: Returned when the submission conflicts with the resolved
+                    fee-source configuration; no record is persisted and error_code
+                    is set.
+                  value:
+                    outcome: config_conflict_rejected
+                    error_code: CONFIG_DISALLOWS_APP_PROVIDED_FEE
+                    bag_transaction_fee:
+                      id: 50002
+                      bag_id: 11111
+                      order_id: 22222
+                      app_id: 12345
+                      merchant_id: 678
+                      currency: USD
+                      transaction_fee_total_amount: 250
+                      source_type: APP_PROVIDED
+                      source_app_id: 12345
+                      source_provider: stripe
+                      source_reference_id: ch_3Qx1a2b3c4d5e6f7
+                      status: REJECTED
+                      rejection_reason: CONFIG_DISALLOWS_APP_PROVIDED_FEE
+                      created_by: app:12345
+                      date_created: 2026-07-07T12:00:00+0000
+                      date_last_modified: 2026-07-07T12:00:00+0000
         "400":
-          description: "Validation error (missing fields, invalid source type, etc.)"
+          description: "Submission rejected. The standard { message, error, code }\
+            \ envelope is returned with error \"bad_request\" and code 1001; the stable\
+            \ rejection code is carried in message."
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Error'
+              examples:
+                Invalid Source Type:
+                  summary: Unsupported source_type for channel submission
+                  description: Returned when source_type is anything other than APP_PROVIDED.
+                  value:
+                    message: INVALID_SOURCE_TYPE
+                    error: bad_request
+                    code: 1001
+                Missing Required Field:
+                  summary: A required field is absent from the request
+                  description: Returned when a required field such as currency or
+                    an amount is null.
+                  value:
+                    message: MISSING_REQUIRED_FIELD
+                    error: bad_request
+                    code: 1001
+                Invalid Amount:
+                  summary: A fee amount is negative
+                  description: Returned when any fee amount is a negative minor-unit
+                    value.
+                  value:
+                    message: INVALID_AMOUNT
+                    error: bad_request
+                    code: 1001
+                Invalid Currency:
+                  summary: Currency does not match the bag base currency
+                  description: Returned when the submitted currency does not match
+                    the bag's base currency.
+                  value:
+                    message: INVALID_CURRENCY
+                    error: bad_request
+                    code: 1001
+                Duplicate Conflict:
+                  summary: Same idempotency_key with different fee data
+                  description: Returned when a fee with the same idempotency_key already
+                    exists but carries different fee data.
+                  value:
+                    message: DUPLICATE_CONFLICT
+                    error: bad_request
+                    code: 1001
         "403":
           description: Bag not owned by the submitting app
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Error'
+              examples:
+                Bag Not Owned By App:
+                  summary: The bag belongs to a different app
+                  description: Returned when the submitting app does not own the target
+                    bag. The facade remaps this rejection to HTTP 403.
+                  value:
+                    message: BAG_NOT_OWNED_BY_APP
+                    error: bad_request
+                    code: 1001
         "404":
           description: Bag not found
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Error'
+              examples:
+                Unknown Bag:
+                  summary: No bag matches the supplied bag_id
+                  description: Returned when the target bag cannot be resolved. The
+                    facade remaps this rejection to HTTP 404.
+                  value:
+                    message: UNKNOWN_BAG
+                    error: bad_request
+                    code: 1001
   /checkout/cart/{cart_id}/discounts:
     post:
       tags:
@@ -9892,6 +10040,182 @@ paths:
                     code: 9000
 components:
   schemas:
+    BagTransactionFee:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the bag transaction fee record
+          format: int64
+        bag_id:
+          type: integer
+          description: ID of the bag this transaction fee applies to
+          format: int64
+        order_id:
+          type: integer
+          description: ID of the order this transaction fee applies to
+          format: int64
+        app_id:
+          type: integer
+          description: ID of the application/channel that submitted the fee
+          format: int32
+        merchant_id:
+          type: integer
+          description: ID of the merchant associated with this fee
+          format: int32
+        currency:
+          type: string
+          description: Currency code for this fee (e.g. USD)
+        transaction_fee_total_amount:
+          type: integer
+          description: Authoritative total transaction fee amount in minor units (e.g.
+            cents)
+          format: int32
+        transaction_fee_percentage_amount:
+          type: integer
+          description: Percentage-based component of the transaction fee in minor
+            units (audit)
+          format: int32
+        transaction_fee_fixed_amount:
+          type: integer
+          description: Fixed component of the transaction fee in minor units (audit)
+          format: int32
+        source_type:
+          type: string
+          description: Source type of this transaction fee
+          enum:
+          - APP_PROVIDED
+          - PAYMENT_PROVIDER_ACTUAL
+          - VIOLET_CONFIGURED
+          - VIOLET_CALCULATED
+          - MANUAL_ADJUSTMENT
+        source_app_id:
+          type: integer
+          description: ID of the application that provided this fee data
+          format: int32
+        source_provider:
+          type: string
+          description: Provider that supplied this fee (e.g. payment processor name)
+        source_reference_id:
+          type: string
+          description: External reference ID from the fee source
+        status:
+          type: string
+          description: Current lifecycle status of this transaction fee
+          enum:
+          - SUBMITTED
+          - ACCEPTED
+          - REJECTED
+          - FALLBACK_USED
+          - APPLIED
+          - LATE_REJECTED
+          - SUPERSEDED
+        idempotency_key:
+          type: string
+          description: Unique key to prevent duplicate fee submissions
+        config_mode:
+          type: string
+          description: Resolved fee-source mode at validation time
+        config_version:
+          type: string
+          description: Version of the fee configuration used
+        rejection_reason:
+          type: string
+          description: "Reason the fee was rejected, if applicable"
+        received_at:
+          type: string
+          description: Timestamp when the fee was received. In ISO-8601 format.
+          format: date-time
+        accepted_at:
+          type: string
+          description: Timestamp when the fee was accepted. In ISO-8601 format.
+          format: date-time
+        applied_at:
+          type: string
+          description: Timestamp when the fee was applied to distribution. In ISO-8601
+            format.
+          format: date-time
+        created_by:
+          type: string
+          description: Identifier of the actor that created this fee record
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+      description: "App-provided per-bag transaction fee record, tracking fee submission,\
+        \ validation, and application lifecycle."
+    BagTransactionFeeSubmissionResponse:
+      type: object
+      properties:
+        outcome:
+          type: string
+          description: "Result of the submission: accepted, duplicate_accepted, config_conflict_rejected,\
+            \ rejected, or late_rejected"
+          enum:
+          - accepted
+          - duplicate_accepted
+          - config_conflict_rejected
+          - rejected
+          - late_rejected
+        error_code:
+          type: string
+          description: Error code if the submission was rejected
+        bag_transaction_fee:
+          $ref: '#/components/schemas/BagTransactionFee'
+      description: Response from submitting a bag transaction fee.
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        code:
+          type: integer
+          format: int32
+        data:
+          $ref: '#/components/schemas/ErrorData'
+        id:
+          type: object
+        ids:
+          type: array
+          items:
+            type: object
+    ErrorData:
+      type: object
+      properties:
+        cause:
+          type: string
+          enum:
+          - ORDER_ERROR
+          - SKU_ERROR
+          - CUSTOMER_ERROR
+          - ADDRESS_ERROR
+          - MERCHANT_ERROR
+        skus:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkuError'
+    SkuError:
+      type: object
+      properties:
+        message:
+          type: string
+        name:
+          type: string
+        skuId:
+          type: integer
+          format: int64
+        orderSkuId:
+          type: integer
+          format: int64
+        bagId:
+          type: integer
+          format: int64
     BagTransactionFeeSubmissionRequest:
       type: object
       properties:
@@ -9929,10 +10253,6 @@ components:
         idempotency_key:
           type: string
           description: Unique key to prevent duplicate fee submissions
-        source_app_id:
-          type: integer
-          description: ID of the application that provided this fee data
-          format: int32
       description: Request body for submitting an app-provided transaction fee for
         a bag.
     Bag:
@@ -11833,55 +12153,6 @@ components:
           $ref: '#/components/schemas/communication_preference_detail'
         order_fulfillment:
           $ref: '#/components/schemas/communication_preference_detail'
-    Error:
-      type: object
-      properties:
-        message:
-          type: string
-        error:
-          type: string
-        code:
-          type: integer
-          format: int32
-        data:
-          $ref: '#/components/schemas/ErrorData'
-        id:
-          type: object
-        ids:
-          type: array
-          items:
-            type: object
-    ErrorData:
-      type: object
-      properties:
-        cause:
-          type: string
-          enum:
-          - ORDER_ERROR
-          - SKU_ERROR
-          - CUSTOMER_ERROR
-          - ADDRESS_ERROR
-          - MERCHANT_ERROR
-        skus:
-          type: array
-          items:
-            $ref: '#/components/schemas/SkuError'
-    SkuError:
-      type: object
-      properties:
-        message:
-          type: string
-        name:
-          type: string
-        skuId:
-          type: integer
-          format: int64
-        orderSkuId:
-          type: integer
-          format: int64
-        bagId:
-          type: integer
-          format: int64
     DiscountRequest:
       required:
       - code
@@ -14491,6 +14762,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -14524,8 +14797,6 @@ components:
           items:
             type: integer
             format: int64
-        externalId:
-          type: string
         related_orders:
           uniqueItems: true
           type: array
