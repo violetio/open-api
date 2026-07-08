@@ -10,6 +10,7 @@ servers:
 - url: https://sandbox-api.violet.io/v1
 tags:
 - name: Payments - Addresses
+- name: Payments - Transaction Fees
 - name: Payments - Distributions
 - name: Payments - Payment Capture
 - name: Payments - Payment Health
@@ -2236,6 +2237,30 @@ components:
           type: string
           description: Unique key to prevent duplicate distributions. This is generated
             by the Violet and unique for each distribution being processed.
+        bag_transaction_fee_id:
+          type: integer
+          description: "Unique identifier of the BagTransactionFee record applied\
+            \ to this Distribution, if any."
+          format: int64
+        transaction_fee_total_amount:
+          type: integer
+          description: Total transaction fee amount applied to this Distribution in
+            minor units (e.g. cents).
+          format: int32
+        transaction_fee_percentage_amount:
+          type: integer
+          description: Percentage-based component of the transaction fee in minor
+            units (e.g. cents).
+          format: int32
+        transaction_fee_fixed_amount:
+          type: integer
+          description: Fixed component of the transaction fee in minor units (e.g.
+            cents).
+          format: int32
+        fee_source_mode:
+          type: string
+          description: "Fee source mode that was active when this Distribution was\
+            \ created. One of APP_PROVIDED, PAYMENT_PROVIDER_ACTUAL, or VIOLET_CONFIGURED."
         tax_remitter:
           type: string
           description: "Tax Remittance setting used to generate this Distribution.\
@@ -2327,24 +2352,24 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
-        paged:
-          type: boolean
     Sort:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PayoutTransfer:
       type: object
@@ -2442,6 +2467,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -2475,8 +2502,6 @@ components:
           items:
             type: integer
             format: int64
-        externalId:
-          type: string
         related_orders:
           uniqueItems: true
           type: array
@@ -3076,6 +3101,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -3109,8 +3136,6 @@ components:
           items:
             type: integer
             format: int64
-        externalId:
-          type: string
         related_orders:
           uniqueItems: true
           type: array
