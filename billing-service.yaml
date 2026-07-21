@@ -24,9 +24,11 @@ tags:
 - name: Payments - Payouts
 - name: Payments - Payment Transactions
 - name: Payments - Payment Transfers
+- name: Payments - Payout Readiness
 - name: Payments - Payout Account Migrations
 - name: Payments - Refunds
 - name: Payments - Subscriptions
+- name: Payments - Transfer Batches
 - name: Payments - Maintenance
 - name: Payments - Supported Country Codes
 - name: Payments - Webhooks
@@ -1514,6 +1516,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterExternalTransferResponse'
+  /payments/payout_readiness:
+    get:
+      tags:
+      - Payments - Payout Readiness
+      summary: Get Payout Readiness
+      description: "Per-merchant payout-connection readiness for an app, with a summary.\
+        \ Derived from payout accounts, Stripe connect account state, queued distributions,\
+        \ and transfer history. At-risk merchants sort first."
+      operationId: getPayoutReadiness
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: query
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutReadinessResponse'
   /payments/payout_accounts/{payout_account_id}:
     get:
       tags:
@@ -1711,6 +1771,133 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MerchantPayoutAccountWrapper'
+  /payments/transfers/next:
+    get:
+      tags:
+      - Payments - Transfer Batches
+      summary: Get Next Transfer Projection
+      description: "Projection of the next scheduled transfer run for an app: pending\
+        \ totals per currency, awaiting-fulfillment bucket, and upcoming run windows."
+      operationId: getNextTransferProjection
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NextTransferProjectionResponse'
+  /payments/transfers/batches/{batch_id}:
+    get:
+      tags:
+      - Payments - Transfer Batches
+      summary: Get Transfer Batch by ID
+      description: A single derived transfer batch with its per-merchant breakdown.
+      operationId: getTransferBatchById
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: batch_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferBatchDetailResponse'
+  /payments/transfers/batches:
+    get:
+      tags:
+      - Payments - Transfer Batches
+      summary: Get Transfer Batches
+      description: "Historical scheduled transfer batches for an app, derived by grouping\
+        \ merchant payout transfers by daily run window. Newest first."
+      operationId: getTransferBatches
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTransferBatchResponse'
 components:
   schemas:
     PaymentPlatformConfiguration:
@@ -2261,6 +2448,20 @@ components:
           type: string
           description: "Fee source mode that was active when this Distribution was\
             \ created. One of APP_PROVIDED, PAYMENT_PROVIDER_ACTUAL, or VIOLET_CONFIGURED."
+        deduct_transaction_fees_before_commission:
+          type: boolean
+          description: Snapshot of the resolved deduct-transaction-fees-before-commission
+            (Net Receipts) setting that was active when this Distribution was created.
+            Null for rows generated before Net Receipts stamping and for non-fee bags.
+        transaction_fee_remitter:
+          type: string
+          description: "Snapshot of the resolved transaction fee remitter that was\
+            \ active when this Distribution was created. One of {APP} or {MERCHANT}.\
+            \ Null for rows generated before Net Receipts stamping and for non-fee\
+            \ bags."
+          enum:
+          - APP
+          - MERCHANT
         tax_remitter:
           type: string
           description: "Tax Remittance setting used to generate this Distribution.\
@@ -2315,12 +2516,12 @@ components:
     PageDistribution:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -2367,9 +2568,9 @@ components:
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
     PayoutTransfer:
       type: object
@@ -2765,12 +2966,12 @@ components:
     PageTransferReversal:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -2912,12 +3113,12 @@ components:
     PageMerchant Transfer Reversal:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3237,12 +3438,12 @@ components:
     PageMerchantTransfer:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3269,12 +3470,12 @@ components:
     PagePayoutTransfer:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3375,12 +3576,12 @@ components:
     PagePaymentTransaction:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         size:
@@ -3987,6 +4188,140 @@ components:
           description: Key-value pairs of additional information associated with this
             external transfer. These will returned in the ExternalTransfer entity
             returned by Violet.
+    MerchantPayoutReadinessResponse:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          description: Merchant identifier.
+          format: int32
+        merchant_name:
+          type: string
+          description: "Merchant name, when known from distributions."
+        stripe_account_id:
+          type: string
+          description: "Stripe connected account id (acct_...), when a payout account\
+            \ exists."
+        status:
+          type: string
+          description: Derived payout-connection status.
+          enum:
+          - ACTIVE
+          - HAS_ERRORS
+          - DISCONNECTED
+          - NEVER_CONNECTED
+        queued_distribution_count:
+          type: integer
+          description: Distributions currently queued for this merchant.
+          format: int32
+        queued_amount:
+          type: integer
+          description: Total queued amount in fractional currency units.
+          format: int64
+        currency:
+          type: string
+          description: Currency of the queued amount.
+        last_paid_at:
+          type: string
+          description: Timestamp of the last successful transfer.
+          format: date-time
+        recent_failure_count:
+          type: integer
+          description: Failed transfers within the last 30 days.
+          format: int32
+        last_verified_at:
+          type: string
+          description: When the Stripe connect account state was last updated via
+            webhook.
+          format: date-time
+        errors:
+          type: array
+          description: Unresolved payout account errors.
+          items:
+            $ref: '#/components/schemas/TransferErrorResponse'
+    PageMerchantPayoutReadinessResponse:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantPayoutReadinessResponse'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        empty:
+          type: boolean
+      description: Page of per-merchant readiness rows.
+    PayoutReadinessResponse:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/Summary'
+        merchants:
+          $ref: '#/components/schemas/PageMerchantPayoutReadinessResponse'
+    Summary:
+      type: object
+      properties:
+        total_merchants:
+          type: integer
+          description: Merchants evaluated for this app.
+          format: int32
+        healthy_count:
+          type: integer
+          description: Merchants with an ACTIVE payout connection.
+          format: int32
+        at_risk_count:
+          type: integer
+          description: Merchants whose payout connection is at risk.
+          format: int32
+        at_risk_queued_amount:
+          type: integer
+          description: "Queued amount held by at-risk merchants, in fractional currency\
+            \ units."
+          format: int64
+        currency:
+          type: string
+          description: Currency of the at-risk queued amount.
+        last_updated:
+          type: string
+          description: When this summary was computed.
+          format: date-time
+      description: Readiness summary across all of the app's merchants.
+    TransferErrorResponse:
+      type: object
+      properties:
+        error_code:
+          type: integer
+          description: Numeric error code associated with this error.
+          format: int32
+        error_message:
+          type: string
+          description: Human-readable description of the error.
+        date_created:
+          type: string
+          description: When this error was first recorded.
+          format: date-time
+      description: "Errors recorded on the transfer, if any."
     MerchantPayoutAccountWrapper:
       type: object
       properties:
@@ -4009,3 +4344,242 @@ components:
           type: boolean
           description: Indicates if this payout account is the target account in an
             ongoing migration process.
+    AwaitingFulfillment:
+      type: object
+      properties:
+        distribution_count:
+          type: integer
+          description: Queued distributions requiring fulfillment before transfer.
+          format: int32
+        amount:
+          type: integer
+          description: Total amount in fractional currency units.
+          format: int64
+        currency:
+          type: string
+          description: Currency of the awaiting-fulfillment amount.
+      description: Queued distributions waiting on bag fulfillment before becoming
+        eligible.
+    CurrencyTotal:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency code.
+        amount:
+          type: integer
+          description: Pending amount in fractional currency units.
+          format: int64
+        merchant_count:
+          type: integer
+          description: Merchants pending in this currency.
+          format: int32
+        distribution_count:
+          type: integer
+          description: Distributions pending in this currency.
+          format: int32
+      description: Pending transfer totals grouped by currency.
+    NextTransferProjectionResponse:
+      type: object
+      properties:
+        next_run_at:
+          type: string
+          description: Timestamp of the next scheduled transfer run.
+          format: date-time
+        totals:
+          type: array
+          description: Pending transfer totals grouped by currency.
+          items:
+            $ref: '#/components/schemas/CurrencyTotal'
+        distribution_count:
+          type: integer
+          description: Total pending distributions across all currencies.
+          format: int32
+        merchant_count:
+          type: integer
+          description: Distinct merchants with pending transfers.
+          format: int32
+        at_risk_merchant_count:
+          type: integer
+          description: Merchants in this projection whose payout connection is not
+            ACTIVE and may fail.
+          format: int32
+        awaiting_fulfillment:
+          $ref: '#/components/schemas/AwaitingFulfillment'
+        upcoming_windows:
+          type: array
+          description: Subsequent scheduled run windows.
+          items:
+            $ref: '#/components/schemas/UpcomingWindow'
+        last_updated:
+          type: string
+          description: When this projection was computed.
+          format: date-time
+    UpcomingWindow:
+      type: object
+      properties:
+        run_at:
+          type: string
+          description: Timestamp of the projected run window.
+          format: date-time
+      description: Subsequent scheduled run windows.
+    TransferBatchDetailResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Derived batch identifier, e.g. batch-2026-07-08."
+        run_at:
+          type: string
+          description: Timestamp of the first transfer in this batch run.
+          format: date-time
+        status:
+          type: string
+          description: Derived batch status.
+          enum:
+          - IN_PROGRESS
+          - COMPLETED
+          - PARTIAL_FAILURE
+          - FAILED
+        merchant_count:
+          type: integer
+          description: Number of merchants included in this batch.
+          format: int32
+        failed_merchant_count:
+          type: integer
+          description: Number of merchants whose transfer failed in this batch.
+          format: int32
+        distribution_count:
+          type: integer
+          description: Total number of distributions included in this batch.
+          format: int32
+        amount:
+          type: integer
+          description: "Total amount successfully transferred, in fractional currency\
+            \ units."
+          format: int64
+        currency:
+          type: string
+          description: Currency of the batch amount.
+        sent_merchant_count:
+          type: integer
+          description: Number of merchants whose transfer was sent successfully.
+          format: int32
+        merchants:
+          type: array
+          description: Per-merchant breakdown of this batch.
+          items:
+            $ref: '#/components/schemas/TransferBatchMerchantResponse'
+    TransferBatchMerchantResponse:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          description: Merchant identifier.
+          format: int32
+        merchant_name:
+          type: string
+          description: Merchant name from the linked distribution.
+        transfer_id:
+          type: integer
+          description: Identifier of the underlying payout transfer.
+          format: int64
+        distribution_count:
+          type: integer
+          description: Number of distributions covered by this merchant's transfer.
+          format: int32
+        status:
+          type: string
+          description: Status of the merchant's transfer within this batch.
+          enum:
+          - SENT
+          - REVERSED
+          - PARTIALLY_REVERSED
+          - PENDING
+          - FAILED
+          - BYPASSED
+          - PARTIALLY_SENT
+          - QUEUED
+        amount:
+          type: integer
+          description: Transfer amount in fractional currency units.
+          format: int64
+        currency:
+          type: string
+          description: Currency of the transfer amount.
+        errors:
+          type: array
+          description: "Errors recorded on the transfer, if any."
+          items:
+            $ref: '#/components/schemas/TransferErrorResponse'
+      description: Per-merchant breakdown of this batch.
+    PageTransferBatchResponse:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferBatchResponse'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    TransferBatchResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Derived batch identifier, e.g. batch-2026-07-08."
+        run_at:
+          type: string
+          description: Timestamp of the first transfer in this batch run.
+          format: date-time
+        status:
+          type: string
+          description: Derived batch status.
+          enum:
+          - IN_PROGRESS
+          - COMPLETED
+          - PARTIAL_FAILURE
+          - FAILED
+        merchant_count:
+          type: integer
+          description: Number of merchants included in this batch.
+          format: int32
+        failed_merchant_count:
+          type: integer
+          description: Number of merchants whose transfer failed in this batch.
+          format: int32
+        distribution_count:
+          type: integer
+          description: Total number of distributions included in this batch.
+          format: int32
+        amount:
+          type: integer
+          description: "Total amount successfully transferred, in fractional currency\
+            \ units."
+          format: int64
+        currency:
+          type: string
+          description: Currency of the batch amount.
