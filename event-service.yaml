@@ -1131,6 +1131,10 @@ components:
           - ORDER_DELIVERED
           - ORDER_ACCEPTED
           - ORDER_FAILED
+          - PAYMENT_TRANSACTION_DISPUTE_OPENED
+          - PAYMENT_TRANSACTION_DISPUTE_WON
+          - PAYMENT_TRANSACTION_DISPUTE_LOST
+          - ORDER_DISPUTED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook event was sent.
@@ -1269,6 +1273,10 @@ components:
             - ORDER_DELIVERED
             - ORDER_ACCEPTED
             - ORDER_FAILED
+            - PAYMENT_TRANSACTION_DISPUTE_OPENED
+            - PAYMENT_TRANSACTION_DISPUTE_WON
+            - PAYMENT_TRANSACTION_DISPUTE_LOST
+            - ORDER_DISPUTED
         entity_ids:
           uniqueItems: true
           type: array
@@ -1387,6 +1395,10 @@ components:
           - ORDER_DELIVERED
           - ORDER_ACCEPTED
           - ORDER_FAILED
+          - PAYMENT_TRANSACTION_DISPUTE_OPENED
+          - PAYMENT_TRANSACTION_DISPUTE_WON
+          - PAYMENT_TRANSACTION_DISPUTE_LOST
+          - ORDER_DISPUTED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook posts against.
