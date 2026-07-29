@@ -1776,8 +1776,11 @@ paths:
       tags:
       - Payments - Transfer Batches
       summary: Get Next Transfer Projection
-      description: "Projection of the next scheduled transfer run for an app: pending\
-        \ totals per currency, awaiting-fulfillment bucket, and upcoming run windows."
+      description: "Projection of the next scheduled transfer run for an app: totals\
+        \ per currency for the distributions projected to be included in that run\
+        \ (eligible queued distributions plus pending refund/adjustment ride-alongs\
+        \ for the run's merchants), the disjoint awaiting-fulfillment bucket, and\
+        \ upcoming run windows."
       operationId: getNextTransferProjection
       parameters:
       - name: X-Violet-Token
@@ -2484,13 +2487,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -2502,6 +2498,13 @@ components:
           format: int32
         externalTransactionId:
           type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
         payment_platform_connection_id:
           type: integer
           description: "Unique identifier of the PaymentPlatformConnection that processed\
@@ -2536,11 +2539,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -2553,6 +2556,8 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
         unpaged:
           type: boolean
         pageNumber:
@@ -2561,16 +2566,14 @@ components:
         pageSize:
           type: integer
           format: int32
-        paged:
-          type: boolean
     Sort:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PayoutTransfer:
       type: object
@@ -2986,11 +2989,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -3133,11 +3136,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -3458,11 +3461,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -3490,11 +3493,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -3596,11 +3599,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -4262,11 +4265,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
@@ -4536,11 +4539,11 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        pageable:
-          $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: '#/components/schemas/Pageable'
         last:
           type: boolean
         empty:
