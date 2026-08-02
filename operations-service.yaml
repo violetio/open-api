@@ -20,7 +20,10 @@ paths:
       tags:
       - Operations - Connection Health
       summary: Get Connection Health
-      description: Reports for all accessible merchants.
+      description: "Reports for all accessible merchants, unpaginated. Each report\
+        \ is built on demand, so this endpoint is limited to apps with 500 or fewer\
+        \ connected merchants and returns 400 above that. Prefer POST /operations/connection_health/search,\
+        \ which is paginated, filterable and sortable."
       operationId: getAllConnectionHealth
       parameters:
       - name: X-Violet-Token
