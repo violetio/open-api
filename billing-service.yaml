@@ -2487,13 +2487,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -2505,6 +2498,13 @@ components:
           format: int32
         externalTransactionId:
           type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
         payment_platform_connection_id:
           type: integer
           description: "Unique identifier of the PaymentPlatformConnection that processed\
@@ -4362,7 +4362,7 @@ components:
           type: string
           description: Currency of the awaiting-fulfillment amount.
       description: Queued distributions waiting on bag fulfillment before becoming
-        eligible.
+        eligible. Excluded from the run totals.
     CurrencyTotal:
       type: object
       properties:
@@ -4371,36 +4371,46 @@ components:
           description: Currency code.
         amount:
           type: integer
-          description: Pending amount in fractional currency units.
+          description: "Net amount the run will transfer in fractional currency units:\
+            \ payments less the pending refund/adjustment ride-alongs for the run's\
+            \ merchants."
+          format: int64
+        gross_amount:
+          type: integer
+          description: "Payments-only amount in fractional currency units, before\
+            \ refund/adjustment ride-alongs are netted out. Pairs with distribution_count."
           format: int64
         merchant_count:
           type: integer
-          description: Merchants pending in this currency.
+          description: Distinct merchants in this currency.
           format: int32
         distribution_count:
           type: integer
-          description: Distributions pending in this currency.
+          description: Distributions in this currency.
           format: int32
-      description: Pending transfer totals grouped by currency.
+      description: Totals grouped by currency for distributions included in the next
+        run.
     NextTransferProjectionResponse:
       type: object
       properties:
         next_run_at:
           type: string
-          description: Timestamp of the next scheduled transfer run.
+          description: "Timestamp of the next scheduled transfer run, accounting for\
+            \ the app's weekend-transfer setting."
           format: date-time
         totals:
           type: array
-          description: Pending transfer totals grouped by currency.
+          description: Totals grouped by currency for distributions included in the
+            next run.
           items:
             $ref: '#/components/schemas/CurrencyTotal'
         distribution_count:
           type: integer
-          description: Total pending distributions across all currencies.
+          description: Total distributions included in the next run across all currencies.
           format: int32
         merchant_count:
           type: integer
-          description: Distinct merchants with pending transfers.
+          description: Distinct merchants included in the next run.
           format: int32
         at_risk_merchant_count:
           type: integer
