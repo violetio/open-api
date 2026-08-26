@@ -1785,6 +1785,173 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Latest'
+  /offers/merchants/{merchant_id}/exports/{export_id}:
+    get:
+      tags:
+      - Catalog - Offers
+      summary: Get a Bulk Offer Export
+      operationId: getExport
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: export_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOfferExport'
+    delete:
+      tags:
+      - Catalog - Offers
+      summary: Cancel a Bulk Offer Export
+      operationId: cancelExport
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: export_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOfferExport'
+  /offers/merchants/{merchant_id}/exports:
+    get:
+      tags:
+      - Catalog - Offers
+      summary: Get Bulk Offer Exports
+      operationId: getExports
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 25
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BulkOfferExport'
+    post:
+      tags:
+      - Catalog - Offers
+      summary: Submit a Bulk Offer Export
+      operationId: submitExport
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkOfferExportParameters'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
 components:
   schemas:
     Album:
@@ -3573,6 +3740,9 @@ components:
           type: array
           items:
             type: object
+      description: "A list of errors encountered during this export. This is the top\
+        \ level Violet Error object, it can contain any Violet Error, if it is encountered\
+        \ during the export."
     ErrorData:
       type: object
       properties:
@@ -3960,3 +4130,226 @@ components:
           additionalProperties:
             type: number
             format: double
+    BulkOfferExport:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          description: The merchant whose offers are being exported. Null is reserved
+            for a future channel-wide export across every connected merchant.
+          format: int32
+        app_id:
+          type: integer
+          description: The app that submitted this export.
+          format: int32
+          readOnly: true
+        status:
+          type: string
+          description: This export's status.
+          enum:
+          - CREATED
+          - RUNNING
+          - CANCELING
+          - CANCELED
+          - COMPLETED
+          - FAILED
+          - EXPIRED
+        error_code:
+          type: string
+          description: Why the export failed. Null unless the export failed.
+          enum:
+          - ACCESS_DENIED
+          - TIMEOUT
+          - QUEUE_TIMEOUT
+          - INVALID_DATE_RANGE
+          - CANCELED
+          - INTERNAL_ERROR
+        errors:
+          type: array
+          description: "A list of errors encountered during this export. This is the\
+            \ top level Violet Error object, it can contain any Violet Error, if it\
+            \ is encountered during the export."
+          items:
+            $ref: '#/components/schemas/Error'
+        parameters:
+          $ref: '#/components/schemas/BulkOfferExportParameters'
+        schema_version:
+          type: integer
+          description: Version of the per-line offer document shape in the result
+            file.
+          format: int32
+        total_count:
+          type: integer
+          description: "The number of offers this export will write, known before\
+            \ the first byte is written."
+          format: int64
+          readOnly: true
+        object_count:
+          type: integer
+          description: Lines written so far. Updates while the export is RUNNING.
+          format: int64
+          readOnly: true
+        offer_count:
+          type: integer
+          description: Root offers written so far. Equal to object_count today; the
+            two diverge if a flattened result format is added later.
+          format: int64
+        skipped_count:
+          type: integer
+          description: Offers that were part of this export when it started but were
+            deleted or became invisible before they were written. total_count equals
+            object_count plus skipped_count on a completed export.
+          format: int64
+        file_size:
+          type: integer
+          description: "Size of the result file in bytes, set on completion."
+          format: int64
+        checksum:
+          type: string
+          description: Whole-object checksum of the result file.
+        checksum_algorithm:
+          type: string
+          description: "The algorithm used to compute checksum, for example CRC32C."
+        format:
+          type: string
+          description: "The result file format. Also present in parameters, echoed\
+            \ here for convenience."
+          enum:
+          - JSONL
+          - JSONL_GZ
+        url:
+          type: string
+          description: "A pre-signed URL for downloading the result, valid for 30\
+            \ minutes. Populated only when status is COMPLETED. Fetch this export\
+            \ again for a freshly signed URL."
+          readOnly: true
+        partial_url:
+          type: string
+          description: "A pre-signed URL for the partial result, when an export failed\
+            \ partway through and partial data is available."
+          readOnly: true
+        partial_max_offer_id:
+          type: integer
+          description: The highest offer id guaranteed to be present in the partial
+            data.
+          format: int64
+        snapshot_at:
+          type: string
+          description: The instant at which this export's membership was decided.
+          format: date-time
+        resume_from:
+          type: string
+          description: The timestamp to pass as `date_last_modified:min` on your next
+            incremental export. It is deliberately earlier than snapshot_at so that
+            no change can fall between two consecutive exports. Consecutive exports
+            overlap; dedupe by offer id.
+          format: date-time
+        date_created:
+          type: string
+          description: Date of creation. The date the request for this export came
+            in.
+          format: date-time
+          readOnly: true
+        date_started:
+          type: string
+          description: When work on this export began. Later than date_created if
+            the export was queued.
+          format: date-time
+        date_completed:
+          type: string
+          description: When this export reached a terminal status.
+          format: date-time
+          readOnly: true
+        date_expires:
+          type: string
+          description: When the result file is deleted from storage. After this the
+            status becomes EXPIRED.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last update.
+          format: date-time
+          readOnly: true
+        id:
+          type: string
+          description: "The identifier for this export. This is what appears in URLs,\
+            \ in the result's storage key, and in the workflow that runs the export."
+          readOnly: true
+      description: "Represents a single bulk offer export: an asynchronous, unpaginated\
+        \ export of a merchant's offers to a downloadable file. Submit an export,\
+        \ poll it until it completes, then download the result from the pre-signed\
+        \ URL."
+    BulkOfferExportParameters:
+      type: object
+      properties:
+        include:
+          type: string
+          description: Comma-separated list of extra data to include.
+          enum:
+          - metadata
+          - collections
+          - shipping
+          - sku_metadata
+          - unpublished
+        base_currency:
+          type: string
+          description: The currency offer prices are presented in.
+        map_variants:
+          type: boolean
+          description: Whether offer variants are mapped in the result.
+          default: true
+        format:
+          type: string
+          description: The result file format.
+          default: JSONL_GZ
+          enum:
+          - JSONL
+          - JSONL_GZ
+        schema_version:
+          type: integer
+          description: Version of the per-line offer document shape in the result
+            file.
+          format: int32
+          readOnly: true
+        published_only:
+          type: boolean
+          description: Whether the export was restricted to published offers. Resolved
+            from the submitting principal at submit time and frozen here.
+          readOnly: true
+        metadata_enabled:
+          type: boolean
+          description: "Whether offer metadata is applied in the result. The merchant\
+            \ configuration this comes from is read once at submit time and frozen\
+            \ here, because it can change while an export runs."
+          readOnly: true
+        contextual_pricing_enabled:
+          type: boolean
+          description: "Whether contextual prices are applied in the result. The merchant\
+            \ configuration this comes from is read once at submit time and frozen\
+            \ here, because it can change while an export runs."
+          readOnly: true
+        api_features_ignored:
+          type: array
+          description: "Recognized API features that were requested on the submit\
+            \ but do not apply to bulk export, and so were dropped. Normally empty\
+            \ or absent."
+          readOnly: true
+          items:
+            type: string
+            description: "Recognized API features that were requested on the submit\
+              \ but do not apply to bulk export, and so were dropped. Normally empty\
+              \ or absent."
+            readOnly: true
+        date_last_modified:min:
+          type: string
+          description: "Export only offers modified after this date, ISO 8601. Mirrors\
+            \ the query parameter of the same name on the paginated offers endpoint.\
+            \ Example: `2026-06-15T01:01:01+0000`"
+          example: 2026-06-15T01:01:01+0000
+        date_last_modified:max:
+          type: string
+          description: "Export only offers modified before this date, ISO 8601. Defaults\
+            \ to the time the export starts, and the effective value is reported here."
+          example: 2026-08-15T01:01:01+0000
+      description: "The parameters a bulk offer export was submitted with, with defaults\
+        \ resolved."
