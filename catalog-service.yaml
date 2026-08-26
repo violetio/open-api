@@ -1785,7 +1785,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Latest'
-  /offers/merchants/{merchant_id}/exports/{export_id}:
+  /catalog/offers/merchants/{merchant_id}/exports/{export_id}:
     get:
       tags:
       - Catalog - Offers
@@ -1866,7 +1866,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkOfferExport'
-  /offers/merchants/{merchant_id}/exports:
+  /catalog/offers/merchants/{merchant_id}/exports:
     get:
       tags:
       - Catalog - Offers
