@@ -1946,7 +1946,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BulkOfferExportParameters'
+              $ref: '#/components/schemas/BulkOfferExportSubmitParameters'
       responses:
         default:
           description: default response
@@ -4353,3 +4353,41 @@ components:
           example: 2026-08-15T01:01:01+0000
       description: "The parameters a bulk offer export was submitted with, with defaults\
         \ resolved."
+    BulkOfferExportSubmitParameters:
+      type: object
+      properties:
+        include:
+          type: string
+          description: Comma-separated list of extra data to include.
+          enum:
+          - metadata
+          - collections
+          - shipping
+          - sku_metadata
+        base_currency:
+          type: string
+          description: The currency offer prices are presented in.
+        format:
+          type: string
+          description: The result file format.
+          default: JSONL_GZ
+          enum:
+          - JSONL
+          - JSONL_GZ
+        published_only:
+          type: boolean
+          description: "Whether to restrict the export to published offers. Defaults\
+            \ to false, so unpublished offers are included unless this is true."
+          default: false
+        date_last_modified:min:
+          type: string
+          description: "Export only offers modified after this date, ISO 8601. Mirrors\
+            \ the query parameter of the same name on the paginated offers endpoint.\
+            \ Example: `2026-06-15T01:01:01+0000`"
+          example: 2026-06-15T01:01:01+0000
+        date_last_modified:max:
+          type: string
+          description: "Export only offers modified before this date, ISO 8601. Defaults\
+            \ to the time the export starts."
+          example: 2026-08-15T01:01:01+0000
+      description: The parameters accepted when submitting a bulk offer export.
