@@ -96,6 +96,72 @@ paths:
                   custom_tags:
                   - tag1
                   - tag2
+  /merchants/{merchant_id}/configuration/change_log:
+    get:
+      tags:
+      - Merchants - Configuration
+      summary: Get Merchant Configuration Change Log
+      description: "The audit trail for a merchant's configuration: every accepted\
+        \ change, which fields it moved, who made it and when. Most recent first."
+      operationId: getMerchantConfigurationChangeLog
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        description: Entries per page. Capped at 100.
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MerchantConfigurationChange'
+              example:
+              - merchant_id: 10000
+                action: GLOBAL_FEATURE_FLAG_UPDATED
+                changed_fields:
+                - field: global_feature_flags.sync_collections
+                  previous_value: false
+                  new_value: true
+                changed_field_count: 1
+                truncated: false
+                user_id: 1
+                user_type: MERCHANT
+                app_id: 10000
+                date_created: 2026-09-11T12:00:00+0000
   /merchants/{merchant_id}/configuration/global_feature_flags/{feature_flag}:
     put:
       tags:
@@ -3425,6 +3491,97 @@ components:
         shipping_exclusions:
           $ref: '#/components/schemas/ShippingExclusionsConfig'
       description: Configurations for the merchants shipping behaviors.
+    FieldChange:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Dotted path to the field within the merchant configuration
+          example: global_feature_flags.sync_collections
+        previous_value:
+          type: object
+          description: "The value before the change, null when unset"
+        new_value:
+          type: object
+          description: "The value after the change, null when removed"
+      description: "A single field that changed, and what it moved between"
+    MerchantConfigurationChange:
+      required:
+      - merchant_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          description: The id of the merchant whose configuration was changed
+          format: int32
+        action:
+          type: string
+          description: The write path that produced this change
+          enum:
+          - CONFIGURATION_CREATED
+          - CONFIGURATION_UPDATED
+          - GLOBAL_FEATURE_FLAG_UPDATED
+          - PLATFORM_FEATURE_FLAG_UPDATED
+          - ORDERS_CONFIG_UPDATED
+          - SYNC_POLICIES_UPDATED
+          - COMMERCE_DISABLED
+          - SHIPPING_SETTINGS_UPDATED
+          - SHIPPING_METHOD_CREATED
+          - SHIPPING_METHOD_UPDATED
+          - SHIPPING_METHOD_DELETED
+          - SHIPPING_METHOD_HANDLES_BACKFILLED
+          - INVENTORY_LOCATION_FILTERS_UPDATED
+          - CATALOG_SETTINGS_UPDATED
+          - CATALOG_AVAILABILITY_RULE_UPDATED
+          - CATALOG_AVAILABILITY_RULE_DELETED
+          - CATALOG_EXCLUSION_RULE_UPDATED
+          - CATALOG_EXCLUSION_RULE_DELETED
+        changed_field_count:
+          type: integer
+          description: How many fields changed in total. Larger than the number of
+            entries in changed_fields when the entry was truncated.
+          format: int32
+        truncated:
+          type: boolean
+          description: "True when the change was too large to record in full: changed_fields\
+            \ holds only the first of the changed fields, or an individual value was\
+            \ replaced by a placeholder"
+        user_id:
+          type: integer
+          description: "The id of the user that made the change, null for system-initiated\
+            \ changes"
+          format: int64
+        user_type:
+          type: string
+          description: "The type of the user that made the change, null for system-initiated\
+            \ changes"
+          enum:
+          - SUPER_ADMIN
+          - ADMIN
+          - MERCHANT
+          - USER
+          - DEVELOPER
+          - INFLUENCER
+          - HYBRID
+          - OTHER
+        app_id:
+          type: integer
+          description: "The application the change was made through, null for internal\
+            \ callers"
+          format: int32
+        date_created:
+          type: string
+          description: When the change was made
+          format: date-time
+        changed_fields:
+          type: array
+          description: The fields that changed
+          items:
+            $ref: '#/components/schemas/FieldChange'
+      description: An audit trail entry for a change to a merchant's configuration
     GenericToggleSettingRequest:
       type: object
       properties:
@@ -4195,9 +4352,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PageMerchantOnboardingRecord:
       type: object
