@@ -36,6 +36,8 @@ tags:
   description: Merchant explore operations
 - name: Merchants - Onboarding
   description: Merchant Onboarding Endpoints
+- name: Merchants - Tax Profile
+  description: A merchant's declared tax basis per region
 - name: Merchants - ReferenceId
   description: Operations relating to Merchant ReferenceIds
 - name: Merchants - Setup
@@ -3194,6 +3196,26 @@ components:
           enum:
           - PER_ORDER
           - PER_ITEM
+        add_vat:
+          type: boolean
+          description: |
+            When true, `price` is NET of VAT and consumers must add VAT on top of it before charging. When false or absent, `price` is charged exactly as configured.
+
+            VAT applicability is country scoped, so a merchant shipping into multiple VAT regimes should define one fallback method per regime and gate them with `conditions.applicable_countries`.
+
+            Only applies to fallback shipping methods. Shipping methods returned by the merchant's commerce platform carry their own tax treatment and are never grossed up.
+          nullable: true
+          default: false
+        vat_rate:
+          type: number
+          description: |
+            Optional forced VAT rate, as a percentage (e.g. `20.0` for 20%). Only meaningful when `add_vat` is true.
+
+            This is an override and is expected to be null in the normal case: consumers resolve the applicable rate downstream from the destination. Set it only when a merchant must pin a specific rate.
+
+            Consumers gross the price up as `round_half_up(price * (1 + vat_rate / 100))`, rounding once at the end so that cent totals agree across services.
+          format: double
+          nullable: true
         conditions:
           $ref: '#/components/schemas/Conditions'
     StockRules:
@@ -4320,13 +4342,13 @@ components:
           $ref: '#/components/schemas/Sort'
         first:
           type: boolean
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     Pageable:
@@ -4337,16 +4359,16 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
     Sort:
       type: object
       properties:
@@ -4379,13 +4401,13 @@ components:
           $ref: '#/components/schemas/Sort'
         first:
           type: boolean
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     OnboardingStep:
