@@ -24,6 +24,7 @@ tags:
 - name: Payments - Payouts
 - name: Payments - Payment Transactions
 - name: Payments - Payment Transfers
+- name: Payments - Payout Pauses
 - name: Payments - Payout Readiness
 - name: Payments - Payout Account Migrations
 - name: Payments - Refunds
@@ -2487,6 +2488,13 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -2498,13 +2506,6 @@ components:
           format: int32
         externalTransactionId:
           type: string
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         payment_platform_connection_id:
           type: integer
           description: "Unique identifier of the PaymentPlatformConnection that processed\
@@ -2525,8 +2526,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2539,6 +2538,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2975,8 +2976,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2989,6 +2988,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3122,8 +3123,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3136,6 +3135,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3447,8 +3448,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3461,6 +3460,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3479,8 +3480,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3493,6 +3492,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3585,8 +3586,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3599,6 +3598,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4251,8 +4252,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -4265,6 +4264,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4419,6 +4420,8 @@ components:
           format: int32
         awaiting_fulfillment:
           $ref: '#/components/schemas/AwaitingFulfillment'
+        paused:
+          $ref: '#/components/schemas/Paused'
         upcoming_windows:
           type: array
           description: Subsequent scheduled run windows.
@@ -4428,6 +4431,26 @@ components:
           type: string
           description: When this projection was computed.
           format: date-time
+    Paused:
+      type: object
+      properties:
+        distribution_count:
+          type: integer
+          description: Queued distributions excluded by an active payout pause.
+          format: int32
+        amount:
+          type: integer
+          description: Total amount in fractional currency units.
+          format: int64
+        currency:
+          type: string
+          description: Currency of the paused amount.
+        merchant_count:
+          type: integer
+          description: Distinct merchants with paused payouts.
+          format: int32
+      description: Queued distributions excluded from the run because an active payout
+        pause exists for their merchant. Excluded from the run totals.
     UpcomingWindow:
       type: object
       properties:
@@ -4535,8 +4558,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -4549,6 +4570,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
