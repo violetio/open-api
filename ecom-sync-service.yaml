@@ -3174,11 +3174,11 @@ components:
       - total
       type: object
       properties:
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         bag_status:
           type: string
           enum:
@@ -4376,6 +4376,14 @@ components:
           description: ID of the merchant the bag belongs to
           format: int32
           readOnly: true
+        tax_total:
+          type: integer
+          description: |
+            Tax the merchant charges on this shipping method. In Cents.
+
+            Null means the merchant's commerce platform does not report tax on shipping, or was never asked for it. Zero means the platform was asked and answered that no tax is due. Consumers must not read null as zero.
+          format: int32
+          nullable: true
         tracking_number:
           type: string
           description: "Carrier Tracking Number. Deprecated: Use `fulfillments` on\
