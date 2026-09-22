@@ -2308,6 +2308,7 @@ components:
               - `enable_addon_sku_injection` - When enabled, automatically injects addon SKUs into orders based on configured rules in `orders_config.conventions.addon_sku_config`. Requires explicit `true`. Default: disabled.
               - `fallback_tax_calculation_enabled` - When enabled, Violet will attempt to calculate fallback taxes when the ecommerce platform fails to return tax information. Requires explicit `true`. Default: disabled.
               - `enable_custom_tag_rules` - When enabled, evaluates rule-based custom tag conditions from `orders_config.conventions.custom_tag_config` to conditionally tag orders. Requires explicit `true`. Default: disabled.
+              - `strip_tax_inclusive_pricing_it` - When enabled, Violet removes the merchant's own 22% Italian VAT from cart calculation totals for destinations where that tax is not owed. Requires explicit `true`. Default: disabled.
           description: |
             Feature flags that apply to a merchant globally, regardless of their commerce platform.
 
@@ -2329,6 +2330,7 @@ components:
             - `enable_addon_sku_injection` - When enabled, automatically injects addon SKUs into orders based on configured rules in `orders_config.conventions.addon_sku_config`. Requires explicit `true`. Default: disabled.
             - `fallback_tax_calculation_enabled` - When enabled, Violet will attempt to calculate fallback taxes when the ecommerce platform fails to return tax information. Requires explicit `true`. Default: disabled.
             - `enable_custom_tag_rules` - When enabled, evaluates rule-based custom tag conditions from `orders_config.conventions.custom_tag_config` to conditionally tag orders. Requires explicit `true`. Default: disabled.
+            - `strip_tax_inclusive_pricing_it` - When enabled, Violet removes the merchant's own 22% Italian VAT from cart calculation totals for destinations where that tax is not owed. Requires explicit `true`. Default: disabled.
         platform_feature_flags:
           type: object
           additionalProperties:
