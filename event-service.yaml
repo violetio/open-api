@@ -1136,6 +1136,7 @@ components:
           - PAYMENT_TRANSACTION_DISPUTE_LOST
           - ORDER_DISPUTED
           - BULK_EXPORT_COMPLETED
+          - RESERVE_FLOOR_CHANGED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook event was sent.
@@ -1279,6 +1280,7 @@ components:
             - PAYMENT_TRANSACTION_DISPUTE_LOST
             - ORDER_DISPUTED
             - BULK_EXPORT_COMPLETED
+            - RESERVE_FLOOR_CHANGED
         entity_ids:
           uniqueItems: true
           type: array
@@ -1287,6 +1289,17 @@ components:
             type: integer
             description: Entity Ids
             format: int64
+        entity_external_ids:
+          uniqueItems: true
+          type: array
+          description: "Entity External Ids. External ids are only unique within a\
+            \ merchant or platform, not globally, so this narrows results within the\
+            \ requested app rather than serving as an exact-match lookup."
+          items:
+            type: string
+            description: "Entity External Ids. External ids are only unique within\
+              \ a merchant or platform, not globally, so this narrows results within\
+              \ the requested app rather than serving as an exact-match lookup."
         before_date:
           type: string
           description: Before Date
@@ -1402,6 +1415,7 @@ components:
           - PAYMENT_TRANSACTION_DISPUTE_LOST
           - ORDER_DISPUTED
           - BULK_EXPORT_COMPLETED
+          - RESERVE_FLOOR_CHANGED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook posts against.
