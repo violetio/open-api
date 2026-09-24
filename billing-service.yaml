@@ -798,45 +798,42 @@ paths:
                     payout_account_id: 5678
                     payout_account_type: MERCHANT
                     currency: USD
-                    net_distribution_amount: -55000
-                    distribution_amount: -55000
-                    tax_amount: -5000
+                    amount: -350
+                    net_distribution_amount: -350
+                    tax_amount: 0
+                    duty_amount: 0
                     shipping_amount: 0
-                    commission: 5000
-                    payment_provider_total_fee: 0
-                    payment_provider_volume_fee: 0
-                    payment_provider_fixed_fee: 0
+                    commission: 50
                     app_id: 10193
-                    app_name: Sample App
+                    app_name: Sample Channel
                     merchant_id: 10064
                     merchant_name: Space Drinks
                     merchant_commission_rate: 10.0
                     payment_provider_transaction_id: re_3PYoWvK29KDiBVld1n8zm5C1
                     payment_provider: STRIPE
-                    status: PENDING
+                    status: SENT
                     bag_id: 64579
-                    bag_sub_total: 100000
-                    bag_commissionable_amount: 100000
-                    bag_shipping_total: 10000
-                    bag_tax_total: 10000
-                    bag_discount_total: 0
-                    bag_total: 120000
-                    gross_subtotal: 100000
-                    gross_total: 120000
+                    bag_sub_total: 750
+                    bag_shipping_total: 490
+                    bag_tax_total: 127
+                    bag_total: 1367
                     totals_include_commission: true
-                    external_order_id: null
+                    external_order_id: "4676695687343"
                     order_id: 54609
-                    order_total: 120000
-                    payout_id: null
-                    payout_amount: null
-                    date_payout_created: null
-                    date_payout_settled: null
-                    payout_transfer_id: null
+                    order_total: 1367
+                    payout_transfer_id: 88213
                     refund_id: 7890
-                    refund_discrepancy: null
+                    bag_transaction_fee_id: 3301
+                    transaction_fee_total_amount: 250
+                    fee_source_mode: APP_PROVIDED
+                    deduct_transaction_fees_before_commission: true
+                    transaction_fee_remitter: MERCHANT
                     tax_remitter: MERCHANT
-                    date_created: 2024-07-10T14:20:30+0000
-                    date_last_modified: 2024-07-10T14:20:30+0000
+                    duty_remitter: MERCHANT
+                    date_created: 2026-09-10T14:20:30+0000
+                    date_last_modified: 2026-09-10T14:20:30+0000
+                    external_transaction_id: re_3PYoWvK29KDiBVld1n8zm5C1
+                    payment_service: STRIPE
         "404":
           description: Distribution not found
           content:
@@ -1112,6 +1109,25 @@ paths:
       tags:
       - Payments - Distributions
       summary: Search Distributions
+      description: "Returns the distributions on an account that match every filter\
+        \ in the body, newest first. Use it to reconcile a specific order, bag, payout\
+        \ or transfer: the commission charged on an order and the commission reversed\
+        \ by its refunds are the order's PAYMENT and REFUND distributions. Get Distributions\
+        \ pages through everything on the account; this narrows it by the body instead.\
+        \ Filters combine with AND, an omitted field does not filter, and {} matches\
+        \ everything the account can see. A merchant search covers the merchant's\
+        \ own orders and a channel search covers the channel's app. Reading refunds:\
+        \ on a REFUND distribution, commission is a figure for the bag, repeated on\
+        \ every refund of it. It is not the commission that refund reversed, so never\
+        \ sum it across refunds. net_distribution_amount is what the refund moved\
+        \ for that account, signed from its side: negative when money is taken back,\
+        \ positive when it is paid, which a refund can do. On the channel's row that\
+        \ movement is not the commission reversed on its own: it can also carry a\
+        \ payment-provider fee credit, tax or duty the channel remits, and a correction\
+        \ for a refund discrepancy. On a bag whose payment distributions have totals_include_commission\
+        \ false, a refund reverses no commission at all. A refund row carries amount,\
+        \ equal to net_distribution_amount, and no distribution_amount. A search that\
+        \ matches nothing returns an empty page, not a 404."
       operationId: searchDistributions
       parameters:
       - name: X-Violet-Token
@@ -1132,49 +1148,255 @@ paths:
           format: int32
       - name: account_type
         in: path
+        description: "Whose distributions to search: merchant, or developer for a\
+          \ channel. Case-insensitive; any other value is refused with 400 invalid_parameter."
         required: true
         schema:
           type: string
+          enum:
+          - merchant
+          - developer
       - name: account_id
         in: path
+        description: "The merchant id when account_type is merchant, or the channel's\
+          \ developer id when it is developer. Must be an account the credentials\
+          \ belong to."
         required: true
         schema:
           type: integer
           format: int32
       - name: include_merchants
         in: query
+        description: "Channel searches only. true returns the merchants' distributions\
+          \ on the channel's orders as well as the channel's own; false returns only\
+          \ the channel's own, those with payout_account_type DEVELOPER. Ignored on\
+          \ a merchant search."
         schema:
           type: boolean
           default: true
       - name: include_channels
         in: query
+        description: "Merchant searches only. true returns the channels' distributions\
+          \ on the merchant's orders as well as the merchant's own; false returns\
+          \ only the merchant's own, those with payout_account_type MERCHANT. Ignored\
+          \ on a channel search."
         schema:
           type: boolean
           default: true
       - name: size
         in: query
+        description: "Results per page, at most 100. Out-of-range values are adjusted\
+          \ rather than refused: above 100 becomes 100, and below 1 becomes 10. The\
+          \ size applied is returned in the response's size. (Violet's own dashboard\
+          \ has a ceiling of 500.)"
         schema:
           type: integer
           format: int32
           default: 20
       - name: page
         in: query
+        description: "Page to return, counting from 1. Values below 1 become 1. The\
+          \ response's number counts from 0, so page 1 comes back as number 0."
         schema:
           type: integer
           format: int32
           default: 1
       requestBody:
+        description: "The filters, all optional. merchant_id narrows a channel search;\
+          \ a merchant search is always limited to the merchant in the path. before_date\
+          \ and after_date are inclusive, compare against date_created, and must be\
+          \ written with a numeric offset, as 2026-09-01T00:00:00+0000: the forms\
+          \ 2026-09-01T00:00:00Z and 2026-09-01T00:00:00+00:00 are refused."
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/DistributionSearchRequest'
+            examples:
+              Every distribution for one order:
+                description: Every distribution for one order
+                value:
+                  order_id: 54609
+              Refund distributions for one order:
+                description: Refund distributions for one order
+                value:
+                  order_id: 54609
+                  distribution_type: REFUND
+              Distributions created in September 2026:
+                description: Distributions created in September 2026
+                value:
+                  after_date: 2026-09-01T00:00:00+0000
+                  before_date: 2026-09-30T23:59:59+0000
+        required: true
       responses:
-        default:
-          description: default response
+        "200":
+          description: "The matching distributions, newest first. May be an empty\
+            \ page."
           content:
             application/json:
+              examples:
+                Refund distributions for one order (channel):
+                  description: Refund distributions for one order (channel)
+                  value:
+                    content:
+                    - id: 12348
+                      type: REFUND
+                      payout_account_id: 1234
+                      payout_account_type: DEVELOPER
+                      currency: USD
+                      amount: -14
+                      net_distribution_amount: -14
+                      tax_amount: 0
+                      duty_amount: 0
+                      shipping_amount: 0
+                      commission: -50
+                      payment_provider_total_fee: -11
+                      payment_provider_volume_fee: -11
+                      payment_provider_fixed_fee: 0
+                      app_id: 10193
+                      app_name: Sample Channel
+                      merchant_id: 10064
+                      merchant_name: Space Drinks
+                      merchant_commission_rate: 10.0
+                      payment_provider_transaction_id: re_3PYoWvK29KDiBVld1n8zm5C1
+                      payment_provider: STRIPE
+                      status: SENT
+                      bag_id: 64579
+                      bag_sub_total: 750
+                      bag_shipping_total: 490
+                      bag_tax_total: 127
+                      bag_total: 1367
+                      totals_include_commission: true
+                      external_order_id: "4676695687343"
+                      order_id: 54609
+                      order_total: 1367
+                      refund_id: 7890
+                      bag_transaction_fee_id: 3301
+                      transaction_fee_total_amount: 250
+                      fee_source_mode: APP_PROVIDED
+                      deduct_transaction_fees_before_commission: true
+                      transaction_fee_remitter: MERCHANT
+                      tax_remitter: MERCHANT
+                      duty_remitter: MERCHANT
+                      date_created: 2026-09-10T14:20:30+0000
+                      date_last_modified: 2026-09-10T14:20:30+0000
+                      payment_service_total_fee: -11
+                      payment_service_volume_fee: -11
+                      payment_service_fixed_fee: 0
+                      external_transaction_id: re_3PYoWvK29KDiBVld1n8zm5C1
+                      payment_service: STRIPE
+                    - id: 12347
+                      type: REFUND
+                      payout_account_id: 5678
+                      payout_account_type: MERCHANT
+                      currency: USD
+                      amount: -350
+                      net_distribution_amount: -350
+                      tax_amount: 0
+                      duty_amount: 0
+                      shipping_amount: 0
+                      commission: 50
+                      app_id: 10193
+                      app_name: Sample Channel
+                      merchant_id: 10064
+                      merchant_name: Space Drinks
+                      merchant_commission_rate: 10.0
+                      payment_provider_transaction_id: re_3PYoWvK29KDiBVld1n8zm5C1
+                      payment_provider: STRIPE
+                      status: SENT
+                      bag_id: 64579
+                      bag_sub_total: 750
+                      bag_shipping_total: 490
+                      bag_tax_total: 127
+                      bag_total: 1367
+                      totals_include_commission: true
+                      external_order_id: "4676695687343"
+                      order_id: 54609
+                      order_total: 1367
+                      payout_transfer_id: 88213
+                      refund_id: 7890
+                      bag_transaction_fee_id: 3301
+                      transaction_fee_total_amount: 250
+                      fee_source_mode: APP_PROVIDED
+                      deduct_transaction_fees_before_commission: true
+                      transaction_fee_remitter: MERCHANT
+                      tax_remitter: MERCHANT
+                      duty_remitter: MERCHANT
+                      date_created: 2026-09-10T14:20:30+0000
+                      date_last_modified: 2026-09-10T14:20:30+0000
+                      external_transaction_id: re_3PYoWvK29KDiBVld1n8zm5C1
+                      payment_service: STRIPE
+                    pageable:
+                      page_number: 0
+                      page_size: 20
+                      sort:
+                        empty: false
+                        sorted: true
+                        unsorted: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    total_elements: 2
+                    total_pages: 1
+                    last: true
+                    size: 20
+                    number: 0
+                    sort:
+                      empty: false
+                      sorted: true
+                      unsorted: false
+                    number_of_elements: 2
+                    first: true
+                    empty: false
+        "400":
+          description: "The request could not be used and nothing was searched. empty_body:\
+            \ no body was sent; send {} to search without filters. invalid_parameter:\
+            \ account_type is neither merchant nor developer. missing_parameter: only\
+            \ on a request made through Violet's own dashboard, which must name the\
+            \ app to search. A body that is not valid JSON, or a field that does not\
+            \ parse — an unknown distribution_type, a date not written like 2026-09-01T00:00:00+0000\
+            \ — is also refused with 400, as a plain-text description of the problem\
+            \ rather than this JSON body."
+          content:
+            application/json:
+              examples:
+                empty_body:
+                  description: empty_body
+                  value:
+                    message: Empty body in request. Expected DistributionSearchRequest
+                      object.
+                    error: empty_body
+                    code: 9910
+                invalid_parameter:
+                  description: invalid_parameter
+                  value:
+                    message: Parameter 'account_type' is invalid.
+                    error: invalid_parameter
+                    code: 9001
+                missing_parameter:
+                  description: missing_parameter
+                  value:
+                    message: Required parameter 'app_id' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+            text/plain:
               schema:
-                $ref: '#/components/schemas/PageDistribution'
+                type: string
+                description: "A body that is not valid JSON, or a field that does\
+                  \ not parse. The text is the JSON parser's own description of the\
+                  \ problem; its wording is not part of this contract."
+        "403":
+          description: "The credentials do not permit this search: for example a merchant\
+            \ searching another merchant's distributions, or a channel searching another\
+            \ developer's. Nothing was searched."
+          content:
+            application/json:
+              examples:
+                Access Denied:
+                  description: Access Denied
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
   /payments/transfers/reversals:
     post:
       tags:
@@ -2527,8 +2749,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2541,6 +2761,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -2562,10 +2784,10 @@ components:
           type: boolean
         unpaged:
           type: boolean
-        pageSize:
+        pageNumber:
           type: integer
           format: int32
-        pageNumber:
+        pageSize:
           type: integer
           format: int32
     Sort:
@@ -2959,6 +3181,15 @@ components:
           type: integer
           description: ID of the payout transfer associated to this Distribution.
           format: int64
+        distribution_type:
+          type: string
+          description: "Filter by type of Distribution. Can be {PAYMENT}, {REFUND},\
+            \ {ADJUSTMENT}, or {DISPUTE_ADJUSTMENT}."
+          enum:
+          - PAYMENT
+          - REFUND
+          - ADJUSTMENT
+          - DISPUTE_ADJUSTMENT
         before_date:
           type: string
           description: Before date
@@ -2977,8 +3208,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -2991,6 +3220,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3124,8 +3355,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3138,6 +3367,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3449,8 +3680,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3463,6 +3692,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3481,8 +3712,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3495,6 +3724,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3587,8 +3818,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -3601,6 +3830,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4253,8 +4484,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -4267,6 +4496,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4559,8 +4790,6 @@ components:
         totalElements:
           type: integer
           format: int64
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -4573,6 +4802,8 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
