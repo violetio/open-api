@@ -2780,6 +2780,8 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -2788,8 +2790,6 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
     Sort:
       type: object
       properties:
