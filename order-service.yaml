@@ -10283,6 +10283,9 @@ components:
       - total
       type: object
       properties:
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -10294,9 +10297,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        bag_id:
-          type: integer
-          format: int64
         communicationPreferencesInternal:
           $ref: '#/components/schemas/communication_preferences'
         id:
@@ -13182,6 +13182,13 @@ components:
           minimum: 0
           type: integer
           description: Tax amount being refunded. In Cents. *This value can be null.*
+          format: int32
+          nullable: true
+        duty_amount:
+          minimum: 0
+          type: integer
+          description: "Duty amount being refunded, in cents, when the platform declared\
+            \ one. *This value can be null.*"
           format: int32
           nullable: true
       description: Order Refund
