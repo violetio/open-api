@@ -4381,7 +4381,7 @@ components:
           description: |
             Tax the merchant charges on this shipping method. In Cents.
 
-            Null means the merchant's commerce platform does not report tax on shipping, or was never asked for it. Zero means the platform was asked and answered that no tax is due. Consumers must not read null as zero.
+            Absent means the merchant's commerce platform does not report tax on shipping, or was never asked for it. Zero means the platform was asked and answered that no tax is due. Consumers must not read an absent value as zero.
           format: int32
           nullable: true
         tracking_number:
