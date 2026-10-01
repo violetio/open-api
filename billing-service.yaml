@@ -804,6 +804,7 @@ paths:
                     duty_amount: 0
                     shipping_amount: 0
                     commission: 50
+                    commission_reversed: 25
                     app_id: 10193
                     app_name: Sample Channel
                     merchant_id: 10064
@@ -1249,6 +1250,7 @@ paths:
                       duty_amount: 0
                       shipping_amount: 0
                       commission: -50
+                      commission_reversed: -25
                       payment_provider_total_fee: -11
                       payment_provider_volume_fee: -11
                       payment_provider_fixed_fee: 0
@@ -1295,6 +1297,7 @@ paths:
                       duty_amount: 0
                       shipping_amount: 0
                       commission: 50
+                      commission_reversed: 25
                       app_id: 10193
                       app_name: Sample Channel
                       merchant_id: 10064
@@ -2465,9 +2468,24 @@ components:
           format: int32
         commission:
           type: integer
-          description: Amount of commission earned by channels. In fractional currency
-            unit (e.g. cents).
+          description: "Amount of commission earned by channels, in fractional currency\
+            \ units (e.g. cents). On a refund distribution this is the whole bag's\
+            \ commission, not the part this refund reversed; see `commission_reversed`."
           format: int32
+        commission_reversed:
+          type: integer
+          description: "The part of the bag's commission that this refund reversed,\
+            \ in fractional currency units (e.g. cents): the commission portion of\
+            \ what actually moved. Same sign as `commission` on the same row: negative\
+            \ on the channel's row, positive on the merchant's. Zero when the bag's\
+            \ commission was deducted before payment, because a refund then reverses\
+            \ none. Because it is the amount that moved, it is not strictly bounded\
+            \ by `commission`: currency conversion can put it a cent above. Present\
+            \ only on refund distributions. Null on payment and adjustment distributions,\
+            \ and on refund distributions recorded before this field existed that\
+            \ have not been filled in yet."
+          format: int32
+          nullable: true
         payment_provider_total_fee:
           type: integer
           description: Total fee charged by the payment provider for this transaction.
@@ -2749,6 +2767,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2761,8 +2781,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3208,6 +3226,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3220,8 +3240,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3355,6 +3373,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3367,8 +3387,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3680,6 +3698,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3692,8 +3712,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3712,6 +3730,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3724,8 +3744,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3818,6 +3836,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3830,8 +3850,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4484,6 +4502,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4496,8 +4516,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4790,6 +4808,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4802,8 +4822,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
