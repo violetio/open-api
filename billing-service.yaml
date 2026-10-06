@@ -1120,15 +1120,18 @@ paths:
         \ own orders and a channel search covers the channel's app. Reading refunds:\
         \ on a REFUND distribution, commission is a figure for the bag, repeated on\
         \ every refund of it. It is not the commission that refund reversed, so never\
-        \ sum it across refunds. net_distribution_amount is what the refund moved\
-        \ for that account, signed from its side: negative when money is taken back,\
-        \ positive when it is paid, which a refund can do. On the channel's row that\
-        \ movement is not the commission reversed on its own: it can also carry a\
-        \ payment-provider fee credit, tax or duty the channel remits, and a correction\
-        \ for a refund discrepancy. On a bag whose payment distributions have totals_include_commission\
-        \ false, a refund reverses no commission at all. A refund row carries amount,\
-        \ equal to net_distribution_amount, and no distribution_amount. A search that\
-        \ matches nothing returns an empty page, not a 404."
+        \ sum it across refunds. The commission that refund reversed is commission_reversed_amount,\
+        \ with the same sign as commission on the row. Sum that instead. It can be\
+        \ empty on refunds recorded before 2026-10-01. net_distribution_amount is\
+        \ what the refund moved for that account, signed from its side: negative when\
+        \ money is taken back, positive when it is paid, which a refund can do. On\
+        \ the channel's row that movement is not the commission reversed on its own:\
+        \ it can also carry a payment-provider fee credit, tax or duty the channel\
+        \ remits, and a correction for a refund discrepancy. On a bag whose payment\
+        \ distributions have totals_include_commission false, a refund reverses no\
+        \ commission at all and commission_reversed_amount is 0. A refund row carries\
+        \ amount, equal to net_distribution_amount, and no distribution_amount. A\
+        \ search that matches nothing returns an empty page, not a 404."
       operationId: searchDistributions
       parameters:
       - name: X-Violet-Token
@@ -2767,6 +2770,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -2779,8 +2784,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3226,6 +3229,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3238,8 +3243,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3373,6 +3376,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3385,8 +3390,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3698,6 +3701,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3710,8 +3715,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3730,6 +3733,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3742,8 +3747,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3836,6 +3839,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3848,8 +3853,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4502,6 +4505,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4514,8 +4519,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4808,6 +4811,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4820,8 +4825,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
