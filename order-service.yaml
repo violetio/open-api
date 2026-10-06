@@ -5883,10 +5883,11 @@ paths:
         \ bag refunds, partial amount refunds, and SKU-level refunds with optional\
         \ shipping refunds. The bag must be in an ACCEPTED, SUBMITTED, COMPLETED,\
         \ PARTIALLY_REFUNDED, or CANCELED state. If no amount_refunded is provided,\
-        \ the full bag total is refunded. If no skus array is provided, all SKUs in\
-        \ the bag are included in the refund. The refund is forwarded to the merchant's\
-        \ external commerce platform for processing. All monetary values are in the\
-        \ smallest currency unit (e.g. cents for USD)."
+        \ whatever is left on the bag is refunded: its total less the refunds already\
+        \ made against it. If no skus array is provided, all SKUs in the bag are included\
+        \ in the refund. The refund is forwarded to the merchant's external commerce\
+        \ platform for processing. All monetary values are in the smallest currency\
+        \ unit (e.g. cents for USD)."
       operationId: performBagRefund
       parameters:
       - name: X-Violet-Token
@@ -5932,10 +5933,10 @@ paths:
           default: false
       requestBody:
         description: "Refund request specifying the refund details. All fields are\
-          \ optional. If amount_refunded is omitted, the full bag total is refunded.\
-          \ If skus is omitted, all SKUs in the bag are included. If shipping is omitted,\
-          \ the full bag shipping total is used as the shipping refund amount. All\
-          \ monetary values are in cents."
+          \ optional. If amount_refunded is omitted, whatever is left on the bag is\
+          \ refunded. If skus is omitted, all SKUs in the bag are included. If shipping\
+          \ is omitted, the full bag shipping total is used as the shipping refund\
+          \ amount. All monetary values are in cents."
         content:
           application/json:
             schema:
@@ -5960,7 +5961,8 @@ paths:
               Full Bag Refund:
                 summary: Refund entire bag with no amount or SKU details
                 description: Refunds the entire bag total including all SKUs and shipping.
-                  Omitting amount_refunded and skus triggers a full refund.
+                  Omitting amount_refunded and skus triggers a full refund of whatever
+                  is left on the bag.
                 value:
                   reason: Order not received by customer.
                   restock_items: true
@@ -5976,8 +5978,8 @@ paths:
               SKU-Level Refund:
                 summary: Refund specific SKUs only
                 description: Refunds specific SKUs by order_sku_id with quantity and
-                  amount per SKU. Omitting amount_refunded causes the full bag total
-                  to be used.
+                  amount per SKU. Omitting amount_refunded causes whatever is left
+                  on the bag to be used.
                 value:
                   reason: One item was defective.
                   restock_items: true
@@ -6014,9 +6016,11 @@ paths:
               examples:
                 Refund Completed:
                   summary: Bag refund processed successfully
-                  description: "Returned when the bag refund is successfully processed.\
-                    \ The response includes the full refund object with refund amount,\
-                    \ reason, refunded SKUs, and status."
+                  description: "Returned when the bag refund is processed. The response\
+                    \ includes the full refund object with refund amount, reason,\
+                    \ refunded SKUs, and status. If the platform made the refund but\
+                    \ the payment refund failed, the refund is returned with status\
+                    \ FAILED and its errors, and the bag is not marked refunded."
                   value:
                     id: 10000
                     order_id: 11111
@@ -6096,6 +6100,39 @@ paths:
                     message: Parameter 'amount_refunded' is invalid.
                     error: invalid_parameter
                     code: 9001
+                Nothing Left to Refund:
+                  summary: "No amount given, and the bag's refunds already cover it"
+                  description: "Returned when amount_refunded is omitted, which refunds\
+                    \ whatever is left on the bag, and the bag's existing refunds\
+                    \ already add up to its total."
+                  value:
+                    message: "Bag 22222 has nothing left to refund: its refunds already\
+                      \ add up to its total of 6076."
+                    error: invalid_bag_state
+                    code: 4225
+                Refund Exceeds What Is Left:
+                  summary: The platform refunded more than is left on the bag
+                  description: Returned when the refund the commerce platform made
+                    is more than 10 cents above what is left on the bag. Violet records
+                    it as a FAILED refund with this reason and does not refund the
+                    shopper.
+                  value:
+                    message: "Refund of 6076 USD cents exceeds the 3479 left on bag\
+                      \ 22222 (total 6076, refunded before 2597). Violet did not process\
+                      \ it, so the bag does not show it."
+                    error: bad_request
+                    code: 1001
+                Platform Returned No Refund:
+                  summary: The commerce platform reported why it made no refund
+                  description: "Returned when the commerce platform returns no refund\
+                    \ and reports an error, for example an order it could not find.\
+                    \ The platform's reason is included. Violet records no refund."
+                  value:
+                    message: "The platform returned no refund for bag 22222: CartPanda\
+                      \ order 98765 was not found. Violet recorded no refund and the\
+                      \ bag is unchanged."
+                    error: bad_request
+                    code: 1001
         "404":
           description: not found
           content:
@@ -14786,8 +14823,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -14821,6 +14856,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
