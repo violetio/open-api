@@ -584,6 +584,471 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PreRegistrationResponse'
+  /merchants/{merchant_id}/app_relationships/{app_id}/fee_settings:
+    get:
+      tags:
+      - Merchants - App Relationships
+      summary: Get a Retailer's Transaction Fee Settings
+      description: |-
+        Returns the transaction-fee settings stored for a retailer with an app, and the values that will actually apply, so that a channel can see what an order will be split with before one exists.
+
+        * `overrides` is what is stored for this retailer. A `null` value means there is no override.
+        * `effective` is the value that applies, and `source` says where it came from: `MERCHANT` (the retailer's override), `APP` (the app's own payment configuration) or `DEFAULT` (the platform default).
+
+        Only Violet admins and the channel that owns the app, with the retailer enabled on it, can read these. The retailer cannot.
+      operationId: getFeeSettings
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        description: "Token of the caller: a Violet admin, or a user of the channel\
+          \ that owns the app."
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        description: Secret of the app the token was issued for.
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        description: Id of the app the token was issued for. This is not necessarily
+          the app in the path.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10001
+      - name: merchant_id
+        in: path
+        description: The retailer whose settings are read.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10000
+      - name: app_id
+        in: path
+        description: The app the retailer's settings are with.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10001
+      responses:
+        "200":
+          description: The retailer's fee settings with this app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeSettings'
+              examples:
+                overridden:
+                  summary: A retailer with its own settings
+                  description: "Every setting is overridden for this retailer, so\
+                    \ every effective value comes from the retailer (source MERCHANT)."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      fee_source_mode: APP_PROVIDED
+                      deduct_transaction_fees_before_commission: true
+                      transaction_fee_remitter: MERCHANT
+                    effective:
+                      fee_source_mode:
+                        value: APP_PROVIDED
+                        source: MERCHANT
+                      deduct_transaction_fees_before_commission:
+                        value: true
+                        source: MERCHANT
+                      transaction_fee_remitter:
+                        value: MERCHANT
+                        source: MERCHANT
+                inherited:
+                  summary: "A retailer with no overrides, so the app's settings apply"
+                  description: "The retailer has no overrides, so each effective value\
+                    \ comes from the app (source APP) or the platform default (source\
+                    \ DEFAULT). Every key under overrides is still present, as null."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      fee_source_mode: null
+                      deduct_transaction_fees_before_commission: null
+                      transaction_fee_remitter: null
+                    effective:
+                      fee_source_mode:
+                        value: PAYMENT_PROVIDER_ACTUAL
+                        source: DEFAULT
+                      deduct_transaction_fees_before_commission:
+                        value: false
+                        source: DEFAULT
+                      transaction_fee_remitter:
+                        value: APP
+                        source: APP
+        "403":
+          description: "The caller is not a Violet admin or the channel that owns\
+            \ the app, or the retailer is not enabled on that app. Retailers cannot\
+            \ read their own settings, and a request with no credentials is refused."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
+                data: null
+                id: null
+                ids: null
+        "404":
+          description: The retailer is not connected to the app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Merchant App Relationship for Merchant {10000} and App {10001}\
+                  \ could not be found. This Merchant may not be connected to this\
+                  \ App. Please contact Violet Support for details."
+                error: merchant_app_relationship_not_found
+                code: 2516
+                data: null
+                id: null
+                ids: null
+        "409":
+          description: "The database reported a concurrency failure while reading,\
+            \ for example that the read was chosen as a deadlock victim. This is rare,\
+            \ because reading takes no lock. Nothing was changed; retry the request."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: The fee settings for this merchant and app were being changed
+                  by another request. Nothing was changed. Retry the request.
+                error: bad_request
+                code: 1001
+                data: null
+                id: null
+                ids: null
+        "500":
+          description: An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: An unknown error has occurred.
+                error: unknown_error
+                code: 9000
+                data: null
+                id: null
+                ids: null
+    patch:
+      tags:
+      - Merchants - App Relationships
+      summary: Update a Retailer's Transaction Fee Settings
+      description: |-
+        Sets how transaction fees apply to a retailer's orders with an app. Only the three fields in the request body can be changed; nothing else on the relationship or its payment configuration is touched.
+
+        **What a request means**
+
+        * A field that is left out is unchanged.
+        * A field set to a value is set to it.
+        * A field set to `null` clears the retailer's override, so that the app's own setting applies again.
+        * `{}` changes nothing. A value a setting already has is not a change and is not recorded.
+        * If the retailer has no payment configuration yet, one is created holding only the settings sent.
+        * The request is all or nothing: if any part of it is rejected, none of it is applied.
+        * The body must be a single JSON object with no repeated fields, sent as `application/json`. Any other content type is refused with a 415 before the request reaches this endpoint.
+
+        **Choosing settings for a contract type**
+
+        * Net Receipts, where the fee lowers the commission base and is withheld from the retailer: `deduct_transaction_fees_before_commission` `true`, `transaction_fee_remitter` `MERCHANT`.
+        * Fee passed to the retailer, commission on the gross amount: `deduct_transaction_fees_before_commission` `false`, `transaction_fee_remitter` `MERCHANT`.
+        * The channel absorbs the fee: `transaction_fee_remitter` `APP`, or unset.
+
+        **When it takes effect**
+
+        New settings apply to payout splits generated after the change. Splits that were already generated keep the settings they were generated with. The cached copy of the relationship that payout generation reads is evicted when the change is committed, so the new settings are picked up on its next lookup. Should that eviction fail the change still stands, but the previous settings can be served for up to an hour, the cache's time to live.
+
+        Every change is recorded with who made it and the previous and new value. Changes to one retailer's settings are applied one at a time.
+
+        Only Violet admins and the channel that owns the app, with the retailer enabled on it, can call this. A retailer cannot change its own terms.
+      operationId: updateFeeSettings
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        description: "Token of the caller: a Violet admin, or a user of the channel\
+          \ that owns the app."
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        description: Secret of the app the token was issued for.
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        description: Id of the app the token was issued for. This is not necessarily
+          the app in the path.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10001
+      - name: merchant_id
+        in: path
+        description: The retailer whose settings are changed.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10000
+      - name: app_id
+        in: path
+        description: The app the retailer's settings are with.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10001
+      requestBody:
+        description: "The settings to change. Send only the ones you want to change:\
+          \ a field left out is unchanged, and a field set to null clears the retailer's\
+          \ override."
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeSettingsUpdate'
+            examples:
+              netReceipts:
+                summary: "Net Receipts: the fee lowers the commission base and is\
+                  \ withheld from the retailer"
+                description: "The fee lowers the base that commission is calculated\
+                  \ on, and is withheld from the retailer's share."
+                value:
+                  deduct_transaction_fees_before_commission: true
+                  transaction_fee_remitter: MERCHANT
+              grossCommissionFeeToRetailer:
+                summary: "Commission on the gross amount, fee passed to the retailer"
+                description: "Commission is calculated on the gross amount, and the\
+                  \ fee is withheld from the retailer's share."
+                value:
+                  deduct_transaction_fees_before_commission: false
+                  transaction_fee_remitter: MERCHANT
+              channelAbsorbsFee:
+                summary: The channel absorbs the fee
+                description: The channel keeps the fee. The other settings are left
+                  as they are.
+                value:
+                  transaction_fee_remitter: APP
+              appProvidedFees:
+                summary: Accept the fees the app provides (the app must allow it)
+                description: The retailer accepts the fees the app provides. Rejected
+                  unless the app allows app-provided fees.
+                value:
+                  fee_source_mode: APP_PROVIDED
+              clearOneOverride:
+                summary: Clear one override so the app's setting applies again; the
+                  other settings are unchanged
+                description: "Only transaction_fee_remitter is sent, as null: its\
+                  \ override is cleared and the app's setting applies again. The other\
+                  \ two settings are left as they are."
+                value:
+                  transaction_fee_remitter: null
+              clearAllOverrides:
+                summary: Clear every override
+                description: "Every override is cleared, so the app's settings, or\
+                  \ the platform defaults, apply to all three."
+                value:
+                  fee_source_mode: null
+                  deduct_transaction_fees_before_commission: null
+                  transaction_fee_remitter: null
+        required: true
+      responses:
+        "200":
+          description: The retailer's fee settings after the update.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeSettings'
+              examples:
+                overridden:
+                  summary: A retailer with its own settings
+                  description: "Every setting is overridden for this retailer, so\
+                    \ every effective value comes from the retailer (source MERCHANT)."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      fee_source_mode: APP_PROVIDED
+                      deduct_transaction_fees_before_commission: true
+                      transaction_fee_remitter: MERCHANT
+                    effective:
+                      fee_source_mode:
+                        value: APP_PROVIDED
+                        source: MERCHANT
+                      deduct_transaction_fees_before_commission:
+                        value: true
+                        source: MERCHANT
+                      transaction_fee_remitter:
+                        value: MERCHANT
+                        source: MERCHANT
+                inherited:
+                  summary: "After clearing every override, the app's settings apply"
+                  description: "The retailer has no overrides, so each effective value\
+                    \ comes from the app (source APP) or the platform default (source\
+                    \ DEFAULT). Every key under overrides is still present, as null."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      fee_source_mode: null
+                      deduct_transaction_fees_before_commission: null
+                      transaction_fee_remitter: null
+                    effective:
+                      fee_source_mode:
+                        value: PAYMENT_PROVIDER_ACTUAL
+                        source: DEFAULT
+                      deduct_transaction_fees_before_commission:
+                        value: false
+                        source: DEFAULT
+                      transaction_fee_remitter:
+                        value: APP
+                        source: APP
+        "400":
+          description: "Nothing was changed. A value is not allowed, `APP_PROVIDED`\
+            \ was requested for an app that does not allow app-provided fees, the\
+            \ body contains a field that cannot be set here, the body is not a single\
+            \ JSON object with no repeated fields, or there is no body."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidValue:
+                  summary: A value outside the allowed values
+                  description: transaction_fee_remitter was sent as a value that is
+                    not APP or MERCHANT. Nothing is changed.
+                  value:
+                    message: "transaction_fee_remitter must be one of APP, MERCHANT,\
+                      \ or null to clear the override."
+                    error: bad_request
+                    code: 1001
+                    data: null
+                    id: null
+                    ids: null
+                unknownField:
+                  summary: A field that cannot be set here
+                  description: "A field other than the three settable settings was\
+                    \ sent. Nothing in the body is applied, including valid fields."
+                  value:
+                    message: "'transfer_schedule' cannot be set here. The settings\
+                      \ that can be changed are: fee_source_mode, deduct_transaction_fees_before_commission,\
+                      \ transaction_fee_remitter."
+                    error: bad_request
+                    code: 1001
+                    data: null
+                    id: null
+                    ids: null
+                appProvidedNotAllowed:
+                  summary: The app does not allow app-provided fees
+                  description: APP_PROVIDED was requested but the app does not allow
+                    app-provided transaction fees (allow_app_provided_transaction_fees
+                    is not true).
+                  value:
+                    message: fee_source_mode cannot be APP_PROVIDED because this app
+                      does not allow app-provided transaction fees (allow_app_provided_transaction_fees).
+                    error: bad_request
+                    code: 1001
+                    data: null
+                    id: null
+                    ids: null
+                malformedBody:
+                  summary: A body that cannot be read
+                  description: "The body is not valid JSON, is not an object, repeats\
+                    \ a field, or has content after the closing brace. The position\
+                    \ of the first problem is given."
+                  value:
+                    message: "The request body must be a single JSON object with no\
+                      \ repeated fields. It could not be read (line 1, column 3)."
+                    error: bad_request
+                    code: 1001
+                    data: null
+                    id: null
+                    ids: null
+                emptyBody:
+                  summary: No request body
+                  description: The request had no body.
+                  value:
+                    message: Empty body in request. Expected FeeSettingsUpdate object.
+                    error: empty_body
+                    code: 9910
+                    data: null
+                    id: null
+                    ids: null
+        "403":
+          description: "The caller is not a Violet admin or the channel that owns\
+            \ the app, or the retailer is not enabled on that app. Retailers cannot\
+            \ change their own settings, and a request with no credentials is refused."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
+                data: null
+                id: null
+                ids: null
+        "404":
+          description: The retailer is not connected to the app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Merchant App Relationship for Merchant {10000} and App {10001}\
+                  \ could not be found. This Merchant may not be connected to this\
+                  \ App. Please contact Violet Support for details."
+                error: merchant_app_relationship_not_found
+                code: 2516
+                data: null
+                id: null
+                ids: null
+        "409":
+          description: Another request was changing this retailer's settings. Nothing
+            was changed; retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: The fee settings for this merchant and app were being changed
+                  by another request. Nothing was changed. Retry the request.
+                error: bad_request
+                code: 1001
+                data: null
+                id: null
+                ids: null
+        "500":
+          description: An unexpected error occurred. Nothing was changed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: An unknown error has occurred.
+                error: unknown_error
+                code: 9000
+                data: null
+                id: null
+                ids: null
   /merchants/app_relationships/{app_id}/tax_remitter/{tax_remitter}:
     put:
       operationId: updateTaxRemitterOnMerchantAppRelationships
@@ -2355,6 +2820,7 @@ components:
               - `sync_duplicate_sku_media` - When enabled, syncs media for products with duplicate SKUs. Requires explicit `true`. Default: disabled.
               - `use_basic_auth` - When enabled, uses HTTP Basic Authentication instead of OAuth for WooCommerce API calls. Requires explicit `true`. Default: disabled.
               - `filter_by_categories` - When enabled, filters product sync to only include products from categories specified in the platform config. Also applies to BigCommerce, SFCC, Ecwid, and Magento. Requires explicit `true`. Default: disabled.
+              - `tax_inclusive_prices` - When enabled, catalog sync publishes prices inclusive of tax, re-basing them with the store's base-location rate when the store enters them net. Requires explicit `true`. Default: disabled.
 
               **Magento Flags:**
               - `has_violet_extension` - Legacy fallback for Magento extension capability when `magento_config.has_violet_extension` is unset. Explicit `false` disables extension behavior; otherwise defaults to enabled for backward compatibility.
@@ -2387,6 +2853,7 @@ components:
             - `sync_duplicate_sku_media` - When enabled, syncs media for products with duplicate SKUs. Requires explicit `true`. Default: disabled.
             - `use_basic_auth` - When enabled, uses HTTP Basic Authentication instead of OAuth for WooCommerce API calls. Requires explicit `true`. Default: disabled.
             - `filter_by_categories` - When enabled, filters product sync to only include products from categories specified in the platform config. Also applies to BigCommerce, SFCC, Ecwid, and Magento. Requires explicit `true`. Default: disabled.
+            - `tax_inclusive_prices` - When enabled, catalog sync publishes prices inclusive of tax, re-basing them with the store's base-location rate when the store enters them net. Requires explicit `true`. Default: disabled.
 
             **Magento Flags:**
             - `has_violet_extension` - Legacy fallback for Magento extension capability when `magento_config.has_violet_extension` is unset. Explicit `false` disables extension behavior; otherwise defaults to enabled for backward compatibility.
@@ -3684,6 +4151,219 @@ components:
             from the Shopify Partner Dashboard. It is generated by Shopify after creating
             a custom app distribution.
       description: Request for pre-registering a Shopify merchant with partial credentials
+    FeeSettings:
+      required:
+      - app_id
+      - effective
+      - merchant_id
+      - overrides
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          description: The retailer the settings are for.
+          format: int32
+          example: 10000
+        app_id:
+          type: integer
+          description: The app the retailer's settings are with.
+          format: int32
+          example: 10001
+        overrides:
+          $ref: '#/components/schemas/FeeSettingsOverrides'
+        effective:
+          $ref: '#/components/schemas/FeeSettingsEffective'
+      description: "A retailer's transaction-fee settings with one app. 'overrides'\
+        \ is what is stored for this retailer; 'effective' is what applies to payout\
+        \ splits generated from now on, and where each value came from. Splits that\
+        \ were already generated keep the settings stamped on them."
+    FeeSettingsEffective:
+      required:
+      - deduct_transaction_fees_before_commission
+      - fee_source_mode
+      - transaction_fee_remitter
+      type: object
+      properties:
+        fee_source_mode:
+          $ref: '#/components/schemas/FeeSettingsResolvedFeeSourceMode'
+        deduct_transaction_fees_before_commission:
+          $ref: '#/components/schemas/FeeSettingsResolvedBoolean'
+        transaction_fee_remitter:
+          $ref: '#/components/schemas/FeeSettingsResolvedTransactionFeeRemitter'
+      description: "The value that applies for each setting, with the level it came\
+        \ from. A value is always present: the platform default fills in anything\
+        \ neither the retailer nor the app sets."
+    FeeSettingsOverrides:
+      required:
+      - deduct_transaction_fees_before_commission
+      - fee_source_mode
+      - transaction_fee_remitter
+      type: object
+      properties:
+        fee_source_mode:
+          type: string
+          description: Whether this retailer accepts transaction fees supplied by
+            the app. Can be set to APP_PROVIDED or PAYMENT_PROVIDER_ACTUAL; VIOLET_CONFIGURED
+            is not supported yet and cannot be set.
+          nullable: true
+          example: APP_PROVIDED
+          enum:
+          - APP_PROVIDED
+          - PAYMENT_PROVIDER_ACTUAL
+          - VIOLET_CONFIGURED
+        deduct_transaction_fees_before_commission:
+          type: boolean
+          description: Net Receipts. When true the transaction fee lowers the base
+            that commission is calculated on.
+          nullable: true
+          example: true
+        transaction_fee_remitter:
+          type: string
+          description: Who bears the transaction fee. MERCHANT withholds the fee from
+            the retailer's share; APP leaves it with the app.
+          nullable: true
+          example: MERCHANT
+          enum:
+          - APP
+          - MERCHANT
+      description: "The transaction-fee settings stored for this retailer. A null\
+        \ value means the retailer has no override, so the app's setting (or the platform\
+        \ default) applies."
+    FeeSettingsResolvedBoolean:
+      required:
+      - source
+      - value
+      type: object
+      properties:
+        value:
+          type: boolean
+          description: The value that applies.
+        source:
+          type: string
+          description: "Where the value came from. MERCHANT: an override stored for\
+            \ this retailer. APP: the app's own payment configuration. DEFAULT: the\
+            \ platform default, because neither sets it."
+          enum:
+          - MERCHANT
+          - APP
+          - DEFAULT
+      description: A setting's effective value and where it was resolved from.
+    FeeSettingsResolvedFeeSourceMode:
+      required:
+      - source
+      - value
+      type: object
+      properties:
+        value:
+          type: string
+          description: The value that applies.
+          enum:
+          - APP_PROVIDED
+          - PAYMENT_PROVIDER_ACTUAL
+          - VIOLET_CONFIGURED
+        source:
+          type: string
+          description: "Where the value came from. MERCHANT: an override stored for\
+            \ this retailer. APP: the app's own payment configuration. DEFAULT: the\
+            \ platform default, because neither sets it."
+          enum:
+          - MERCHANT
+          - APP
+          - DEFAULT
+      description: A setting's effective value and where it was resolved from.
+    FeeSettingsResolvedTransactionFeeRemitter:
+      required:
+      - source
+      - value
+      type: object
+      properties:
+        value:
+          type: string
+          description: The value that applies.
+          enum:
+          - APP
+          - MERCHANT
+        source:
+          type: string
+          description: "Where the value came from. MERCHANT: an override stored for\
+            \ this retailer. APP: the app's own payment configuration. DEFAULT: the\
+            \ platform default, because neither sets it."
+          enum:
+          - MERCHANT
+          - APP
+          - DEFAULT
+      description: A setting's effective value and where it was resolved from.
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: "Stable, machine-readable name of the error."
+          example: bad_request
+        code:
+          type: integer
+          description: Stable numeric code for the error.
+          format: int32
+          example: 1001
+        message:
+          type: string
+          description: "A description of what went wrong, for people."
+          example: "transaction_fee_remitter must be one of APP, MERCHANT, or null\
+            \ to clear the override."
+        data:
+          type: object
+          description: "Additional structured detail, when the error has any. Usually\
+            \ null."
+          nullable: true
+        id:
+          type: object
+          description: "The identifier the error is about, when it concerns a single\
+            \ one."
+          nullable: true
+        ids:
+          type: array
+          description: "The identifiers the error is about, when it concerns several."
+          nullable: true
+          items:
+            type: object
+            description: "The identifiers the error is about, when it concerns several."
+            nullable: true
+      description: The error envelope used across the Violet API. Branch on 'error'
+        (a stable machine-readable name) or 'code'; 'message' is for people and may
+        change.
+    FeeSettingsUpdate:
+      type: object
+      properties:
+        fee_source_mode:
+          type: string
+          description: Whether this retailer accepts transaction fees supplied by
+            the app. APP_PROVIDED requires the app to allow app-provided fees. VIOLET_CONFIGURED
+            is not supported yet and is rejected. Null clears the override.
+          nullable: true
+          example: APP_PROVIDED
+          enum:
+          - APP_PROVIDED
+          - PAYMENT_PROVIDER_ACTUAL
+        deduct_transaction_fees_before_commission:
+          type: boolean
+          description: Net Receipts. When true the transaction fee lowers the base
+            that commission is calculated on. Null clears the override.
+          nullable: true
+          example: true
+        transaction_fee_remitter:
+          type: string
+          description: Who bears the transaction fee. MERCHANT withholds the fee from
+            the retailer's share; APP leaves it with the app. Null clears the override.
+          nullable: true
+          example: MERCHANT
+          enum:
+          - APP
+          - MERCHANT
+      description: "A partial update to a retailer's transaction-fee settings with\
+        \ one app. A field that is left out is unchanged; a field set to null clears\
+        \ the retailer-specific override so that the app's setting applies again.\
+        \ No other setting can be changed here: any other field is rejected, and an\
+        \ empty object changes nothing."
     CatalogAvailabilityRules:
       type: object
       properties:
@@ -4330,6 +5010,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4342,8 +5024,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4389,6 +5069,8 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4401,8 +5083,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
