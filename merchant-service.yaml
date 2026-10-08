@@ -1049,6 +1049,425 @@ paths:
                 data: null
                 id: null
                 ids: null
+  /merchants/{merchant_id}/app_relationships/{app_id}/return_policy:
+    get:
+      tags:
+      - Merchants - App Relationships
+      summary: Get a Retailer's Return Policy
+      description: |-
+        Returns the return policy stored for a retailer with an app, and the policy that will actually apply, so that a channel can see what a sale made now would be treated as before one exists.
+
+        * `overrides` is what is stored for this retailer. A `null` value means there is no override.
+        * `effective` is the policy that applies, and `source` says where it came from: `MERCHANT` (the retailer's override), `APP` (the app's own default, set on its payment configuration) or `DEFAULT` (the platform default, `REVERSE`). An app with no configuration has no default, so `DEFAULT` applies.
+
+        The policy decides what happens to the commission on a returned sale: `REVERSE` reverses it (SAR contracts), `RETAIN` keeps it (SBR and SBR Net Receipts contracts). Nothing configured means `REVERSE`. The transaction fee is not part of the policy: an applied fee is never reversed.
+
+        Only Violet admins and the channel that owns the app, with the retailer enabled on it, can read this. The retailer cannot.
+      operationId: getReturnPolicy
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        description: "Token of the caller: a Violet admin, or a user of the channel\
+          \ that owns the app."
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        description: Secret of the app the token was issued for.
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        description: Id of the app the token was issued for. This is not necessarily
+          the app in the path.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10001
+      - name: merchant_id
+        in: path
+        description: The retailer whose policy is read.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10000
+      - name: app_id
+        in: path
+        description: The app the retailer's policy is with.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10001
+      responses:
+        "200":
+          description: The retailer's return policy with this app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnPolicy'
+              examples:
+                overridden:
+                  summary: A retailer with its own policy
+                  description: "The retailer has its own policy, so the effective\
+                    \ value comes from the retailer (source MERCHANT) whatever the\
+                    \ app's default is."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      return_commission_policy: RETAIN
+                    effective:
+                      return_commission_policy:
+                        value: RETAIN
+                        source: MERCHANT
+                inherited:
+                  summary: "A retailer with no override, so the app's default applies"
+                  description: "The retailer has no override, so the effective value\
+                    \ is the app's default (source APP). The override is still present,\
+                    \ as null."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      return_commission_policy: null
+                    effective:
+                      return_commission_policy:
+                        value: RETAIN
+                        source: APP
+                notConfigured:
+                  summary: "Nothing configured, so the platform default applies"
+                  description: "Neither the retailer nor the app sets a policy, so\
+                    \ the platform default applies (source DEFAULT): the commission\
+                    \ is reversed with a return."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      return_commission_policy: null
+                    effective:
+                      return_commission_policy:
+                        value: REVERSE
+                        source: DEFAULT
+        "403":
+          description: "The caller is not a Violet admin or the channel that owns\
+            \ the app, or the retailer is not enabled on that app. Retailers cannot\
+            \ read their own policy, and a request with no credentials is refused."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
+                data: null
+                id: null
+                ids: null
+        "404":
+          description: The retailer is not connected to the app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Merchant App Relationship for Merchant {10000} and App {10001}\
+                  \ could not be found. This Merchant may not be connected to this\
+                  \ App. Please contact Violet Support for details."
+                error: merchant_app_relationship_not_found
+                code: 2516
+                data: null
+                id: null
+                ids: null
+        "409":
+          description: "The database reported a concurrency failure while reading,\
+            \ for example that the read was chosen as a deadlock victim. This is rare,\
+            \ because reading takes no lock. Nothing was changed; retry the request."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: The return policy for this merchant and app was being changed
+                  by another request. Nothing was changed. Retry the request.
+                error: bad_request
+                code: 1001
+                data: null
+                id: null
+                ids: null
+        "500":
+          description: An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: An unknown error has occurred.
+                error: unknown_error
+                code: 9000
+                data: null
+                id: null
+                ids: null
+    patch:
+      tags:
+      - Merchants - App Relationships
+      summary: Update a Retailer's Return Policy
+      description: |-
+        Sets what happens to the commission when one of a retailer's sales with an app is returned. Only `return_commission_policy` can be changed; nothing else on the relationship or its payment configuration is touched.
+
+        **What a request means**
+
+        * `return_commission_policy` left out: unchanged.
+        * Set to `REVERSE`: the commission is reversed with a return (SAR contracts). This is an override like any other: it stays `REVERSE` if the app's default later changes to `RETAIN`.
+        * Set to `RETAIN`: the commission is kept on a return (SBR and SBR Net Receipts contracts).
+        * Set to `null`: clears the retailer's override, so that the app's default applies again, or `REVERSE` if the app has none.
+        * `{}` changes nothing. A value the policy already has is not a change and is not recorded.
+        * If the retailer has no payment configuration yet, one is created holding only the policy.
+        * The body must be a single JSON object with no repeated fields, sent as `application/json`. Any other content type is refused with a 415 before the request reaches this endpoint.
+
+        A retailer whose payment configuration is set not to inherit from the app takes nothing from the app: with no override of its own it resolves to `REVERSE`, and clearing its override leads there too.
+
+        **When it takes effect**
+
+        A change applies to sales made after it. A sale that already exists keeps the policy it was made under; changing the policy never alters one. The cached copy of the relationship that sales read is evicted when the change is committed, so the new policy is picked up on its next lookup. Should that eviction fail the change still stands, but the previous policy can be served for up to an hour, the cache's time to live.
+
+        Every change is recorded with who made it and the previous and new value. Changes to one retailer's payment configuration are applied one at a time.
+
+        Only Violet admins and the channel that owns the app, with the retailer enabled on it, can call this. A retailer cannot change its own terms.
+      operationId: updateReturnPolicy
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        description: "Token of the caller: a Violet admin, or a user of the channel\
+          \ that owns the app."
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        description: Secret of the app the token was issued for.
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        description: Id of the app the token was issued for. This is not necessarily
+          the app in the path.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10001
+      - name: merchant_id
+        in: path
+        description: The retailer whose policy is changed.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10000
+      - name: app_id
+        in: path
+        description: The app the retailer's policy is with.
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 10001
+      requestBody:
+        description: "The policy to set. A field left out is unchanged, and a field\
+          \ set to null clears the retailer's override."
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnPolicyUpdate'
+            examples:
+              retain:
+                summary: Retain the commission on a return (SBR)
+                description: "The commission is kept on a return: an SBR or SBR Net\
+                  \ Receipts retailer."
+                value:
+                  return_commission_policy: RETAIN
+              reverse:
+                summary: Reverse the commission on a return (SAR)
+                description: "The commission is reversed with a return: a SAR retailer.\
+                  \ Set explicitly, it holds even where the app's default is RETAIN."
+                value:
+                  return_commission_policy: REVERSE
+              clearOverride:
+                summary: Clear the override so the app's default applies again
+                description: The override is cleared and the app's default applies
+                  again.
+                value:
+                  return_commission_policy: null
+        required: true
+      responses:
+        "200":
+          description: The retailer's return policy after the update.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnPolicy'
+              examples:
+                overridden:
+                  summary: A retailer with its own policy
+                  description: "The retailer has its own policy, so the effective\
+                    \ value comes from the retailer (source MERCHANT) whatever the\
+                    \ app's default is."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      return_commission_policy: RETAIN
+                    effective:
+                      return_commission_policy:
+                        value: RETAIN
+                        source: MERCHANT
+                inherited:
+                  summary: "After clearing the override, the app's default applies"
+                  description: "The retailer has no override, so the effective value\
+                    \ is the app's default (source APP). The override is still present,\
+                    \ as null."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      return_commission_policy: null
+                    effective:
+                      return_commission_policy:
+                        value: RETAIN
+                        source: APP
+                notConfigured:
+                  summary: "After clearing the override, nothing is configured"
+                  description: "Neither the retailer nor the app sets a policy, so\
+                    \ the platform default applies (source DEFAULT)."
+                  value:
+                    merchant_id: 10000
+                    app_id: 10001
+                    overrides:
+                      return_commission_policy: null
+                    effective:
+                      return_commission_policy:
+                        value: REVERSE
+                        source: DEFAULT
+        "400":
+          description: "Nothing was changed. The value is not allowed, the body contains\
+            \ a field that cannot be set here, the body is not a single JSON object\
+            \ with no repeated fields, or there is no body."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidValue:
+                  summary: A value outside the allowed values
+                  description: return_commission_policy was sent as a value that is
+                    not REVERSE or RETAIN. Nothing is changed.
+                  value:
+                    message: "return_commission_policy must be one of REVERSE, RETAIN,\
+                      \ or null to clear the override."
+                    error: bad_request
+                    code: 1001
+                    data: null
+                    id: null
+                    ids: null
+                unknownField:
+                  summary: A field that cannot be set here
+                  description: A field other than return_commission_policy was sent.
+                    Nothing in the body is applied.
+                  value:
+                    message: "'transaction_fee_remitter' cannot be set here. The setting\
+                      \ that can be changed is: return_commission_policy."
+                    error: bad_request
+                    code: 1001
+                    data: null
+                    id: null
+                    ids: null
+                malformedBody:
+                  summary: A body that cannot be read
+                  description: "The body is not valid JSON, is not an object, repeats\
+                    \ a field, or has content after the closing brace. The position\
+                    \ of the first problem is given."
+                  value:
+                    message: "The request body must be a single JSON object with no\
+                      \ repeated fields. It could not be read (line 1, column 3)."
+                    error: bad_request
+                    code: 1001
+                    data: null
+                    id: null
+                    ids: null
+                emptyBody:
+                  summary: No request body
+                  description: The request had no body.
+                  value:
+                    message: Empty body in request. Expected ReturnPolicyUpdate object.
+                    error: empty_body
+                    code: 9910
+                    data: null
+                    id: null
+                    ids: null
+        "403":
+          description: "The caller is not a Violet admin or the channel that owns\
+            \ the app, or the retailer is not enabled on that app. Retailers cannot\
+            \ change their own policy, and a request with no credentials is refused."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: You do not have permission to access this resource.
+                error: insufficient_permissions
+                code: 9901
+                data: null
+                id: null
+                ids: null
+        "404":
+          description: The retailer is not connected to the app.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Merchant App Relationship for Merchant {10000} and App {10001}\
+                  \ could not be found. This Merchant may not be connected to this\
+                  \ App. Please contact Violet Support for details."
+                error: merchant_app_relationship_not_found
+                code: 2516
+                data: null
+                id: null
+                ids: null
+        "409":
+          description: Another request was changing this retailer's policy. Nothing
+            was changed; retry the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: The return policy for this merchant and app was being changed
+                  by another request. Nothing was changed. Retry the request.
+                error: bad_request
+                code: 1001
+                data: null
+                id: null
+                ids: null
+        "500":
+          description: An unexpected error occurred. Nothing was changed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: An unknown error has occurred.
+                error: unknown_error
+                code: 9000
+                data: null
+                id: null
+                ids: null
   /merchants/app_relationships/{app_id}/tax_remitter/{tax_remitter}:
     put:
       operationId: updateTaxRemitterOnMerchantAppRelationships
@@ -4364,6 +4783,102 @@ components:
         \ the retailer-specific override so that the app's setting applies again.\
         \ No other setting can be changed here: any other field is rejected, and an\
         \ empty object changes nothing."
+    ReturnPolicy:
+      required:
+      - app_id
+      - effective
+      - merchant_id
+      - overrides
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          description: The retailer the policy is for.
+          format: int32
+          example: 10000
+        app_id:
+          type: integer
+          description: The app the retailer's policy is with.
+          format: int32
+          example: 10001
+        overrides:
+          $ref: '#/components/schemas/ReturnPolicyOverrides'
+        effective:
+          $ref: '#/components/schemas/ReturnPolicyEffective'
+      description: "A retailer's return policy with one app: what happens to the commission\
+        \ when a sale is returned. 'overrides' is what is stored for this retailer;\
+        \ 'effective' is what applies to sales made from now on, and where it came\
+        \ from. A change applies to new sales only: a sale that already exists keeps\
+        \ the policy it was made under."
+    ReturnPolicyEffective:
+      required:
+      - return_commission_policy
+      type: object
+      properties:
+        return_commission_policy:
+          $ref: '#/components/schemas/ReturnPolicyResolvedReturnCommissionPolicy'
+      description: "The value that applies, with the level it came from. A value is\
+        \ always present: the platform default (REVERSE) fills in when neither the\
+        \ retailer nor the app sets one."
+    ReturnPolicyOverrides:
+      required:
+      - return_commission_policy
+      type: object
+      properties:
+        return_commission_policy:
+          type: string
+          description: What happens to the commission when a sale is returned. REVERSE
+            reverses it (SAR contracts). RETAIN keeps it (SBR and SBR Net Receipts
+            contracts).
+          nullable: true
+          example: RETAIN
+          enum:
+          - REVERSE
+          - RETAIN
+      description: "The return policy stored for this retailer. A null value means\
+        \ the retailer has no override, so the app's default (or the platform default)\
+        \ applies."
+    ReturnPolicyResolvedReturnCommissionPolicy:
+      required:
+      - source
+      - value
+      type: object
+      properties:
+        value:
+          type: string
+          description: The value that applies.
+          enum:
+          - REVERSE
+          - RETAIN
+        source:
+          type: string
+          description: "Where the value came from. MERCHANT: an override stored for\
+            \ this retailer. APP: the app's own payment configuration. DEFAULT: the\
+            \ platform default, because neither sets it. A retailer whose payment\
+            \ configuration is set not to inherit from the app resolves to DEFAULT\
+            \ when it has no override of its own."
+          enum:
+          - MERCHANT
+          - APP
+          - DEFAULT
+      description: A setting's effective value and where it was resolved from.
+    ReturnPolicyUpdate:
+      type: object
+      properties:
+        return_commission_policy:
+          type: string
+          description: What happens to the commission when a sale is returned. REVERSE
+            reverses it (SAR contracts). RETAIN keeps it (SBR and SBR Net Receipts
+            contracts). Null clears the override.
+          nullable: true
+          example: RETAIN
+          enum:
+          - REVERSE
+          - RETAIN
+      description: "A partial update to a retailer's return policy with one app. A\
+        \ field that is left out is unchanged; a field set to null clears the retailer-specific\
+        \ override so that the app's default applies again. No other setting can be\
+        \ changed here: any other field is rejected, and an empty object changes nothing."
     CatalogAvailabilityRules:
       type: object
       properties:
