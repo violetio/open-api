@@ -2271,10 +2271,21 @@ paths:
       description: "Cancels a specific bag within an order and forwards the cancellation\
         \ to the merchant's external commerce platform for processing. The bag must\
         \ be in an ACCEPTED, SUBMITTED, COMPLETED, or PARTIALLY_REFUNDED state to\
-        \ qualify for cancellation. If the external cancellation succeeds, a full\
-        \ refund is automatically processed and included in the response. Returns\
-        \ an OrderCancellation object containing the bag cancellation record and,\
-        \ if applicable, the associated refund. Both successful and failed cancellations\
+        \ qualify for cancellation. When the external platform cancels the bag and\
+        \ returns a refund, Violet processes that refund, held to what is left to\
+        \ refund on the bag, and includes it in the response; a refund Violet cannot\
+        \ make is reported as an error on the bag's cancellation, which still stands.\
+        \ Whether or not a refund is made, once a bag whose payment Violet captured\
+        \ is cancelled, Violet reports it to its billing system, which checks the\
+        \ refunds it has recorded for the bag. When they do not cover what was captured,\
+        \ billing holds the merchant's sale if it has not yet been paid out, and records\
+        \ the case if it has. This moves no money, and a failure to reach billing\
+        \ does not affect the cancellation: while billing cannot be reached or is\
+        \ failing, the report is kept and sent again. It is not sent again once billing\
+        \ refuses it outright, or still has no merchant sale for the bag a day after\
+        \ the cancellation, and is not sent for an order whose payment was never captured.\
+        \ Returns an OrderCancellation object containing the bag cancellation record\
+        \ and, if applicable, the associated refund. Both successful and failed cancellations\
         \ return HTTP 202 Accepted."
       operationId: cancelBag
       parameters:
@@ -2493,11 +2504,22 @@ paths:
       description: "Cancels all bags within an order by forwarding cancellation requests\
         \ to each merchant's external commerce platform. Each bag must be in an ACCEPTED,\
         \ SUBMITTED, COMPLETED, or PARTIALLY_REFUNDED state to qualify for cancellation.\
-        \ If all external cancellations succeed, full refunds are automatically processed\
-        \ for each bag. Returns an OrderCancellation object containing the cancellation\
-        \ status, individual bag cancellation records, and any associated refunds.\
-        \ If some bags fail cancellation on the external platform, the response will\
-        \ include error details for those bags."
+        \ When a platform cancels a bag and returns a refund, Violet processes that\
+        \ refund for the bag, held to what is left to refund on it; a refund Violet\
+        \ cannot make is reported as an error on that bag's cancellation, which still\
+        \ stands. Whether or not a refund is made, once a bag whose payment Violet\
+        \ captured is cancelled, Violet reports it to its billing system, which checks\
+        \ the refunds it has recorded for the bag. When they do not cover what was\
+        \ captured, billing holds the merchant's sale if it has not yet been paid\
+        \ out, and records the case if it has. This moves no money, and a failure\
+        \ to reach billing does not affect the cancellation: while billing cannot\
+        \ be reached or is failing, the report is kept and sent again. It is not sent\
+        \ again once billing refuses it outright, or still has no merchant sale for\
+        \ the bag a day after the cancellation, and is not sent for an order whose\
+        \ payment was never captured. Returns an OrderCancellation object containing\
+        \ the cancellation status, individual bag cancellation records, and any associated\
+        \ refunds. If some bags fail cancellation on the external platform, the response\
+        \ will include error details for those bags."
       operationId: cancelOrder
       parameters:
       - name: X-Violet-Token
@@ -14823,6 +14845,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -14856,8 +14880,6 @@ components:
           items:
             type: integer
             format: int64
-        externalId:
-          type: string
         related_orders:
           uniqueItems: true
           type: array
