@@ -2719,6 +2719,13 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -2730,13 +2737,6 @@ components:
           format: int32
         externalTransactionId:
           type: string
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         commission_reversed_amount:
           type: integer
           description: "The part of the bag's commission that this refund reversed,\
@@ -2817,9 +2817,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PayoutTransfer:
       type: object
@@ -2919,18 +2919,6 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         externalId:
           type: string
-        effectiveRelatedOrderIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
-        effectiveRelatedDistributionIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
         payoutExternalId:
           type: string
         paymentService:
@@ -2940,7 +2928,19 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
         effectiveRelatedBagIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedDistributionIds:
           uniqueItems: true
           type: array
           items:
@@ -3562,18 +3562,6 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         externalId:
           type: string
-        effectiveRelatedOrderIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
-        effectiveRelatedDistributionIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
         payoutExternalId:
           type: string
         paymentService:
@@ -3583,7 +3571,19 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
         effectiveRelatedBagIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedDistributionIds:
           uniqueItems: true
           type: array
           items:
