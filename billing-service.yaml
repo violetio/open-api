@@ -10,6 +10,7 @@ servers:
 - url: https://sandbox-api.violet.io/v1
 tags:
 - name: Payments - Addresses
+- name: Payments - Cancellations
 - name: Payments - Transaction Fees
 - name: Payments - Distributions
 - name: Payments - Payment Capture
@@ -2718,13 +2719,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -2736,6 +2730,13 @@ components:
           format: int32
         externalTransactionId:
           type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
         commission_reversed_amount:
           type: integer
           description: "The part of the bag's commission that this refund reversed,\
@@ -2764,12 +2765,12 @@ components:
     PageDistribution:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -2801,9 +2802,9 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
-        unpaged:
-          type: boolean
         paged:
+          type: boolean
+        unpaged:
           type: boolean
         pageNumber:
           type: integer
@@ -2816,9 +2817,9 @@ components:
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
     PayoutTransfer:
       type: object
@@ -2918,6 +2919,18 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         externalId:
           type: string
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedDistributionIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
         payoutExternalId:
           type: string
         paymentService:
@@ -2927,19 +2940,7 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        effectiveRelatedOrderIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
         effectiveRelatedBagIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
-        effectiveRelatedDistributionIds:
           uniqueItems: true
           type: array
           items:
@@ -3223,12 +3224,12 @@ components:
     PageTransferReversal:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3370,12 +3371,12 @@ components:
     PageMerchant Transfer Reversal:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3561,6 +3562,18 @@ components:
             $ref: '#/components/schemas/PayoutTransferError'
         externalId:
           type: string
+        effectiveRelatedOrderIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
+        effectiveRelatedDistributionIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: integer
+            format: int64
         payoutExternalId:
           type: string
         paymentService:
@@ -3570,19 +3583,7 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        effectiveRelatedOrderIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
         effectiveRelatedBagIds:
-          uniqueItems: true
-          type: array
-          items:
-            type: integer
-            format: int64
-        effectiveRelatedDistributionIds:
           uniqueItems: true
           type: array
           items:
@@ -3695,12 +3696,12 @@ components:
     PageMerchantTransfer:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3727,12 +3728,12 @@ components:
     PagePayoutTransfer:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3833,12 +3834,12 @@ components:
     PagePaymentTransaction:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -4499,12 +4500,12 @@ components:
     PageMerchantPayoutReadinessResponse:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -4805,12 +4806,12 @@ components:
     PageTransferBatchResponse:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
