@@ -1137,6 +1137,10 @@ components:
           - ORDER_DISPUTED
           - BULK_EXPORT_COMPLETED
           - RESERVE_FLOOR_CHANGED
+          - RECOVERY_CASE_OPENED
+          - RECOVERY_CASE_GAP_REMAINING
+          - RECOVERY_CASE_RECOVERED
+          - RECOVERY_CASE_EXHAUSTED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook event was sent.
@@ -1281,6 +1285,10 @@ components:
             - ORDER_DISPUTED
             - BULK_EXPORT_COMPLETED
             - RESERVE_FLOOR_CHANGED
+            - RECOVERY_CASE_OPENED
+            - RECOVERY_CASE_GAP_REMAINING
+            - RECOVERY_CASE_RECOVERED
+            - RECOVERY_CASE_EXHAUSTED
         entity_ids:
           uniqueItems: true
           type: array
@@ -1416,6 +1424,10 @@ components:
           - ORDER_DISPUTED
           - BULK_EXPORT_COMPLETED
           - RESERVE_FLOOR_CHANGED
+          - RECOVERY_CASE_OPENED
+          - RECOVERY_CASE_GAP_REMAINING
+          - RECOVERY_CASE_RECOVERED
+          - RECOVERY_CASE_EXHAUSTED
         remote_endpoint:
           type: string
           description: Remote endpoint the webhook posts against.
