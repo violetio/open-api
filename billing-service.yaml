@@ -9,6 +9,7 @@ info:
 servers:
 - url: https://sandbox-api.violet.io/v1
 tags:
+- name: Payments - Recovery Cases
 - name: Payments - Addresses
 - name: Payments - Cancellations
 - name: Payments - Transaction Fees
@@ -37,6 +38,108 @@ tags:
 - name: Payments - Supported Country Codes
 - name: Payments - Webhooks
 paths:
+  /recovery_cases/{id}:
+    get:
+      tags:
+      - Payments - Recovery Cases
+      summary: Get Recovery Case
+      description: "Returns one recovery case with its allocations. A case that belongs\
+        \ to another app returns 404, as a case that does not exist does."
+      operationId: getRecoveryCase
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecoveryCaseResponse'
+  /recovery_cases:
+    get:
+      tags:
+      - Payments - Recovery Cases
+      summary: List Recovery Cases
+      description: "Lists your app's retained-commission recovery cases, newest first,\
+        \ without allocations. Filter by retailer and status. page is 1-based and\
+        \ size is 1 to 100 (default 20); the response's number is 0-based."
+      operationId: getRecoveryCases
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: merchant_id
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageRecoveryCaseResponse'
   /payments/payment_platform_configurations:
     post:
       tags:
@@ -2135,6 +2238,241 @@ paths:
                 $ref: '#/components/schemas/PageTransferBatchResponse'
 components:
   schemas:
+    RecoveryAllocationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Null for seq 0, the refund's own reversal."
+          format: int64
+        recovery_case_id:
+          type: integer
+          description: The recovery case this allocation belongs to.
+          format: int64
+        seq:
+          type: integer
+          description: "Order within the case. Draws start at 1. A draw on a transfer\
+            \ that paid several sales is listed once per sale, with the same seq."
+          format: int32
+        funding_type:
+          type: string
+          description: OWN_TRANSACTION (the sale's own transfer) or BORROWED_REVERSAL
+            (another of the retailer's transfers).
+        window:
+          type: string
+          description: "OWN, IN_WINDOW (a sale in the 120 days before the case opened)\
+            \ or BEYOND_WINDOW."
+        status:
+          type: string
+          description: EXECUTED or FAILED. A draw in progress is not listed.
+        amount:
+          type: integer
+          description: "Amount recovered by this allocation, and its currency."
+          format: int64
+        currency:
+          type: string
+          description: "Amount recovered by this allocation, and its currency."
+        stripe_transfer_reversal_id:
+          type: string
+          description: The Stripe reversal and the Stripe transfer drawn on.
+        stripe_transfer_id:
+          type: string
+          description: The Stripe reversal and the Stripe transfer drawn on.
+        funding_payout_transfer_id:
+          type: integer
+          description: The Violet transfer drawn on.
+          format: int64
+        donor_order_id:
+          type: integer
+          description: "The order and bag the amount came from; for seq 0, the refunded\
+            \ order and bag."
+          format: int64
+        donor_bag_id:
+          type: integer
+          description: "The order and bag the amount came from; for seq 0, the refunded\
+            \ order and bag."
+          format: int64
+        failure_reason:
+          type: string
+          description: Set only when status is FAILED.
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+      description: Single-case response only.
+    RecoveryCaseResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The recovery case ID; the join key between Violet's records
+            and yours.
+          format: int64
+        recovery_case_id:
+          type: integer
+          description: "Same as id, matching the webhook payload."
+          format: int64
+        refund_id:
+          type: integer
+          description: The refund that opened the case.
+          format: int64
+        order_id:
+          type: integer
+          description: The refunded order and bag.
+          format: int64
+        bag_id:
+          type: integer
+          description: The refunded order and bag.
+          format: int64
+        merchant_id:
+          type: integer
+          description: The retailer that owes the amount.
+          format: int32
+        payout_account_id:
+          type: integer
+          description: The retailer's payout account for the refunded sale.
+          format: int32
+        currency:
+          type: string
+          description: "The case currency: the platform currency."
+        gap_amount:
+          type: integer
+          description: "The commission the channel kept on this refund, in minor units."
+          format: int64
+        shortfall_amount:
+          type: integer
+          description: Any part of the sale's own reversal that came up short because
+            an earlier recovery had already drawn on that transfer. Usually 0.
+          format: int64
+        amount_to_recover:
+          type: integer
+          description: "What the sale's own reversal returned, plus gap_amount, plus\
+            \ shortfall_amount."
+          format: int64
+        amount_recovered:
+          type: integer
+          description: The sale's own reversal plus every executed draw; the sum of
+            the allocations whose status is EXECUTED.
+          format: int64
+        remaining_gap:
+          type: integer
+          description: amount_to_recover minus amount_recovered. Zero or less means
+            nothing is owed.
+          format: int64
+        gap_amount_usd:
+          type: integer
+          description: "The same amount in US cents, at rates fixed when the case\
+            \ opened. Null when a rate was unavailable."
+          format: int64
+        shortfall_amount_usd:
+          type: integer
+          description: "The same amount in US cents, at rates fixed when the case\
+            \ opened. Null when a rate was unavailable."
+          format: int64
+        amount_to_recover_usd:
+          type: integer
+          description: "The same amount in US cents, at rates fixed when the case\
+            \ opened. Null when a rate was unavailable."
+          format: int64
+        shortfall_unknown:
+          type: boolean
+          description: True when the shortfall could not be measured.
+        status:
+          type: string
+          description: "OPENED, RECOVERING, RECOVERED or EXHAUSTED."
+        escalation:
+          type: string
+          description: "RUNGS_1_2_EXHAUSTED when the case is EXHAUSTED, otherwise\
+            \ null."
+        exhausted_reason:
+          type: string
+          description: "NO_DONOR_HEADROOM (can recover later, checked daily), TRANSFER_METHOD_NOT_AUTOMATIC,\
+            \ CURRENCY_UNKNOWN or SHORTFALL_UNKNOWN when EXHAUSTED, otherwise null."
+        transfer_reversal_ids:
+          type: array
+          description: "Transfer reversal IDs: the sale's own reversal first, then\
+            \ each executed draw."
+          items:
+            type: integer
+            description: "Transfer reversal IDs: the sale's own reversal first, then\
+              \ each executed draw."
+            format: int64
+        date_created:
+          type: string
+          description: Time at which the object was created. In ISO-8601 format.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Time at which the object was last modified. In ISO-8601 format.
+          format: date-time
+        allocations:
+          type: array
+          description: Single-case response only.
+          items:
+            $ref: '#/components/schemas/RecoveryAllocationResponse'
+    PageRecoveryCaseResponse:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecoveryCaseResponse'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    Pageable:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+    Sort:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
     PaymentPlatformConfiguration:
       type: object
       properties:
@@ -2752,6 +3090,15 @@ components:
             \ have not been filled in yet."
           format: int32
           nullable: true
+        commission_retained_amount:
+          type: integer
+          description: "On a refund distribution under a retain return policy, the\
+            \ commission the channel kept instead of reversing, in fractional currency\
+            \ units. Same sign convention as commission_reversed_amount on the same\
+            \ row. Null under a reverse policy and on payment, adjustment and dispute\
+            \ distributions."
+          format: int32
+          nullable: true
         payment_platform_connection_id:
           type: integer
           description: "Unique identifier of the PaymentPlatformConnection that processed\
@@ -2766,12 +3113,12 @@ components:
     PageDistribution:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -2786,41 +3133,14 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
-          type: boolean
-    Pageable:
-      type: object
-      properties:
-        offset:
-          type: integer
-          format: int64
-        sort:
-          $ref: '#/components/schemas/Sort'
-        pageNumber:
-          type: integer
-          format: int32
-        pageSize:
-          type: integer
-          format: int32
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
-    Sort:
-      type: object
-      properties:
-        empty:
-          type: boolean
-        unsorted:
-          type: boolean
-        sorted:
           type: boolean
     PayoutTransfer:
       type: object
@@ -3225,12 +3545,12 @@ components:
     PageTransferReversal:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3245,13 +3565,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     SearchTransfersReversalsRequest:
@@ -3372,12 +3692,12 @@ components:
     PageMerchant Transfer Reversal:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3392,13 +3712,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     AdvancedSearchRequest:
@@ -3697,12 +4017,12 @@ components:
     PageMerchantTransfer:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3717,24 +4037,24 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     PagePayoutTransfer:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3749,13 +4069,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     SearchTransfersRequest:
@@ -3835,12 +4155,12 @@ components:
     PagePaymentTransaction:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -3855,13 +4175,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     PaymentTransaction:
@@ -4501,12 +4821,12 @@ components:
     PageMerchantPayoutReadinessResponse:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -4521,13 +4841,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
       description: Page of per-merchant readiness rows.
@@ -4807,12 +5127,12 @@ components:
     PageTransferBatchResponse:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         size:
@@ -4827,13 +5147,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     TransferBatchResponse:
