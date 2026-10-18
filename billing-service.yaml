@@ -2437,13 +2437,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     Pageable:
@@ -2456,22 +2456,22 @@ components:
           $ref: '#/components/schemas/Sort'
         paged:
           type: boolean
-        unpaged:
-          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
     Sort:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PaymentPlatformConfiguration:
       type: object
@@ -3058,13 +3058,6 @@ components:
           type: string
           description: Time at which the object was last modified. In ISO-8601 format.
           format: date-time
-        paymentService:
-          type: string
-          enum:
-          - STRIPE
-          - NUVEI
-          - CREDOVA
-          - EXTERNAL
         paymentServiceTotalFee:
           type: integer
           format: int32
@@ -3076,6 +3069,13 @@ components:
           format: int32
         externalTransactionId:
           type: string
+        paymentService:
+          type: string
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
         commission_reversed_amount:
           type: integer
           description: "The part of the bag's commission that this refund reversed,\
@@ -3133,13 +3133,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     PayoutTransfer:
@@ -3565,13 +3565,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     SearchTransfersReversalsRequest:
@@ -3712,13 +3712,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     AdvancedSearchRequest:
@@ -4037,13 +4037,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     PagePayoutTransfer:
@@ -4069,13 +4069,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     SearchTransfersRequest:
@@ -4175,13 +4175,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     PaymentTransaction:
@@ -4841,13 +4841,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
       description: Page of per-merchant readiness rows.
@@ -5147,13 +5147,13 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        last:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
+        last:
+          type: boolean
         empty:
           type: boolean
     TransferBatchResponse:
