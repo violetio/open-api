@@ -28,6 +28,20 @@ tags:
 - name: Invalid Products
 - name: Shop Profile
 - name: Relay
+  description: |
+    Reads data straight from the merchant's ecom platform when you call it. Nothing is served from Violet's catalog or order tables, so a response shows the platform's current state and takes as long as the platform's API does.
+
+    **Access.** Send `X-Violet-Token`, `X-Violet-App-Secret` and `X-Violet-App-Id` on every request. The token must belong to the developer that owns the app, otherwise the call fails with 403 `insufficient_permissions`. Every endpoint except Get Shipping Zones also requires the app to be subscribed to the Relay plan, and fails with the same 403 if it is not. The app must also be connected to the merchant, otherwise the call fails with 401 `merchant_not_connected`.
+
+    **Platform support.** Each endpoint lists the platforms it supports. What happens on any other platform depends on the endpoint and is described there.
+
+    **Pagination.** List endpoints paginate by cursor or by page number, depending on the platform.
+    - Cursor platforms (for example Shopify) return `next_page_cursor`. Send it back as the `next_page_cursor` query parameter to get the next page, and stop when `last` is `true`. The cursor carries the filters of the first request, so filters sent with a cursor are ignored.
+    - Page-number platforms (for example WooCommerce and BigCommerce) use `page` and `size`, and the filters must be sent on every request. Request pages until one comes back empty. Do not rely on `last` or the totals on these platforms: `last` is not set reliably, and some report totals for the current page only.
+
+    **Filters.** A filter applies only on the platforms named in its description. Other platforms ignore it without returning an error, so the results may be unfiltered.
+
+    **Errors.** Errors use Violet's standard body with `error`, `code` and `message`. If the merchant's platform rejects Violet's stored connection, an endpoint answers 400 `invalid_merchant_credentials` on the platforms that detect it, and Shopify list calls report a platform 404 the same way. On other platforms, and on endpoints that do not check, the same failure comes back as a 500.
 - name: Schedule
 paths:
   /sync/merchants/{merchant_id}/invalid_products:
@@ -214,666 +228,1940 @@ paths:
     get:
       tags:
       - Relay
-      summary: Get a collection directly from the merchant's ecom platform.
+      summary: Relay - Get Collection
+      description: |-
+        Returns one collection from the merchant's ecom platform by its platform ID.
+
+        Supported platforms: Shopify. On any other platform the response is 204 No Content.
       operationId: getCollection
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: collection_id
         in: path
+        description: ID of the collection on the merchant's platform. This is the
+          `external_id` of the collection.
         required: true
         schema:
           type: string
+          example: "428123456789"
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: The collection.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collection'
+              examples:
+                shopify:
+                  description: shopify
+                  value:
+                    external_id: "428123456789"
+                    merchant_id: 12345
+                    name: Travel Bags
+                    handle: travel-bags
+                    description: Bags for weekends away.
+                    status: ACTIVE
+                    type: CUSTOM
+                    media:
+                      source_url: https://cdn.example.com/files/travel-bags.jpg
+                      alt: Three travel bags on a bench
+                      width: 1200
+                      height: 800
+        "204":
+          description: The platform is not supported by this endpoint.
+        "400":
+          description: "On Shopify, the platform rejected Violet's stored connection\
+            \ (`invalid_merchant_credentials`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/collections/{collection_id}/offers:
     get:
       tags:
       - Relay
-      summary: Get collection offers directly from the merchant's ecom platform.
+      summary: Relay - Get Collection Offers
+      description: |-
+        Returns a page of the products in one collection on the merchant's ecom platform.
+
+        Supported platforms: Shopify and Demandware. On any other platform the response is 204 No Content.
       operationId: getCollectionOffers
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: collection_id
         in: path
+        description: ID of the collection on the merchant's platform. This is the
+          `external_id` of the collection.
         required: true
         schema:
           type: string
+          example: "428123456789"
       - name: size
         in: query
+        description: "Number of results per page. Values below 1 are treated as 1.\
+          \ Violet reduces larger values only where noted below. Elsewhere the value\
+          \ is sent on as given and the platform may apply its own limit. Caps: Shopify\
+          \ 250."
         schema:
           type: integer
           format: int32
           default: 20
       - name: page
         in: query
+        description: "Page number, starting at 1. Used by page-number platforms (for\
+          \ example WooCommerce and BigCommerce). Cursor platforms such as Shopify\
+          \ ignore it and use `next_page_cursor`."
         schema:
           type: integer
           format: int32
           default: 1
       - name: next_page_cursor
         in: query
+        description: "Cursor for the next page, copied from `next_page_cursor` in\
+          \ the previous response. Used by cursor platforms such as Shopify. Filters\
+          \ sent with a cursor are ignored, because the cursor carries the filters\
+          \ of the first request."
         schema:
           type: string
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: A page of offers in the collection.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+              examples:
+                cursor_pagination:
+                  summary: Cursor pagination (Shopify)
+                  description: cursor_pagination
+                  value:
+                    content:
+                    - external_id: "7469837175852"
+                      name: Canvas Weekender Bag
+                      description: Durable cotton canvas weekender with leather handles.
+                      source: SHOPIFY
+                      seller: Example Goods
+                      vendor: Example Goods
+                      merchant_id: 12345
+                      available: true
+                      visible: true
+                      min_price: 12900
+                      max_price: 12900
+                      currency: USD
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      publishing_status: NOT_PUBLISHED
+                      external_url: https://shop.example.com/products/canvas-weekender-bag
+                      variants:
+                      - name: Color
+                        values:
+                        - name: Natural
+                      skus:
+                      - external_id: "42001965334700"
+                        name: Canvas Weekender Bag - Natural
+                        in_stock: true
+                        qty_available: 14
+                        retail_price: 15900
+                        sale_price: 12900
+                        currency: USD
+                        taxable: true
+                        type: PHYSICAL
+                        variant_values:
+                        - variant: Color
+                          value: Natural
+                      albums:
+                      - type: OFFER
+                        name: Canvas Weekender Bag
+                        media:
+                        - external_id: "34567890123"
+                          source_url: https://cdn.example.com/files/weekender-natural.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                    last: false
+                    number_of_elements: 1
+                    empty: false
+                    next_page_cursor: eyJsYXN0X2lkIjo3NDY5ODM3MTc1ODUyfQ
+        "204":
+          description: The platform is not supported by this endpoint.
+        "400":
+          description: "On Shopify, the platform rejected Violet's stored connection\
+            \ (`invalid_merchant_credentials`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/collections:
     get:
       tags:
       - Relay
-      summary: Get multiple collections directly from the merchant's ecom platform.
+      summary: Relay - Get Collections
+      description: |-
+        Returns a page of collections from the merchant's ecom platform. A collection is a named group of products.
+
+        Supported platforms: Shopify and Demandware. On any other platform the response is 204 No Content.
       operationId: getCollections
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: size
         in: query
+        description: "Number of results per page. Values below 1 are treated as 1.\
+          \ Violet reduces larger values only where noted below. Elsewhere the value\
+          \ is sent on as given and the platform may apply its own limit. Caps: Shopify\
+          \ 250."
         schema:
           type: integer
           format: int32
           default: 20
       - name: page
         in: query
+        description: "Page number, starting at 1. Used by page-number platforms (for\
+          \ example WooCommerce and BigCommerce). Cursor platforms such as Shopify\
+          \ ignore it and use `next_page_cursor`."
         schema:
           type: integer
           format: int32
           default: 1
       - name: next_page_cursor
         in: query
+        description: "Cursor for the next page, copied from `next_page_cursor` in\
+          \ the previous response. Used by cursor platforms such as Shopify. Filters\
+          \ sent with a cursor are ignored, because the cursor carries the filters\
+          \ of the first request."
         schema:
           type: string
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: A page of collections.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageCollection'
-  /relay/merchants/{merchant_id}/customers/{order_id}:
+              examples:
+                cursor_pagination:
+                  summary: "Cursor pagination (Shopify), last page"
+                  description: cursor_pagination
+                  value:
+                    content:
+                    - external_id: "428123456789"
+                      merchant_id: 12345
+                      name: Travel Bags
+                      handle: travel-bags
+                      description: Bags for weekends away.
+                      status: ACTIVE
+                      type: CUSTOM
+                      media:
+                        source_url: https://cdn.example.com/files/travel-bags.jpg
+                        alt: Three travel bags on a bench
+                        width: 1200
+                        height: 800
+                    last: true
+                    number_of_elements: 1
+                    empty: false
+                    next_page_cursor: ""
+        "204":
+          description: The platform is not supported by this endpoint.
+        "400":
+          description: "On Shopify, the platform rejected Violet's stored connection\
+            \ (`invalid_merchant_credentials`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
+  /relay/merchants/{merchant_id}/customers/{customer_id}:
     get:
       tags:
       - Relay
-      summary: Get a single customer directly from the merchant's ecom platform
+      summary: Relay - Get Customer
+      description: |-
+        Returns one customer from the merchant's ecom platform by its platform ID. Fields the platform does not provide are omitted.
+
+        Supported platforms: Shopify, BigCommerce, WooCommerce, Magento, Square, Centra, commercetools, Miva and Saleor. On any other platform the response is 204 No Content.
       operationId: getCustomer
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
-      - name: order_id
+        example: 12345
+      - name: customer_id
         in: path
+        description: ID of the customer on the merchant's platform. This is the `external_id`
+          of the customer.
         required: true
         schema:
           type: string
+          example: "6012345678901"
       - name: include
         in: query
+        description: Accepted but has no effect.
         schema:
           type: string
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: The customer.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RelayCustomer'
+              examples:
+                shopify:
+                  description: shopify
+                  value:
+                    external_id: "6012345678901"
+                    first_name: Jordan
+                    last_name: Rivera
+                    email: jordan.rivera@example.com
+                    phone: "+15555550100"
+                    accepts_marketing: false
+                    addresses:
+                    - name: Jordan Rivera
+                      address_1: 123 Example Street
+                      address_2: Apt 4
+                      city: Springfield
+                      state: Illinois
+                      country: United States
+                      postal_code: "62701"
+                      phone: "+15555550100"
+                    status: ENABLED
+                    date_created: 2025-11-02T09:15:44.000+00:00
+                    date_last_modified: 2026-03-04T15:22:10.000+00:00
+        "204":
+          description: The platform is not supported by this endpoint.
   /relay/merchants/{merchant_id}/customers:
     get:
       tags:
       - Relay
-      summary: Get multiple customers directly from the merchant's ecom platform
+      summary: Relay - Get Customers
+      description: |-
+        Returns a page of customers from the merchant's ecom platform. Fields the platform does not provide are omitted. `state` and `country` on addresses come back as the platform reports them: Shopify returns names such as `Illinois` and `United States`, not codes.
+
+        Supported platforms: Shopify, BigCommerce, WooCommerce, Magento, Square, Centra, commercetools, Miva and Saleor. On any other platform the response is an empty page.
+
+        Pagination and filters differ by platform. See the Relay overview and the notes on each parameter.
       operationId: getCustomers
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: size
         in: query
+        description: "Number of results per page. Values below 1 are treated as 1.\
+          \ Violet reduces larger values only where noted below. Elsewhere the value\
+          \ is sent on as given and the platform may apply its own limit. Caps: Shopify\
+          \ 250, Miva 100. WooCommerce and BigCommerce do not cap customer requests,\
+          \ so a large value goes to them unchanged."
         schema:
           type: integer
           format: int32
           default: 20
       - name: page
         in: query
+        description: "Page number, starting at 1. Used by page-number platforms (for\
+          \ example WooCommerce and BigCommerce). Cursor platforms such as Shopify\
+          \ ignore it and use `next_page_cursor`."
         schema:
           type: integer
           format: int32
           default: 1
       - name: next_page_cursor
         in: query
+        description: "Cursor for the next page, copied from `next_page_cursor` in\
+          \ the previous response. Used by cursor platforms such as Shopify. Filters\
+          \ sent with a cursor are ignored, because the cursor carries the filters\
+          \ of the first request."
         schema:
           type: string
       - name: include
         in: query
+        description: Accepted but has no effect.
         schema:
           type: string
       - name: q
         in: query
-        description: Text search query
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       - name: sort
         in: query
-        description: "Sort field (e.g. created_at, updated_at)"
+        description: Accepted but not applied by any platform. Results come back in
+          the platform's default order.
         schema:
           type: string
       - name: sort_order
         in: query
-        description: "Sort direction: asc or desc"
+        description: Accepted but not applied by any platform. Results come back in
+          the platform's default order.
         schema:
           type: string
       - name: updated_after
         in: query
-        description: Filter by updated date (ISO 8601)
+        description: "Only return customers updated after this time. ISO 8601 timestamp,\
+          \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+          \ with 400 `invalid_parameter`. Applied by Shopify only."
         schema:
           type: string
       - name: updated_before
         in: query
-        description: Filter by updated date (ISO 8601)
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       - name: created_after
         in: query
-        description: Filter by created date (ISO 8601)
+        description: "Only return customers created after this time. ISO 8601 timestamp,\
+          \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+          \ with 400 `invalid_parameter`. Applied by Shopify only."
         schema:
           type: string
       - name: created_before
         in: query
-        description: Filter by created date (ISO 8601)
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: A page of customers.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageRelayCustomer'
+              examples:
+                cursor_pagination:
+                  summary: "Cursor pagination (Shopify), last page"
+                  description: cursor_pagination
+                  value:
+                    content:
+                    - external_id: "6012345678901"
+                      first_name: Jordan
+                      last_name: Rivera
+                      email: jordan.rivera@example.com
+                      phone: "+15555550100"
+                      accepts_marketing: false
+                      addresses:
+                      - name: Jordan Rivera
+                        address_1: 123 Example Street
+                        address_2: Apt 4
+                        city: Springfield
+                        state: Illinois
+                        country: United States
+                        postal_code: "62701"
+                        phone: "+15555550100"
+                      status: ENABLED
+                      date_created: 2025-11-02T09:15:44.000+00:00
+                      date_last_modified: 2026-03-04T15:22:10.000+00:00
+                    last: true
+                    number_of_elements: 1
+                    empty: false
+                    next_page_cursor: ""
+        "400":
+          description: "A parameter is invalid (`invalid_parameter`), a filter that\
+            \ is not supported yet was used (`operation_not_supported_exception`),\
+            \ or the merchant's platform rejected Violet's stored connection (`invalid_merchant_credentials`,\
+            \ on platforms that detect it)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_date:
+                  description: invalid_date
+                  value:
+                    message: "Parameter 'Invalid date format: 2026-01-15. Expected\
+                      \ ISO 8601 (e.g. 2024-01-01T00:00:00Z)' is invalid."
+                    error: invalid_parameter
+                    code: 9001
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/offers/{product_id}:
     get:
       tags:
       - Relay
-      summary: "Get a product directly from the merchant's ecom platform. An offer\
-        \ is a single merchant's offering of a product, most ecom platforms refer\
-        \ to these as products."
+      summary: Relay - Get Offer
+      description: |-
+        Returns one product from the merchant's ecom platform by its platform ID.
+
+        Supported platforms: Shopify, BigCommerce, WooCommerce, Magento, Wix, Square, Swell, commercetools, Oracle Commerce Cloud, Medusa, Squarespace, Spree, Vendo, Big Cartel, and custom integrations that provide a catalog. On any other platform the response is 204 No Content. Shopify also returns 204 for a product the merchant has excluded from Violet by tag or vendor.
       operationId: getOffer
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: product_id
         in: path
+        description: ID of the product on the merchant's platform. This is the `external_id`
+          of the offer.
         required: true
         schema:
           type: string
+          example: "7469837175852"
       - name: include
         in: query
+        description: "Comma-separated extras to include. Supported values are `categories`\
+          \ and `metadata`. Either one can require extra calls to the merchant's platform.\
+          \ Applied by Shopify only; other platforms ignore it. Any other value is\
+          \ rejected with 400 `invalid_parameter`, on every platform."
         schema:
           type: string
+        example: "categories,metadata"
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: The offer.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Offer'
+              examples:
+                shopify:
+                  description: shopify
+                  value:
+                    external_id: "7469837175852"
+                    name: Canvas Weekender Bag
+                    description: Durable cotton canvas weekender with leather handles.
+                    source: SHOPIFY
+                    seller: Example Goods
+                    vendor: Example Goods
+                    merchant_id: 12345
+                    available: true
+                    visible: true
+                    min_price: 12900
+                    max_price: 12900
+                    currency: USD
+                    type: PHYSICAL
+                    status: AVAILABLE
+                    publishing_status: NOT_PUBLISHED
+                    external_url: https://shop.example.com/products/canvas-weekender-bag
+                    variants:
+                    - name: Color
+                      values:
+                      - name: Natural
+                    skus:
+                    - external_id: "42001965334700"
+                      name: Canvas Weekender Bag - Natural
+                      in_stock: true
+                      qty_available: 14
+                      retail_price: 15900
+                      sale_price: 12900
+                      currency: USD
+                      taxable: true
+                      type: PHYSICAL
+                      variant_values:
+                      - variant: Color
+                        value: Natural
+                    albums:
+                    - type: OFFER
+                      name: Canvas Weekender Bag
+                      media:
+                      - external_id: "34567890123"
+                        source_url: https://cdn.example.com/files/weekender-natural.jpg
+                        type: IMAGE
+                        display_order: 1
+                        primary: true
+        "204":
+          description: "The platform is not supported by this endpoint, or the product\
+            \ is excluded by the merchant's tag or vendor settings (Shopify)."
+        "400":
+          description: "A parameter is invalid (`invalid_parameter`), a filter that\
+            \ is not supported yet was used (`operation_not_supported_exception`),\
+            \ or the merchant's platform rejected Violet's stored connection (`invalid_merchant_credentials`,\
+            \ on platforms that detect it)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_include:
+                  description: invalid_include
+                  value:
+                    message: "Parameter 'include: foo' is invalid."
+                    error: invalid_parameter
+                    code: 9001
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/offers:
     get:
       tags:
       - Relay
-      summary: "Get multiple products directly from the merchant's ecom platform.\
-        \ An offer is a single merchant's offering of a product, most ecom platforms\
-        \ refer to these as products."
+      summary: Relay - Get Offers
+      description: |-
+        Returns a page of products from the merchant's ecom platform. An offer is one merchant's listing of a product, which most platforms call a product.
+
+        Supported platforms: Shopify, BigCommerce, WooCommerce, Magento, Wix, Square, Swell, commercetools, Oracle Commerce Cloud, Medusa, Squarespace, Spree, Vendo, Big Cartel, and custom integrations that provide a catalog. On any other platform the response is an empty page.
+
+        Pagination and filters differ by platform. See the Relay overview and the notes on each parameter.
       operationId: getOffers
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: size
         in: query
+        description: "Number of results per page. Values below 1 are treated as 1.\
+          \ Violet reduces larger values only where noted below. Elsewhere the value\
+          \ is sent on as given and the platform may apply its own limit. Caps: Shopify\
+          \ and BigCommerce 250, WooCommerce 100."
         schema:
           type: integer
           format: int32
           default: 20
       - name: page
         in: query
+        description: "Page number, starting at 1. Used by page-number platforms (for\
+          \ example WooCommerce and BigCommerce). Cursor platforms such as Shopify\
+          \ ignore it and use `next_page_cursor`."
         schema:
           type: integer
           format: int32
           default: 1
       - name: next_page_cursor
         in: query
+        description: "Cursor for the next page, copied from `next_page_cursor` in\
+          \ the previous response. Used by cursor platforms such as Shopify. Filters\
+          \ sent with a cursor are ignored, because the cursor carries the filters\
+          \ of the first request."
         schema:
           type: string
       - name: include
         in: query
+        description: "Comma-separated extras to include. Supported values are `categories`\
+          \ and `metadata`. Either one can require extra calls to the merchant's platform.\
+          \ Applied by Shopify only; other platforms ignore it. Any other value is\
+          \ rejected with 400 `invalid_parameter`, on every platform."
         schema:
           type: string
+        example: "categories,metadata"
       - name: q
         in: query
-        description: Reserved for future offer text search support; currently unsupported
+        description: Not supported. A non-blank value is rejected with 400 `operation_not_supported_exception`.
         schema:
           type: string
       - name: status
         in: query
-        description: "Filter by product status (e.g. active, draft, archived)"
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       - name: category_id
         in: query
-        description: Filter by category or collection ID
+        description: "Only return products in this category or collection. Applied\
+          \ by WooCommerce and BigCommerce (a category ID) and by Shopify (a numeric\
+          \ collection ID, any other value is ignored). Shopify applies it only for\
+          \ merchants on a custom app connection, and ignores it on other connections."
         schema:
           type: string
+          example: "428123456789"
       - name: sort
         in: query
-        description: "Sort field (e.g. created_at, updated_at, title)"
+        description: Accepted but not applied by any platform. Results come back in
+          the platform's default order.
         schema:
           type: string
       - name: sort_order
         in: query
-        description: "Sort direction: asc or desc"
+        description: Accepted but not applied by any platform. Results come back in
+          the platform's default order.
         schema:
           type: string
       - name: updated_after
         in: query
-        description: Filter by updated date (ISO 8601)
+        description: "Only return products updated after this time. ISO 8601 timestamp,\
+          \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+          \ with 400 `invalid_parameter`. Applied by WooCommerce, BigCommerce and\
+          \ Shopify. Shopify applies it only for merchants on a custom app connection,\
+          \ and ignores it on other connections."
         schema:
           type: string
       - name: updated_before
         in: query
-        description: Filter by updated date (ISO 8601)
+        description: "Only return products updated before this time. ISO 8601 timestamp,\
+          \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+          \ with 400 `invalid_parameter`. Applied by BigCommerce and Shopify. Shopify\
+          \ applies it only for merchants on a custom app connection, and ignores\
+          \ it on other connections."
         schema:
           type: string
       - name: created_after
         in: query
-        description: Filter by created date (ISO 8601)
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       - name: created_before
         in: query
-        description: Filter by created date (ISO 8601)
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: A page of offers.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+              examples:
+                cursor_pagination:
+                  summary: Cursor pagination (Shopify)
+                  description: cursor_pagination
+                  value:
+                    content:
+                    - external_id: "7469837175852"
+                      name: Canvas Weekender Bag
+                      description: Durable cotton canvas weekender with leather handles.
+                      source: SHOPIFY
+                      seller: Example Goods
+                      vendor: Example Goods
+                      merchant_id: 12345
+                      available: true
+                      visible: true
+                      min_price: 12900
+                      max_price: 12900
+                      currency: USD
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      publishing_status: NOT_PUBLISHED
+                      external_url: https://shop.example.com/products/canvas-weekender-bag
+                      variants:
+                      - name: Color
+                        values:
+                        - name: Natural
+                      skus:
+                      - external_id: "42001965334700"
+                        name: Canvas Weekender Bag - Natural
+                        in_stock: true
+                        qty_available: 14
+                        retail_price: 15900
+                        sale_price: 12900
+                        currency: USD
+                        taxable: true
+                        type: PHYSICAL
+                        variant_values:
+                        - variant: Color
+                          value: Natural
+                      albums:
+                      - type: OFFER
+                        name: Canvas Weekender Bag
+                        media:
+                        - external_id: "34567890123"
+                          source_url: https://cdn.example.com/files/weekender-natural.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                    last: false
+                    number_of_elements: 1
+                    empty: false
+                    next_page_cursor: eyJsYXN0X2lkIjo3NDY5ODM3MTc1ODUyfQ
+                page_number_pagination:
+                  summary: "Page-number pagination (WooCommerce). `last` and the totals\
+                    \ only describe this page, so keep requesting pages until `content`\
+                    \ is empty."
+                  description: page_number_pagination
+                  value:
+                    content:
+                    - external_id: "1187"
+                      name: Canvas Weekender Bag
+                      source: WOOCOMMERCE
+                      merchant_id: 12345
+                      available: true
+                      visible: true
+                      min_price: 12900
+                      max_price: 12900
+                      currency: USD
+                      type: PHYSICAL
+                      status: AVAILABLE
+                    last: false
+                    total_pages: 1
+                    total_elements: 1
+                    first: true
+                    number_of_elements: 1
+                    size: 1
+                    number: 1
+                    empty: false
+                    pageable:
+                      page_number: 1
+                      page_size: 1
+                      sort:
+                        unsorted: true
+                        sorted: false
+                        empty: false
+                      offset: 1
+                      paged: true
+                      unpaged: false
+                    sort:
+                      unsorted: true
+                      sorted: false
+                      empty: false
+        "400":
+          description: "A parameter is invalid (`invalid_parameter`), a filter that\
+            \ is not supported yet was used (`operation_not_supported_exception`),\
+            \ or the merchant's platform rejected Violet's stored connection (`invalid_merchant_credentials`,\
+            \ on platforms that detect it)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_include:
+                  description: invalid_include
+                  value:
+                    message: "Parameter 'include: foo' is invalid."
+                    error: invalid_parameter
+                    code: 9001
+                invalid_date:
+                  description: invalid_date
+                  value:
+                    message: "Parameter 'Invalid date format: 2026-01-15. Expected\
+                      \ ISO 8601 (e.g. 2024-01-01T00:00:00Z)' is invalid."
+                    error: invalid_parameter
+                    code: 9001
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/orders/{order_id}:
     get:
       tags:
       - Relay
-      summary: Get a single order directly from the merchant's ecom platform
+      summary: Relay - Get Order
+      description: |-
+        Returns one order from the merchant's ecom platform by its platform ID, in Violet's order model. Amounts are integer cents.
+
+        Supported platforms: Shopify, BigCommerce, WooCommerce, Magento, Wix, Square, Demandware, Squarespace, Rithum, Swell, commercetools, Shoptet, Oracle Commerce Cloud, Medusa, Spree, Vendo and Big Cartel. On any other platform the response is 204 No Content.
       operationId: getOrder
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: order_id
         in: path
+        description: ID of the order on the merchant's platform. This is the `external_id`
+          of the order's bag.
         required: true
         schema:
           type: string
+          example: "5123456789012"
       - name: include
         in: query
+        description: Accepted but has no effect.
         schema:
           type: string
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: The order.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+              examples:
+                shopify:
+                  description: shopify
+                  value:
+                    status: COMPLETED
+                    currency: USD
+                    priced: true
+                    sub_total: 12900
+                    shipping_total: 800
+                    tax_total: 1032
+                    discount_total: 0
+                    total: 14732
+                    customer:
+                      first_name: Jordan
+                      last_name: Rivera
+                      email: jordan.rivera@example.com
+                      external_id: "6012345678901"
+                    shipping_address:
+                      name: Jordan Rivera
+                      address_1: 123 Example Street
+                      address_2: Apt 4
+                      city: Springfield
+                      state: IL
+                      country: US
+                      postal_code: "62701"
+                      phone: "+15555550100"
+                    billing_address:
+                      name: Jordan Rivera
+                      address_1: 123 Example Street
+                      address_2: Apt 4
+                      city: Springfield
+                      state: IL
+                      country: US
+                      postal_code: "62701"
+                      phone: "+15555550100"
+                    bags:
+                    - merchant_id: 12345
+                      external_id: "5123456789012"
+                      status: COMPLETED
+                      financial_status: PAID
+                      fulfillment_status: SHIPPED
+                      currency: USD
+                      sub_total: 12900
+                      shipping_total: 800
+                      tax_total: 1032
+                      discount_total: 0
+                      total: 14732
+                      taxes_included: false
+                      skus:
+                      - external_id: "42001965334700"
+                        name: Canvas Weekender Bag - Natural
+                        quantity: 1
+                        price: 12900
+                        status: SHIPPED
+                      shipping_method:
+                        label: Standard Shipping
+                        price: 800
+                        external_id: shopify-Standard%20Shipping-8.00
+                      taxes:
+                      - description: IL State Tax
+                        rate: 0.08
+                        amount: 1032
+                      fulfillments:
+                      - external_id: "4412345678901"
+                        status: SUCCESS
+                        raw_carrier: USPS
+                        tracking_number: "9400100000000000000000"
+                        tracking_url: https://tools.example.com/track/9400100000000000000000
+        "204":
+          description: The platform is not supported by this endpoint.
+        "404":
+          description: "On Shopify, the order was not found (`order_not_found`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                order_not_found:
+                  description: order_not_found
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
+        "400":
+          description: "On Shopify, WooCommerce and BigCommerce, the platform rejected\
+            \ Violet's stored connection (`invalid_merchant_credentials`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/orders/{order_id}/refunds:
     get:
       tags:
       - Relay
-      summary: Get refunds for an order directly from the merchant's ecom platform.
+      summary: Relay - Get Order Refunds
+      description: |-
+        Returns the refunds recorded against an order on the merchant's ecom platform. The response is a JSON array and is not paged. Unlike the order endpoints, `amount` values are decimal strings in the order's currency (for example `129.0`), not cents, and their formatting is not the same on every platform. `currency` is only filled on Shopify, and `sku_external_id` is not filled yet. The order ID must be numeric.
+
+        Supported platforms: Shopify, BigCommerce and WooCommerce. On any other platform the response is 400 `operation_not_supported_exception`.
       operationId: getOrderRefunds
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: order_id
         in: path
+        description: ID of the order on the merchant's platform. This is the `external_id`
+          of the order's bag.
         required: true
         schema:
           type: string
+          example: "5123456789012"
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: The refunds for the order. The array is empty if there are
+            none.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/RelayRefund'
+              examples:
+                shopify:
+                  description: shopify
+                  value:
+                  - external_id: "929361462325"
+                    order_id: "5123456789012"
+                    amount: "129.0"
+                    currency: USD
+                    reason: Customer returned the item
+                    created_at: 2026-03-06T14:05:12.000+00:00
+                    line_items:
+                    - external_id: "1234567890123"
+                      quantity: 1
+                      amount: "129.0"
+        "400":
+          description: The platform is not supported by this endpoint (`operation_not_supported_exception`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                platform_not_supported:
+                  description: platform_not_supported
+                  value:
+                    message: "Operation not supported. Caused by: Relay order refunds\
+                      \ are not currently supported for MAGENTO.."
+                    error: operation_not_supported_exception
+                    code: 9911
   /relay/merchants/{merchant_id}/orders:
     get:
       tags:
       - Relay
-      summary: Get multiple orders directly from the merchant's ecom platform
+      summary: Relay - Get Orders
+      description: |-
+        Returns a page of orders from the merchant's ecom platform, in Violet's order model. The platform's own order ID is the `external_id` of the order's bag. Amounts are integer cents, so 12900 is 129.00 in the order's currency.
+
+        Supported platforms: Shopify, BigCommerce, WooCommerce, Magento, Wix, Square, Demandware, Swell, commercetools, Shoptet, Oracle Commerce Cloud, Medusa, Squarespace, Spree, Vendo and Big Cartel. On any other platform the response is an empty page.
+
+        Pagination and filters differ by platform. See the Relay overview and the notes on each parameter.
       operationId: getOrders
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       - name: size
         in: query
+        description: "Number of results per page. Values below 1 are treated as 1.\
+          \ Violet reduces larger values only where noted below. Elsewhere the value\
+          \ is sent on as given and the platform may apply its own limit. Caps: Shopify\
+          \ and BigCommerce 250, WooCommerce 100, Shoptet 50."
         schema:
           type: integer
           format: int32
           default: 20
       - name: page
         in: query
+        description: "Page number, starting at 1. Used by page-number platforms (for\
+          \ example WooCommerce and BigCommerce). Cursor platforms such as Shopify\
+          \ ignore it and use `next_page_cursor`."
         schema:
           type: integer
           format: int32
           default: 1
       - name: next_page_cursor
         in: query
+        description: "Cursor for the next page, copied from `next_page_cursor` in\
+          \ the previous response. Used by cursor platforms such as Shopify. Filters\
+          \ sent with a cursor are ignored, because the cursor carries the filters\
+          \ of the first request."
         schema:
           type: string
       - name: include
         in: query
+        description: Accepted but has no effect.
         schema:
           type: string
       - name: q
         in: query
-        description: Text search query
+        description: Free-text search. Applied by WooCommerce only.
         schema:
           type: string
       - name: status
         in: query
-        description: "Filter by order status (e.g. open, closed, cancelled)"
+        description: "Only return orders with this status. Applied by WooCommerce\
+          \ only, which uses it as its own order status filter (for example `processing`\
+          \ or `completed`)."
         schema:
           type: string
+        example: processing
       - name: financial_status
         in: query
-        description: "Filter by financial status (e.g. paid, pending, refunded, voided)"
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       - name: fulfillment_status
         in: query
-        description: "Filter by fulfillment status (e.g. shipped, unshipped, partial)"
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       - name: sort
         in: query
-        description: "Sort field (e.g. created_at, updated_at)"
+        description: Accepted but not applied by any platform. Results come back in
+          the platform's default order.
         schema:
           type: string
       - name: sort_order
         in: query
-        description: "Sort direction: asc or desc"
+        description: Accepted but not applied by any platform. Results come back in
+          the platform's default order.
         schema:
           type: string
       - name: updated_after
         in: query
-        description: Filter by updated date (ISO 8601)
+        description: "Only return orders updated after this time. ISO 8601 timestamp,\
+          \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+          \ with 400 `invalid_parameter`. Applied by Shopify only."
         schema:
           type: string
       - name: updated_before
         in: query
-        description: Filter by updated date (ISO 8601)
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       - name: created_after
         in: query
-        description: Filter by created date (ISO 8601)
+        description: "Only return orders created after this time. ISO 8601 timestamp,\
+          \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+          \ with 400 `invalid_parameter`. Applied by Shopify and WooCommerce."
         schema:
           type: string
       - name: created_before
         in: query
-        description: Filter by created date (ISO 8601)
+        description: Accepted but not applied by any platform.
         schema:
           type: string
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: A page of orders.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOrder'
+              examples:
+                cursor_pagination:
+                  summary: Cursor pagination (Shopify)
+                  description: cursor_pagination
+                  value:
+                    content:
+                    - status: COMPLETED
+                      currency: USD
+                      priced: true
+                      sub_total: 12900
+                      shipping_total: 800
+                      tax_total: 1032
+                      discount_total: 0
+                      total: 14732
+                      customer:
+                        first_name: Jordan
+                        last_name: Rivera
+                        email: jordan.rivera@example.com
+                        external_id: "6012345678901"
+                      shipping_address:
+                        name: Jordan Rivera
+                        address_1: 123 Example Street
+                        address_2: Apt 4
+                        city: Springfield
+                        state: IL
+                        country: US
+                        postal_code: "62701"
+                        phone: "+15555550100"
+                      billing_address:
+                        name: Jordan Rivera
+                        address_1: 123 Example Street
+                        address_2: Apt 4
+                        city: Springfield
+                        state: IL
+                        country: US
+                        postal_code: "62701"
+                        phone: "+15555550100"
+                      bags:
+                      - merchant_id: 12345
+                        external_id: "5123456789012"
+                        status: COMPLETED
+                        financial_status: PAID
+                        fulfillment_status: SHIPPED
+                        currency: USD
+                        sub_total: 12900
+                        shipping_total: 800
+                        tax_total: 1032
+                        discount_total: 0
+                        total: 14732
+                        taxes_included: false
+                        skus:
+                        - external_id: "42001965334700"
+                          name: Canvas Weekender Bag - Natural
+                          quantity: 1
+                          price: 12900
+                          status: SHIPPED
+                        shipping_method:
+                          label: Standard Shipping
+                          price: 800
+                          external_id: shopify-Standard%20Shipping-8.00
+                        taxes:
+                        - description: IL State Tax
+                          rate: 0.08
+                          amount: 1032
+                        fulfillments:
+                        - external_id: "4412345678901"
+                          status: SUCCESS
+                          raw_carrier: USPS
+                          tracking_number: "9400100000000000000000"
+                          tracking_url: https://tools.example.com/track/9400100000000000000000
+                    last: false
+                    number_of_elements: 1
+                    empty: false
+                    next_page_cursor: eyJsYXN0X2lkIjo1MTIzNDU2Nzg5MDEyfQ
+        "400":
+          description: "A parameter is invalid (`invalid_parameter`), a filter that\
+            \ is not supported yet was used (`operation_not_supported_exception`),\
+            \ or the merchant's platform rejected Violet's stored connection (`invalid_merchant_credentials`,\
+            \ on platforms that detect it)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_date:
+                  description: invalid_date
+                  value:
+                    message: "Parameter 'Invalid date format: 2026-01-15. Expected\
+                      \ ISO 8601 (e.g. 2024-01-01T00:00:00Z)' is invalid."
+                    error: invalid_parameter
+                    code: 9001
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/shipping-zones:
     get:
       tags:
       - Relay
       summary: Relay - Get Shipping Zones
-      description: Get realtime shipping zone data directly from the merchant’s ecom
-        platform.
+      description: |-
+        Get realtime shipping zone data directly from the merchant’s ecom platform. Unlike the other Relay endpoints, this one does not require the Relay plan.
+
+        Supported platforms: Shopify, BigCommerce, WooCommerce and Ecwid. On any other platform the response is 400 `operation_not_supported_exception`.
       operationId: getShippingZones
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: The token does not belong to the developer that owns the app
+            (`insufficient_permissions`). This endpoint does not require the Relay
+            plan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: The merchant's shipping zones.
+          headers:
+            X-Violet-Platform:
+              description: "The merchant's ecom platform, for example `SHOPIFY`."
+              style: simple
+              schema:
+                type: string
+            X-Violet-Merchant-Id:
+              description: ID of the merchant the zones belong to.
+              style: simple
+              schema:
+                type: integer
           content:
             application/json:
               schema:
@@ -972,168 +2260,696 @@ paths:
                     min_price: 5000
                     price_type: SUBTOTAL
                     exclude_products_with_custom_shipping: true
+        "204":
+          description: The merchant's platform has no shipping zones. The `X-Violet-Merchant-Id`
+            and `X-Violet-Platform` headers are still returned.
+        "400":
+          description: The platform is not supported by this endpoint (`operation_not_supported_exception`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                platform_not_supported:
+                  description: platform_not_supported
+                  value:
+                    message: "Operation not supported. Caused by: Relay order refunds\
+                      \ are not currently supported for MAGENTO.."
+                    error: operation_not_supported_exception
+                    code: 9911
   /relay/merchants/{merchant_id}/store:
     get:
       tags:
       - Relay
-      summary: Get store profile information directly from the merchant's ecom platform.
+      summary: Relay - Get Store
+      description: |-
+        Returns the profile of the merchant's store: name, contact email, currency, URLs and plan. Fields the platform does not provide are omitted. Shopify does not return `primary_address` or `shop_locations`.
+
+        Supported platforms: Shopify, BigCommerce, WooCommerce, Magento and Square. On any other platform the response is 400 `operation_not_supported_exception`.
       operationId: getStoreInfo
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: The store profile.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ShopProfile'
+              examples:
+                shopify:
+                  description: shopify
+                  value:
+                    email: owner@example.com
+                    name: Example Goods
+                    external_id: gid://shopify/Shop/61234567890
+                    plan: Basic
+                    currency: USD
+                    url: example-goods.myshopify.com
+                    custom_url: https://shop.example.com
+                    country_code: US
+                    state_code: IL
+                    language: en
+                    has_active_plan: true
+                    has_shipping_methods: true
+        "400":
+          description: "The platform is not supported by this endpoint (`operation_not_supported_exception`),\
+            \ or, on Shopify, BigCommerce and Square, the platform rejected Violet's\
+            \ stored connection (`invalid_merchant_credentials`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                platform_not_supported:
+                  description: platform_not_supported
+                  value:
+                    message: "Operation not supported. Caused by: Relay order refunds\
+                      \ are not currently supported for MAGENTO.."
+                    error: operation_not_supported_exception
+                    code: 9911
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/customers/search:
     post:
       tags:
       - Relay
-      summary: Search customers on the merchant's ecom platform with advanced filters
-        including email address.
+      summary: Relay - Search Customers
+      description: "Searches the merchant's customers with the filters in a JSON body.\
+        \ It returns the same results as Get Customers with the same values as query\
+        \ parameters, so the platform support, pagination and filter notes there apply\
+        \ here too. `ids` and `email` are not supported yet."
       operationId: searchCustomers
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       requestBody:
+        description: The search filters. Every field is optional.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RelayCustomerSearchRequest'
+            examples:
+              customers_created_since:
+                description: customers_created_since
+                value:
+                  created_after: 2026-01-01T00:00:00Z
+                  size: 100
+        required: true
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: A page of customers.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageRelayCustomer'
+              examples:
+                cursor_pagination:
+                  summary: "Cursor pagination (Shopify), last page"
+                  description: cursor_pagination
+                  value:
+                    content:
+                    - external_id: "6012345678901"
+                      first_name: Jordan
+                      last_name: Rivera
+                      email: jordan.rivera@example.com
+                      phone: "+15555550100"
+                      accepts_marketing: false
+                      addresses:
+                      - name: Jordan Rivera
+                        address_1: 123 Example Street
+                        address_2: Apt 4
+                        city: Springfield
+                        state: Illinois
+                        country: United States
+                        postal_code: "62701"
+                        phone: "+15555550100"
+                      status: ENABLED
+                      date_created: 2025-11-02T09:15:44.000+00:00
+                      date_last_modified: 2026-03-04T15:22:10.000+00:00
+                    last: true
+                    number_of_elements: 1
+                    empty: false
+                    next_page_cursor: ""
+        "400":
+          description: "A parameter is invalid (`invalid_parameter`), a filter that\
+            \ is not supported yet was used (`operation_not_supported_exception`),\
+            \ or the merchant's platform rejected Violet's stored connection (`invalid_merchant_credentials`,\
+            \ on platforms that detect it)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_date:
+                  description: invalid_date
+                  value:
+                    message: "Parameter 'Invalid date format: 2026-01-15. Expected\
+                      \ ISO 8601 (e.g. 2024-01-01T00:00:00Z)' is invalid."
+                    error: invalid_parameter
+                    code: 9001
+                filter_not_supported:
+                  description: filter_not_supported
+                  value:
+                    message: "Operation not supported. Caused by: The 'ids' filter\
+                      \ is not yet supported on orders/search. This filter will be\
+                      \ available in a future release.."
+                    error: operation_not_supported_exception
+                    code: 9911
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/offers/search:
     post:
       tags:
       - Relay
-      summary: Search products on the merchant's ecom platform with advanced filters.
-        Accepts a JSON body for richer query capabilities than the GET list endpoint.
+      summary: Relay - Search Offers
+      description: "Searches the merchant's products with the filters in a JSON body.\
+        \ It returns the same results as Get Offers with the same values as query\
+        \ parameters, so the platform support, pagination and filter notes there apply\
+        \ here too. `ids` is not supported yet."
       operationId: searchOffers
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       requestBody:
+        description: The search filters. Every field is optional.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RelayOfferSearchRequest'
+            examples:
+              recently_updated_in_a_collection:
+                summary: "Products in a category updated since a date. Applied by\
+                  \ WooCommerce, BigCommerce and Shopify custom app connections; other\
+                  \ Shopify connections ignore both filters."
+                description: recently_updated_in_a_collection
+                value:
+                  category_id: "428123456789"
+                  updated_after: 2026-03-01T00:00:00Z
+                  include:
+                  - categories
+                  - metadata
+                  size: 50
+        required: true
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: A page of offers.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOffer'
+              examples:
+                cursor_pagination:
+                  summary: Cursor pagination (Shopify)
+                  description: cursor_pagination
+                  value:
+                    content:
+                    - external_id: "7469837175852"
+                      name: Canvas Weekender Bag
+                      description: Durable cotton canvas weekender with leather handles.
+                      source: SHOPIFY
+                      seller: Example Goods
+                      vendor: Example Goods
+                      merchant_id: 12345
+                      available: true
+                      visible: true
+                      min_price: 12900
+                      max_price: 12900
+                      currency: USD
+                      type: PHYSICAL
+                      status: AVAILABLE
+                      publishing_status: NOT_PUBLISHED
+                      external_url: https://shop.example.com/products/canvas-weekender-bag
+                      variants:
+                      - name: Color
+                        values:
+                        - name: Natural
+                      skus:
+                      - external_id: "42001965334700"
+                        name: Canvas Weekender Bag - Natural
+                        in_stock: true
+                        qty_available: 14
+                        retail_price: 15900
+                        sale_price: 12900
+                        currency: USD
+                        taxable: true
+                        type: PHYSICAL
+                        variant_values:
+                        - variant: Color
+                          value: Natural
+                      albums:
+                      - type: OFFER
+                        name: Canvas Weekender Bag
+                        media:
+                        - external_id: "34567890123"
+                          source_url: https://cdn.example.com/files/weekender-natural.jpg
+                          type: IMAGE
+                          display_order: 1
+                          primary: true
+                    last: false
+                    number_of_elements: 1
+                    empty: false
+                    next_page_cursor: eyJsYXN0X2lkIjo3NDY5ODM3MTc1ODUyfQ
+        "400":
+          description: "A parameter is invalid (`invalid_parameter`), a filter that\
+            \ is not supported yet was used (`operation_not_supported_exception`),\
+            \ or the merchant's platform rejected Violet's stored connection (`invalid_merchant_credentials`,\
+            \ on platforms that detect it)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_include:
+                  description: invalid_include
+                  value:
+                    message: "Parameter 'include: foo' is invalid."
+                    error: invalid_parameter
+                    code: 9001
+                filter_not_supported:
+                  description: filter_not_supported
+                  value:
+                    message: "Operation not supported. Caused by: The 'ids' filter\
+                      \ is not yet supported on orders/search. This filter will be\
+                      \ available in a future release.."
+                    error: operation_not_supported_exception
+                    code: 9911
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
   /relay/merchants/{merchant_id}/orders/search:
     post:
       tags:
       - Relay
-      summary: "Search orders on the merchant's ecom platform with advanced filters\
-        \ including customer email, financial status, and fulfillment status."
+      summary: Relay - Search Orders
+      description: "Searches the merchant's orders with the filters in a JSON body.\
+        \ It returns the same results as Get Orders with the same values as query\
+        \ parameters, so the platform support, pagination and filter notes there apply\
+        \ here too. `ids` and `customer_email` are not supported yet."
       operationId: searchOrders
       parameters:
       - name: X-Violet-Token
         in: header
+        description: Violet auth token. It must belong to the developer that owns
+          the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Secret
         in: header
+        description: Secret of the app in `X-Violet-App-Id`.
         required: true
         schema:
           type: string
       - name: X-Violet-App-Id
         in: header
+        description: ID of the Violet app making the request. The app must be connected
+          to the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 20001
       - name: merchant_id
         in: path
+        description: Violet ID of the merchant.
         required: true
         schema:
           type: integer
           format: int32
+        example: 12345
       requestBody:
+        description: The search filters. Every field is optional.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RelayOrderSearchRequest'
+            examples:
+              shopify_recent_orders:
+                summary: "Shopify: orders created and updated since a date"
+                description: shopify_recent_orders
+                value:
+                  created_after: 2026-03-01T00:00:00Z
+                  updated_after: 2026-03-04T00:00:00Z
+                  size: 50
+              woocommerce_processing_orders:
+                summary: "WooCommerce: text search and status, by page number"
+                description: woocommerce_processing_orders
+                value:
+                  query: "1042"
+                  status: processing
+                  created_after: 2026-03-01T00:00:00Z
+                  page: 1
+                  size: 25
+        required: true
       responses:
-        default:
-          description: default response
+        "401":
+          description: The app is not connected to the merchant (`merchant_not_connected`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant with ID 12345. Merchant
+                      must connect to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The token does not belong to the developer that owns the app,\
+            \ or the app is not subscribed to the Relay plan (`insufficient_permissions`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_permissions:
+                  description: insufficient_permissions
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "500":
+          description: The request failed in Violet or while reading from the merchant's
+            platform.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "200":
+          description: A page of orders.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VioletPageOrder'
+              examples:
+                cursor_pagination:
+                  summary: Cursor pagination (Shopify)
+                  description: cursor_pagination
+                  value:
+                    content:
+                    - status: COMPLETED
+                      currency: USD
+                      priced: true
+                      sub_total: 12900
+                      shipping_total: 800
+                      tax_total: 1032
+                      discount_total: 0
+                      total: 14732
+                      customer:
+                        first_name: Jordan
+                        last_name: Rivera
+                        email: jordan.rivera@example.com
+                        external_id: "6012345678901"
+                      shipping_address:
+                        name: Jordan Rivera
+                        address_1: 123 Example Street
+                        address_2: Apt 4
+                        city: Springfield
+                        state: IL
+                        country: US
+                        postal_code: "62701"
+                        phone: "+15555550100"
+                      billing_address:
+                        name: Jordan Rivera
+                        address_1: 123 Example Street
+                        address_2: Apt 4
+                        city: Springfield
+                        state: IL
+                        country: US
+                        postal_code: "62701"
+                        phone: "+15555550100"
+                      bags:
+                      - merchant_id: 12345
+                        external_id: "5123456789012"
+                        status: COMPLETED
+                        financial_status: PAID
+                        fulfillment_status: SHIPPED
+                        currency: USD
+                        sub_total: 12900
+                        shipping_total: 800
+                        tax_total: 1032
+                        discount_total: 0
+                        total: 14732
+                        taxes_included: false
+                        skus:
+                        - external_id: "42001965334700"
+                          name: Canvas Weekender Bag - Natural
+                          quantity: 1
+                          price: 12900
+                          status: SHIPPED
+                        shipping_method:
+                          label: Standard Shipping
+                          price: 800
+                          external_id: shopify-Standard%20Shipping-8.00
+                        taxes:
+                        - description: IL State Tax
+                          rate: 0.08
+                          amount: 1032
+                        fulfillments:
+                        - external_id: "4412345678901"
+                          status: SUCCESS
+                          raw_carrier: USPS
+                          tracking_number: "9400100000000000000000"
+                          tracking_url: https://tools.example.com/track/9400100000000000000000
+                    last: false
+                    number_of_elements: 1
+                    empty: false
+                    next_page_cursor: eyJsYXN0X2lkIjo1MTIzNDU2Nzg5MDEyfQ
+        "400":
+          description: "A parameter is invalid (`invalid_parameter`), a filter that\
+            \ is not supported yet was used (`operation_not_supported_exception`),\
+            \ or the merchant's platform rejected Violet's stored connection (`invalid_merchant_credentials`,\
+            \ on platforms that detect it)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_date:
+                  description: invalid_date
+                  value:
+                    message: "Parameter 'Invalid date format: 2026-01-15. Expected\
+                      \ ISO 8601 (e.g. 2024-01-01T00:00:00Z)' is invalid."
+                    error: invalid_parameter
+                    code: 9001
+                filter_not_supported:
+                  description: filter_not_supported
+                  value:
+                    message: "Operation not supported. Caused by: The 'ids' filter\
+                      \ is not yet supported on orders/search. This filter will be\
+                      \ available in a future release.."
+                    error: operation_not_supported_exception
+                    code: 9911
+                invalid_merchant_credentials:
+                  description: invalid_merchant_credentials
+                  value:
+                    message: The provided merchant credentials are invalid.
+                    error: invalid_merchant_credentials
+                    code: 2503
 components:
   schemas:
     InvalidProduct:
@@ -3174,11 +4990,11 @@ components:
       - total
       type: object
       properties:
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_id:
           type: integer
           format: int64
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         bag_status:
           type: string
           enum:
@@ -5058,33 +6874,59 @@ components:
       properties:
         quantity:
           type: integer
+          description: Number of units refunded.
           format: int32
+          example: 1
         amount:
           type: string
+          description: "Amount refunded for this line, as a decimal string in the\
+            \ order's currency, not cents."
+          example: "129.0"
         external_id:
           type: string
+          description: ID of the refund line as the platform reports it. BigCommerce
+            reports the ID of the refunded order item.
+          example: "1234567890123"
         sku_external_id:
           type: string
+          description: Not filled yet.
+      description: One refunded line of a refund.
     RelayRefund:
       type: object
       properties:
         amount:
           type: string
+          description: "Total refunded, as a decimal string in the order's currency,\
+            \ not cents. Formatting differs by platform (for example `129.0` or `129.00`)."
+          example: "129.0"
         currency:
           type: string
+          description: Currency code of the refund. Only filled on Shopify.
+          example: USD
         reason:
           type: string
+          description: "Reason or note recorded with the refund, if the platform keeps\
+            \ one."
+          example: Customer returned the item
         external_id:
           type: string
+          description: ID of the refund on the merchant's platform.
+          example: "929361462325"
         order_id:
           type: string
+          description: "ID of the order the refund belongs to, as sent in the request\
+            \ path."
+          example: "5123456789012"
         created_at:
           type: string
+          description: "When the refund was created, as an ISO 8601 timestamp."
           format: date-time
         line_items:
           type: array
+          description: "The refunded lines, if the platform reports them."
           items:
             $ref: '#/components/schemas/LineItem'
+      description: A refund recorded against an order on the merchant's ecom platform.
     VioletPageOrder:
       type: object
       properties:
@@ -5524,107 +7366,235 @@ components:
       properties:
         query:
           type: string
+          description: Accepted but not applied by any platform.
         email:
           type: string
+          description: Not supported yet. A non-empty value is rejected with 400 `operation_not_supported_exception`.
         ids:
           type: array
+          description: Not supported yet. A non-empty value is rejected with 400 `operation_not_supported_exception`.
           items:
             type: string
+            description: Not supported yet. A non-empty value is rejected with 400
+              `operation_not_supported_exception`.
         sort:
           type: string
+          description: Accepted but not applied by any platform. Results come back
+            in the platform's default order.
         page:
           type: integer
+          description: "Page number, starting at 1. Used by page-number platforms\
+            \ (for example WooCommerce and BigCommerce). Cursor platforms such as\
+            \ Shopify ignore it and use `next_page_cursor`. Defaults to 1."
           format: int32
+          example: 1
         size:
           type: integer
+          description: "Number of results per page. Values below 1 are treated as\
+            \ 1. Violet reduces larger values only where noted below. Elsewhere the\
+            \ value is sent on as given and the platform may apply its own limit.\
+            \ Caps: Shopify 250, Miva 100. WooCommerce and BigCommerce do not cap\
+            \ customer requests, so a large value goes to them unchanged. Defaults\
+            \ to 20."
           format: int32
+          example: 100
         sort_order:
           type: string
+          description: Accepted but not applied by any platform. Results come back
+            in the platform's default order.
         updated_after:
           type: string
+          description: "Only return customers updated after this time. ISO 8601 timestamp,\
+            \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+            \ with 400 `invalid_parameter`. Applied by Shopify only."
         updated_before:
           type: string
+          description: Accepted but not applied by any platform.
         created_after:
           type: string
+          description: "Only return customers created after this time. ISO 8601 timestamp,\
+            \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+            \ with 400 `invalid_parameter`. Applied by Shopify only."
         created_before:
           type: string
+          description: Accepted but not applied by any platform.
         next_page_cursor:
           type: string
+          description: "Cursor for the next page, copied from `next_page_cursor` in\
+            \ the previous response. Used by cursor platforms such as Shopify. Filters\
+            \ sent with a cursor are ignored, because the cursor carries the filters\
+            \ of the first request."
+      description: Filters for searching a merchant's customers on their ecom platform.
+        Every field is optional. Each filter has the same meaning and platform support
+        as the query parameter of the same name on Get Customers.
     RelayOfferSearchRequest:
       type: object
       properties:
         query:
           type: string
+          description: Not supported. A non-blank value is rejected with 400 `operation_not_supported_exception`.
         status:
           type: string
+          description: Accepted but not applied by any platform.
         ids:
           type: array
+          description: Not supported yet. A non-empty value is rejected with 400 `operation_not_supported_exception`.
           items:
             type: string
+            description: Not supported yet. A non-empty value is rejected with 400
+              `operation_not_supported_exception`.
         sort:
           type: string
+          description: Accepted but not applied by any platform. Results come back
+            in the platform's default order.
         include:
           type: array
+          description: "Extras to include. Supported values are `categories` and `metadata`.\
+            \ Either one can require extra calls to the merchant's platform. Applied\
+            \ by Shopify only; other platforms ignore it. Any other value is rejected\
+            \ with 400 `invalid_parameter`, on every platform."
           items:
             type: string
+            description: "Extras to include. Supported values are `categories` and\
+              \ `metadata`. Either one can require extra calls to the merchant's platform.\
+              \ Applied by Shopify only; other platforms ignore it. Any other value\
+              \ is rejected with 400 `invalid_parameter`, on every platform."
         page:
           type: integer
+          description: "Page number, starting at 1. Used by page-number platforms\
+            \ (for example WooCommerce and BigCommerce). Cursor platforms such as\
+            \ Shopify ignore it and use `next_page_cursor`. Defaults to 1."
           format: int32
+          example: 1
         size:
           type: integer
+          description: "Number of results per page. Values below 1 are treated as\
+            \ 1. Violet reduces larger values only where noted below. Elsewhere the\
+            \ value is sent on as given and the platform may apply its own limit.\
+            \ Caps: Shopify and BigCommerce 250, WooCommerce 100. Defaults to 20."
           format: int32
+          example: 50
         category_id:
           type: string
+          description: "Only return products in this category or collection. Applied\
+            \ by WooCommerce and BigCommerce (a category ID) and by Shopify (a numeric\
+            \ collection ID, any other value is ignored). Shopify applies it only\
+            \ for merchants on a custom app connection, and ignores it on other connections."
+          example: "428123456789"
         sort_order:
           type: string
+          description: Accepted but not applied by any platform. Results come back
+            in the platform's default order.
         updated_after:
           type: string
+          description: "Only return products updated after this time. ISO 8601 timestamp,\
+            \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+            \ with 400 `invalid_parameter`. Applied by WooCommerce, BigCommerce and\
+            \ Shopify. Shopify applies it only for merchants on a custom app connection,\
+            \ and ignores it on other connections."
         updated_before:
           type: string
+          description: "Only return products updated before this time. ISO 8601 timestamp,\
+            \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+            \ with 400 `invalid_parameter`. Applied by BigCommerce and Shopify. Shopify\
+            \ applies it only for merchants on a custom app connection, and ignores\
+            \ it on other connections."
         created_after:
           type: string
+          description: Accepted but not applied by any platform.
         created_before:
           type: string
+          description: Accepted but not applied by any platform.
         next_page_cursor:
           type: string
+          description: "Cursor for the next page, copied from `next_page_cursor` in\
+            \ the previous response. Used by cursor platforms such as Shopify. Filters\
+            \ sent with a cursor are ignored, because the cursor carries the filters\
+            \ of the first request."
+      description: Filters for searching a merchant's products on their ecom platform.
+        Every field is optional. Each filter has the same meaning and platform support
+        as the query parameter of the same name on Get Offers.
     RelayOrderSearchRequest:
       type: object
       properties:
         query:
           type: string
+          description: Free-text search. Applied by WooCommerce only.
+          example: "1042"
         status:
           type: string
+          description: "Only return orders with this status. Applied by WooCommerce\
+            \ only, which uses it as its own order status filter (for example `processing`\
+            \ or `completed`)."
+          example: processing
         ids:
           type: array
+          description: Not supported yet. A non-empty value is rejected with 400 `operation_not_supported_exception`.
           items:
             type: string
+            description: Not supported yet. A non-empty value is rejected with 400
+              `operation_not_supported_exception`.
         sort:
           type: string
+          description: Accepted but not applied by any platform. Results come back
+            in the platform's default order.
         include:
           type: array
+          description: Accepted but has no effect.
           items:
             type: string
+            description: Accepted but has no effect.
         page:
           type: integer
+          description: "Page number, starting at 1. Used by page-number platforms\
+            \ (for example WooCommerce and BigCommerce). Cursor platforms such as\
+            \ Shopify ignore it and use `next_page_cursor`. Defaults to 1."
           format: int32
+          example: 1
         size:
           type: integer
+          description: "Number of results per page. Values below 1 are treated as\
+            \ 1. Violet reduces larger values only where noted below. Elsewhere the\
+            \ value is sent on as given and the platform may apply its own limit.\
+            \ Caps: Shopify and BigCommerce 250, WooCommerce 100, Shoptet 50. Defaults\
+            \ to 20."
           format: int32
+          example: 50
         financial_status:
           type: string
+          description: Accepted but not applied by any platform.
         fulfillment_status:
           type: string
+          description: Accepted but not applied by any platform.
         customer_email:
           type: string
+          description: Not supported yet. A non-empty value is rejected with 400 `operation_not_supported_exception`.
         sort_order:
           type: string
+          description: Accepted but not applied by any platform. Results come back
+            in the platform's default order.
         updated_after:
           type: string
+          description: "Only return orders updated after this time. ISO 8601 timestamp,\
+            \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+            \ with 400 `invalid_parameter`. Applied by Shopify only."
         updated_before:
           type: string
+          description: Accepted but not applied by any platform.
         created_after:
           type: string
+          description: "Only return orders created after this time. ISO 8601 timestamp,\
+            \ for example `2026-01-15T00:00:00Z`. A date without a time is rejected\
+            \ with 400 `invalid_parameter`. Applied by Shopify and WooCommerce."
         created_before:
           type: string
+          description: Accepted but not applied by any platform.
         next_page_cursor:
           type: string
+          description: "Cursor for the next page, copied from `next_page_cursor` in\
+            \ the previous response. Used by cursor platforms such as Shopify. Filters\
+            \ sent with a cursor are ignored, because the cursor carries the filters\
+            \ of the first request."
+      description: Filters for searching a merchant's orders on their ecom platform.
+        Every field is optional. Each filter has the same meaning and platform support
+        as the query parameter of the same name on Get Orders.
