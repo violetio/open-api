@@ -2341,7 +2341,12 @@ components:
           format: int32
         currency:
           type: string
-          description: "The case currency: the platform currency."
+          description: "The case currency: the currency of the payment connection\
+            \ the order was paid through. Where the order names no connection it is\
+            \ the currency of the channel's payout account, and for a channel that\
+            \ is not on platform payments it is USD. A case that is EXHAUSTED with\
+            \ exhausted_reason CURRENCY_UNKNOWN, because no currency could be worked\
+            \ out for it, is in the currency of the refunded bag."
         gap_amount:
           type: integer
           description: "The commission the channel kept on this refund, in minor units."
@@ -3247,8 +3252,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -3282,6 +3285,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
@@ -3890,8 +3895,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -3925,6 +3928,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
