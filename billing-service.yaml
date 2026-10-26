@@ -1230,14 +1230,18 @@ paths:
         \ with the same sign as commission on the row. Sum that instead. It can be\
         \ empty on refunds recorded before 2026-10-01. net_distribution_amount is\
         \ what the refund moved for that account, signed from its side: negative when\
-        \ money is taken back, positive when it is paid, which a refund can do. On\
-        \ the channel's row that movement is not the commission reversed on its own:\
-        \ it can also carry a payment-provider fee credit, tax or duty the channel\
-        \ remits, and a correction for a refund discrepancy. On a bag whose payment\
-        \ distributions have totals_include_commission false, a refund reverses no\
-        \ commission at all and commission_reversed_amount is 0. A refund row carries\
-        \ amount, equal to net_distribution_amount, and no distribution_amount. A\
-        \ search that matches nothing returns an empty page, not a 404."
+        \ money is taken back, positive when it is paid, which a refund recorded with\
+        \ a payment-provider fee credit can be. A Stripe refund records no fee credit:\
+        \ the processing fee of the sale stays with whoever bore it, so payment_provider_total_fee\
+        \ on its refund rows is 0 or absent. Older Stripe refund rows, and Nuvei refund\
+        \ rows, can carry a negative payment_provider_total_fee, which is a fee credited\
+        \ back. On the channel's row that movement is not the commission reversed\
+        \ on its own: it can also carry tax or duty the channel remits, and a correction\
+        \ for a refund discrepancy. On a bag whose payment distributions have totals_include_commission\
+        \ false, a refund reverses no commission at all and commission_reversed_amount\
+        \ is 0. A refund row carries amount, equal to net_distribution_amount, and\
+        \ no distribution_amount. A search that matches nothing returns an empty page,\
+        \ not a 404."
       operationId: searchDistributions
       parameters:
       - name: X-Violet-Token
@@ -1353,15 +1357,15 @@ paths:
                       payout_account_id: 1234
                       payout_account_type: DEVELOPER
                       currency: USD
-                      amount: -14
-                      net_distribution_amount: -14
+                      amount: -25
+                      net_distribution_amount: -25
                       tax_amount: 0
                       duty_amount: 0
                       shipping_amount: 0
                       commission: -50
                       commission_reversed_amount: -25
-                      payment_provider_total_fee: -11
-                      payment_provider_volume_fee: -11
+                      payment_provider_total_fee: 0
+                      payment_provider_volume_fee: 0
                       payment_provider_fixed_fee: 0
                       app_id: 10193
                       app_name: Sample Channel
@@ -1391,8 +1395,8 @@ paths:
                       duty_remitter: MERCHANT
                       date_created: 2026-09-10T14:20:30+0000
                       date_last_modified: 2026-09-10T14:20:30+0000
-                      payment_service_total_fee: -11
-                      payment_service_volume_fee: -11
+                      payment_service_total_fee: 0
+                      payment_service_volume_fee: 0
                       payment_service_fixed_fee: 0
                       external_transaction_id: re_3PYoWvK29KDiBVld1n8zm5C1
                       payment_service: STRIPE
