@@ -10461,6 +10461,9 @@ components:
       - total
       type: object
       properties:
+        bag_id:
+          type: integer
+          format: int64
         bag_status:
           type: string
           enum:
@@ -10472,9 +10475,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        bag_id:
-          type: integer
-          format: int64
         communicationPreferencesInternal:
           $ref: '#/components/schemas/communication_preferences'
         id:
@@ -14975,13 +14975,13 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        effectiveRelatedBagIds:
+        effectiveRelatedOrderIds:
           uniqueItems: true
           type: array
           items:
             type: integer
             format: int64
-        effectiveRelatedOrderIds:
+        effectiveRelatedBagIds:
           uniqueItems: true
           type: array
           items:
