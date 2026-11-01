@@ -9150,6 +9150,21 @@ paths:
                       action.
                     error: insufficient_permissions
                     code: 9403
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                App Not Found:
+                  summary: The app named by app_id is not available to the caller
+                  description: "Returned when app_id names an app that does not exist,\
+                    \ or, for a dashboard user, one that is not its developer's."
+                  value:
+                    message: App identified by 54321 could not be found.
+                    error: app_not_found
+                    code: 7100
         "500":
           description: internal server error
           content:
@@ -9403,6 +9418,21 @@ paths:
                       action.
                     error: insufficient_permissions
                     code: 9403
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                App Not Found:
+                  summary: The app named by app_id is not available to the caller
+                  description: "Returned when app_id names an app that does not exist,\
+                    \ or, for a dashboard user, one that is not its developer's."
+                  value:
+                    message: App identified by 54321 could not be found.
+                    error: app_not_found
+                    code: 7100
         "500":
           description: internal server error
           content:
@@ -9553,12 +9583,17 @@ paths:
       tags:
       - Bag - Transfers
       summary: Process Transfers for Bags
-      description: Initiates payout transfers for multiple bags in a single batch
-        request. The request body must contain a list of bag IDs to process. Transfers
-        are sent to the merchant's configured payout account via the appropriate payment
-        provider. The response separates results into successful and failed transfers.
-        Dashboard and admin users must specify a target app_id query parameter; channel
-        users can only process transfers for their own application.
+      description: "Initiates payout transfers for multiple bags in a single batch\
+        \ request. The request body must contain a list of bag IDs to process. Transfers\
+        \ are sent to the merchant's configured payout account via the appropriate\
+        \ payment provider. The response separates results into successful and failed\
+        \ transfers. Dashboard and admin users must specify a target app_id query\
+        \ parameter; channel users can only process transfers for their own application.\
+        \ Every bag must be on an order of that application: if any bag is not, or\
+        \ does not exist, the whole request is refused with a 404 and no transfer\
+        \ is sent. A request may name at most 500 bag IDs. An app_id that does not\
+        \ exist, or that a dashboard user may not name because it is not its developer's,\
+        \ is a 404."
       operationId: processTransfersForBags
       parameters:
       - name: X-Violet-Token
@@ -9685,6 +9720,22 @@ paths:
                     message: Required parameter 'app_id' cannot be null or empty.
                     error: missing_parameter
                     code: 9002
+                Null Bag ID:
+                  summary: An entry of bag_ids is null
+                  description: Returned when bag_ids contains a null entry.
+                  value:
+                    message: Invalid parameter 'bag_ids'. Use the bags endpoint to
+                      process transfers by bag.
+                    error: invalid_parameter
+                    code: 9001
+                Too Many IDs:
+                  summary: More than 500 IDs in one request
+                  description: Returned when a list names more than 500 IDs. The request
+                    is refused before anything is looked up.
+                  value:
+                    message: bag_ids may name at most 500 ids in one request
+                    error: bad_request
+                    code: 1001
         "403":
           description: forbidden
           content:
@@ -9701,6 +9752,30 @@ paths:
                       action.
                     error: insufficient_permissions
                     code: 9403
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Bag Not Found:
+                  summary: A bag is not the application's
+                  description: Returned when any bag_id does not exist or is on an
+                    order of another application. The whole request is refused and
+                    nothing is sent.
+                  value:
+                    message: Bag could not be found.
+                    error: bag_not_found
+                    code: 4201
+                App Not Found:
+                  summary: The app named by app_id is not available to the caller
+                  description: "Returned when app_id names an app that does not exist,\
+                    \ or, for a dashboard user, one that is not its developer's."
+                  value:
+                    message: App identified by 54321 could not be found.
+                    error: app_not_found
+                    code: 7100
         "500":
           description: internal server error
           content:
@@ -9873,7 +9948,11 @@ paths:
         \ into successful and failed transfers, allowing callers to identify and retry\
         \ failures independently. Dashboard and admin users must specify a target\
         \ app_id query parameter; channel users can only process transfers for their\
-        \ own application."
+        \ own application. Every order must belong to that application: if any order\
+        \ does not, or does not exist, the whole request is refused with a 404 and\
+        \ no transfer is sent. A request may name at most 500 order IDs. An app_id\
+        \ that does not exist, or that a dashboard user may not name because it is\
+        \ not its developer's, is a 404."
       operationId: processTransfersForOrders
       parameters:
       - name: X-Violet-Token
@@ -10066,6 +10145,22 @@ paths:
                     message: Required parameter 'app_id' cannot be null or empty.
                     error: missing_parameter
                     code: 9002
+                Null Order ID:
+                  summary: An entry of order_ids is null
+                  description: Returned when order_ids contains a null entry.
+                  value:
+                    message: Invalid parameter 'order_ids'. Use the orders endpoint
+                      to process transfers by order.
+                    error: invalid_parameter
+                    code: 9001
+                Too Many IDs:
+                  summary: More than 500 IDs in one request
+                  description: Returned when a list names more than 500 IDs. The request
+                    is refused before anything is looked up.
+                  value:
+                    message: order_ids may name at most 500 ids in one request
+                    error: bad_request
+                    code: 1001
         "403":
           description: forbidden
           content:
@@ -10082,6 +10177,30 @@ paths:
                       action.
                     error: insufficient_permissions
                     code: 9403
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Order Not Found:
+                  summary: An order is not the application's
+                  description: Returned when any order_id does not exist or belongs
+                    to another application. The whole request is refused and nothing
+                    is sent.
+                  value:
+                    message: Order could not be found.
+                    error: order_not_found
+                    code: 4216
+                App Not Found:
+                  summary: The app named by app_id is not available to the caller
+                  description: "Returned when app_id names an app that does not exist,\
+                    \ or, for a dashboard user, one that is not its developer's."
+                  value:
+                    message: App identified by 54321 could not be found.
+                    error: app_not_found
+                    code: 7100
         "500":
           description: internal server error
           content:
@@ -10342,9 +10461,6 @@ components:
       - total
       type: object
       properties:
-        bag_id:
-          type: integer
-          format: int64
         bag_status:
           type: string
           enum:
@@ -10356,6 +10472,9 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
+        bag_id:
+          type: integer
+          format: int64
         communicationPreferencesInternal:
           $ref: '#/components/schemas/communication_preferences'
         id:
@@ -14845,6 +14964,8 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
+        externalId:
+          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -14854,13 +14975,13 @@ components:
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        effectiveRelatedOrderIds:
+        effectiveRelatedBagIds:
           uniqueItems: true
           type: array
           items:
             type: integer
             format: int64
-        effectiveRelatedBagIds:
+        effectiveRelatedOrderIds:
           uniqueItems: true
           type: array
           items:
@@ -14878,8 +14999,6 @@ components:
           items:
             type: integer
             format: int64
-        externalId:
-          type: string
         related_orders:
           uniqueItems: true
           type: array
