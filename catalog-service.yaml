@@ -397,7 +397,13 @@ paths:
           type: string
       - name: include
         in: query
-        description: Comma-separated list of extra data to be included.
+        description: "Comma-separated list of extra data to be included. `sku_inventory_levels`\
+          \ (BETA) adds `inventory_levels` to each SKU: its available stock at each\
+          \ of the merchant's locations. It appears only for merchants Violet has\
+          \ turned location inventory on for. `sku_contextual_availability` (BETA)\
+          \ adds `contextual_availability` to each SKU: the units a shopper in each\
+          \ country can buy. It appears only for SKUs Violet has that availability\
+          \ for."
         schema:
           type: string
           enum:
@@ -405,6 +411,8 @@ paths:
           - collections
           - shipping
           - sku_metadata
+          - sku_inventory_levels
+          - sku_contextual_availability
           - unpublished
       - name: date_last_modified:min
         in: query
@@ -947,7 +955,13 @@ paths:
           format: double
       - name: include
         in: query
-        description: Comma-separated list of extra data to be included.
+        description: "Comma-separated list of extra data to be included. `sku_inventory_levels`\
+          \ (BETA) adds `inventory_levels` to each SKU: its available stock at each\
+          \ of the merchant's locations. It appears only for merchants Violet has\
+          \ turned location inventory on for. `sku_contextual_availability` (BETA)\
+          \ adds `contextual_availability` to each SKU: the units a shopper in each\
+          \ country can buy. It appears only for SKUs Violet has that availability\
+          \ for."
         schema:
           type: string
           enum:
@@ -955,6 +969,8 @@ paths:
           - collections
           - shipping
           - sku_metadata
+          - sku_inventory_levels
+          - sku_contextual_availability
       responses:
         "200":
           description: successful operation
@@ -1137,13 +1153,21 @@ paths:
           type: string
       - name: include
         in: query
-        description: Comma-separated list of extra data to be included.
+        description: "Comma-separated list of extra data to be included. `sku_inventory_levels`\
+          \ (BETA) adds `inventory_levels` to each SKU: its available stock at each\
+          \ of the merchant's locations. It appears only for merchants Violet has\
+          \ turned location inventory on for. `sku_contextual_availability` (BETA)\
+          \ adds `contextual_availability` to each SKU: the units a shopper in each\
+          \ country can buy. It appears only for SKUs Violet has that availability\
+          \ for."
         schema:
           type: string
           default: sku_dimensions
           enum:
           - sku_dimensions
           - sku_metadata
+          - sku_inventory_levels
+          - sku_contextual_availability
       responses:
         "200":
           description: successful operation
@@ -1311,6 +1335,20 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: include
+        in: query
+        description: "Comma-separated list of extra data to be included on each SKU.\
+          \ `sku_inventory_levels` (BETA) adds `inventory_levels` to each SKU: its\
+          \ available stock at each of the merchant's locations. It appears only for\
+          \ merchants Violet has turned location inventory on for. `sku_contextual_availability`\
+          \ (BETA) adds `contextual_availability` to each SKU: the units a shopper\
+          \ in each country can buy. It appears only for SKUs Violet has that availability\
+          \ for."
+        schema:
+          type: string
+          enum:
+          - sku_inventory_levels
+          - sku_contextual_availability
       requestBody:
         description: Filters to apply to the offer search.
         content:
@@ -2111,6 +2149,35 @@ components:
           - LESS_THAN_OR_EQUAL_TO
           - GREATER_THAN_OR_EQUAL_TO
       description: Conditions that must be met for the method to be available.
+      nullable: true
+    ContextualAvailability:
+      type: object
+      properties:
+        countries:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CountryAvailability'
+          description: "Availability by country, keyed by two-letter ISO 3166-1 country\
+            \ code. The numbers overlap and don't add up to each other or to the SKU's\
+            \ total."
+          nullable: true
+      description: "BETA: Units a shopper in each country can buy, keyed by two-letter\
+        \ ISO 3166-1 country code, as the merchant's own store works it out. Requested\
+        \ with `?include=sku_contextual_availability`. Country numbers overlap and\
+        \ don't add up to each other or to the SKU's total."
+      nullable: true
+      readOnly: true
+    CountryAvailability:
+      type: object
+      properties:
+        qty_available:
+          minimum: 0
+          type: integer
+          description: "Units a shopper in that country can buy, 0 or more."
+          format: int32
+      description: "Availability by country, keyed by two-letter ISO 3166-1 country\
+        \ code. The numbers overlap and don't add up to each other or to the SKU's\
+        \ total."
       nullable: true
     Media:
       required:
@@ -3175,6 +3242,18 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/MetaObject'
+        inventory_levels:
+          type: array
+          description: "BETA: Available stock at each location Violet syncs for the\
+            \ merchant, one entry per location, sorted by external_id. Present only\
+            \ for merchants with location inventory on, when requested with `?include=sku_inventory_levels`.\
+            \ A bundle has an empty list."
+          nullable: true
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/SkuInventoryLevel'
+        contextual_availability:
+          $ref: '#/components/schemas/ContextualAvailability'
         display_order:
           type: integer
           description: The order that the merchant has chosen to display this Sku
@@ -3224,6 +3303,38 @@ components:
           - SHIPPING
       description: Individual Sku Dimensions
       nullable: true
+    SkuInventoryLevel:
+      type: object
+      properties:
+        external_id:
+          type: string
+          description: "The location's ID on the merchant's commerce platform (for\
+            \ Shopify, the numeric location ID). Use it as the location's key."
+        name:
+          type: string
+          description: "The merchant's name for the location. It can change, so don't\
+            \ use it as a key."
+          nullable: true
+        country_code:
+          type: string
+          description: "Two-letter ISO 3166-1 code of the location's address: where\
+            \ the location is, not the countries it ships to. Null when the merchant\
+            \ hasn't set one."
+          nullable: true
+        qty_available:
+          minimum: 0
+          type: integer
+          description: "Units available to sell at this location, floored at 0, before\
+            \ any safety stock the merchant holds back. 0 when the item isn't stocked\
+            \ there."
+          format: int32
+        in_stock:
+          type: boolean
+          description: "True when the SKU doesn't track inventory, or qty_available\
+            \ is above 0."
+      description: The available stock of a Sku at one of the merchant's locations.
+      nullable: true
+      readOnly: true
     SkuVariantValue:
       required:
       - value
@@ -4358,12 +4469,20 @@ components:
       properties:
         include:
           type: string
-          description: Comma-separated list of extra data to include.
+          description: "Comma-separated list of extra data to include. `sku_inventory_levels`\
+            \ (BETA) adds `inventory_levels` to each SKU: its available stock at each\
+            \ of the merchant's locations. It appears only for merchants Violet has\
+            \ turned location inventory on for. `sku_contextual_availability` (BETA)\
+            \ adds `contextual_availability` to each SKU: the units a shopper in each\
+            \ country can buy. It appears only for SKUs Violet has that availability\
+            \ for."
           enum:
           - metadata
           - collections
           - shipping
           - sku_metadata
+          - sku_inventory_levels
+          - sku_contextual_availability
         base_currency:
           type: string
           description: The currency offer prices are presented in.
