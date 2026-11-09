@@ -3236,6 +3236,7 @@ components:
               - `use_storefront_api` - When enabled, uses the Shopify Storefront API for product sync and order writeback, allowing merchants to control product availability via Product Listings. Requires explicit `true`. Default: disabled.
               - `use_cart_estimation` - When enabled, creates a draft order for shipping rate estimation instead of using draft order calculation. Requires explicit `true`. Default: disabled.
               - `redistribute_taxes` - When enabled, requests tax distribution from Shopify during order creation and assigns taxes as line items. Requires explicit `true`. Default: disabled.
+              - `sync_inventory_locations` - BETA: When enabled, Violet syncs the available stock at each of the merchant's Shopify locations for every SKU, returned with `?include=sku_inventory_levels`. Requires explicit `true`. Default: disabled.
 
               **WooCommerce Flags:**
               - `use_short_description` - When enabled, syncs the WooCommerce short description field instead of the full product description. Also applies to Prestashop. Requires explicit `true`. Default: disabled (uses full description).
@@ -3269,6 +3270,7 @@ components:
             - `use_storefront_api` - When enabled, uses the Shopify Storefront API for product sync and order writeback, allowing merchants to control product availability via Product Listings. Requires explicit `true`. Default: disabled.
             - `use_cart_estimation` - When enabled, creates a draft order for shipping rate estimation instead of using draft order calculation. Requires explicit `true`. Default: disabled.
             - `redistribute_taxes` - When enabled, requests tax distribution from Shopify during order creation and assigns taxes as line items. Requires explicit `true`. Default: disabled.
+            - `sync_inventory_locations` - BETA: When enabled, Violet syncs the available stock at each of the merchant's Shopify locations for every SKU, returned with `?include=sku_inventory_levels`. Requires explicit `true`. Default: disabled.
 
             **WooCommerce Flags:**
             - `use_short_description` - When enabled, syncs the WooCommerce short description field instead of the full product description. Also applies to Prestashop. Requires explicit `true`. Default: disabled (uses full description).
