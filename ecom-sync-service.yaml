@@ -3241,6 +3241,35 @@ components:
           - GREATER_THAN_OR_EQUAL_TO
       description: Conditions that must be met for the method to be available.
       nullable: true
+    ContextualAvailability:
+      type: object
+      properties:
+        countries:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CountryAvailability'
+          description: "Availability by country, keyed by two-letter ISO 3166-1 country\
+            \ code. The numbers overlap and don't add up to each other or to the SKU's\
+            \ total."
+          nullable: true
+      description: "BETA: Units a shopper in each country can buy, keyed by two-letter\
+        \ ISO 3166-1 country code, as the merchant's own store works it out. Requested\
+        \ with `?include=sku_contextual_availability`. Country numbers overlap and\
+        \ don't add up to each other or to the SKU's total."
+      nullable: true
+      readOnly: true
+    CountryAvailability:
+      type: object
+      properties:
+        qty_available:
+          minimum: 0
+          type: integer
+          description: "Units a shopper in that country can buy, 0 or more."
+          format: int32
+      description: "Availability by country, keyed by two-letter ISO 3166-1 country\
+        \ code. The numbers overlap and don't add up to each other or to the SKU's\
+        \ total."
+      nullable: true
     Media:
       required:
       - album_id
@@ -4304,6 +4333,18 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/MetaObject'
+        inventory_levels:
+          type: array
+          description: "BETA: Available stock at each location Violet syncs for the\
+            \ merchant, one entry per location, sorted by external_id. Present only\
+            \ for merchants with location inventory on, when requested with `?include=sku_inventory_levels`.\
+            \ A bundle has an empty list."
+          nullable: true
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/SkuInventoryLevel'
+        contextual_availability:
+          $ref: '#/components/schemas/ContextualAvailability'
         display_order:
           type: integer
           description: The order that the merchant has chosen to display this Sku
@@ -4353,6 +4394,38 @@ components:
           - SHIPPING
       description: Individual Sku Dimensions
       nullable: true
+    SkuInventoryLevel:
+      type: object
+      properties:
+        external_id:
+          type: string
+          description: "The location's ID on the merchant's commerce platform (for\
+            \ Shopify, the numeric location ID). Use it as the location's key."
+        name:
+          type: string
+          description: "The merchant's name for the location. It can change, so don't\
+            \ use it as a key."
+          nullable: true
+        country_code:
+          type: string
+          description: "Two-letter ISO 3166-1 code of the location's address: where\
+            \ the location is, not the countries it ships to. Null when the merchant\
+            \ hasn't set one."
+          nullable: true
+        qty_available:
+          minimum: 0
+          type: integer
+          description: "Units available to sell at this location, floored at 0, before\
+            \ any safety stock the merchant holds back. 0 when the item isn't stocked\
+            \ there."
+          format: int32
+        in_stock:
+          type: boolean
+          description: "True when the SKU doesn't track inventory, or qty_available\
+            \ is above 0."
+      description: The available stock of a Sku at one of the merchant's locations.
+      nullable: true
+      readOnly: true
     SkuVariantValue:
       required:
       - value
