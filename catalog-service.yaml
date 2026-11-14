@@ -2264,9 +2264,17 @@ components:
           type: string
           description: Type of the value in the external commerce platform
           nullable: true
+        namespace:
+          type: string
+          description: "The namespace the key belongs to in the external commerce\
+            \ platform, for example `custom` for a Shopify metafield. Two meta objects\
+            \ can share a key and differ by namespace. Null when the platform has\
+            \ no namespaces or the value was stored before namespaces were kept."
+          nullable: true
         key:
           type: string
-          description: The key of meta value
+          description: "The key of meta value, without its namespace. Use `namespace`\
+            \ together with `key` to identify a meta object"
         value:
           type: object
           description: The meta value. Values of type JSON will be stringified
@@ -3532,11 +3540,18 @@ components:
           type: integer
           description: Offer Id
           format: int64
+        namespace:
+          maxLength: 255
+          type: string
+          description: Namespace the key belongs to in the external commerce platform.
+            Null for rows stored before namespaces were kept and for platforms without
+            namespaces
+          nullable: true
         key:
           maxLength: 191
           minLength: 1
           type: string
-          description: Key
+          description: "Key, without its namespace"
         value:
           type: string
           description: Value
