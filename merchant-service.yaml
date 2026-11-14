@@ -3051,7 +3051,10 @@ components:
           $ref: '#/components/schemas/AddonSkuConfig'
         custom_tag_config:
           $ref: '#/components/schemas/CustomTagConfig'
-      description: Order conventions including addon SKU rules and custom tag rules.
+        line_item_property_config:
+          $ref: '#/components/schemas/LineItemPropertyConfig'
+      description: "Order conventions including addon SKU rules, custom tag rules\
+        \ and line item property rules."
     CustomTagConfig:
       type: object
       properties:
@@ -3167,6 +3170,54 @@ components:
           format: int32
       description: Configured stock rules that can override the data from the external
         commerce platform.
+    LineItemPropertyConfig:
+      type: object
+      properties:
+        rules:
+          type: array
+          description: List of line item property rules.
+          items:
+            $ref: '#/components/schemas/LineItemPropertyRule'
+      description: Configuration for rule-based line item properties on orders.
+    LineItemPropertyRule:
+      type: object
+      properties:
+        rule_name:
+          type: string
+          description: Human-readable name for this rule (for logging/debugging).
+        enabled:
+          type: boolean
+          description: "Whether this rule is active. Default: true"
+        property:
+          type: string
+          description: "The Shopify line item property name to write (e.g., '_cleaned_mpn')."
+        source:
+          type: string
+          description: Where the value of the line item property comes from.
+          enum:
+          - PRODUCT_METAFIELD
+          - VARIANT_METAFIELD
+          - VARIANT_TITLE
+        namespace:
+          type: string
+          description: "Metafield namespace. Required when source is PRODUCT_METAFIELD\
+            \ or VARIANT_METAFIELD, ignored for VARIANT_TITLE."
+        key:
+          type: string
+          description: "Metafield key. Required when source is PRODUCT_METAFIELD or\
+            \ VARIANT_METAFIELD, ignored for VARIANT_TITLE."
+        app_ids:
+          uniqueItems: true
+          type: array
+          description: "Set of application IDs. If specified, the rule applies only\
+            \ to orders placed by one of these apps."
+          items:
+            type: integer
+            description: "Set of application IDs. If specified, the rule applies only\
+              \ to orders placed by one of these apps."
+            format: int64
+      description: A rule defining which line item property to set on an order and
+        where its value comes from.
     MerchantConfiguration:
       type: object
       properties:
@@ -3196,6 +3247,7 @@ components:
               - `fallback_tax_calculation_enabled` - When enabled, Violet will attempt to calculate fallback taxes when the ecommerce platform fails to return tax information. Requires explicit `true`. Default: disabled.
               - `enable_custom_tag_rules` - When enabled, evaluates rule-based custom tag conditions from `orders_config.conventions.custom_tag_config` to conditionally tag orders. Requires explicit `true`. Default: disabled.
               - `strip_tax_inclusive_pricing_it` - When enabled, Violet removes the merchant's own 22% Italian VAT from cart calculation totals for destinations where that tax is not owed. Requires explicit `true`. Default: disabled.
+              - `enable_line_item_property_rules` - When enabled, evaluates the rules in `orders_config.conventions.line_item_property_config` to set line item properties on Shopify orders from product metafields, variant metafields or the variant title. Requires explicit `true`. Default: disabled.
           description: |
             Feature flags that apply to a merchant globally, regardless of their commerce platform.
 
@@ -3218,6 +3270,7 @@ components:
             - `fallback_tax_calculation_enabled` - When enabled, Violet will attempt to calculate fallback taxes when the ecommerce platform fails to return tax information. Requires explicit `true`. Default: disabled.
             - `enable_custom_tag_rules` - When enabled, evaluates rule-based custom tag conditions from `orders_config.conventions.custom_tag_config` to conditionally tag orders. Requires explicit `true`. Default: disabled.
             - `strip_tax_inclusive_pricing_it` - When enabled, Violet removes the merchant's own 22% Italian VAT from cart calculation totals for destinations where that tax is not owed. Requires explicit `true`. Default: disabled.
+            - `enable_line_item_property_rules` - When enabled, evaluates the rules in `orders_config.conventions.line_item_property_config` to set line item properties on Shopify orders from product metafields, variant metafields or the variant title. Requires explicit `true`. Default: disabled.
         platform_feature_flags:
           type: object
           additionalProperties:
@@ -5531,8 +5584,6 @@ components:
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -5545,13 +5596,15 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     Pageable:
@@ -5562,16 +5615,16 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
     Sort:
       type: object
       properties:
@@ -5590,8 +5643,6 @@ components:
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -5604,13 +5655,15 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
+        last:
+          type: boolean
+        first:
+          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
           type: integer
           format: int32
-        last:
-          type: boolean
         empty:
           type: boolean
     OnboardingStep:
