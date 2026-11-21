@@ -1029,6 +1029,897 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageDistribution'
+  /payments/{account_type}/{account_id}/payouts/{payout_id}/distributions:
+    get:
+      tags:
+      - Payments - Distributions
+      summary: Get Distributions by Payout Id
+      description: "Returns a page of the distributions on one payout: the sales,\
+        \ refunds and adjustments that make up the payout, each row's type saying\
+        \ which. A merchant reads its own payouts, whichever app they came through.\
+        \ A channel reads either its own payouts, with account_type developer, or\
+        \ the payouts of a merchant that its app is, or has been, connected to, with\
+        \ account_type merchant. Of such a merchant a channel sees the payouts made\
+        \ to the merchant's payout accounts for its own app, and no other payout of\
+        \ the merchant's. A channel reading a merchant's payout is given only the\
+        \ distributions of its own app. Distributions come oldest first by creation\
+        \ date, and distributions created at the same moment come lowest id first,\
+        \ so the order is the same on every page. A payout that does not exist and\
+        \ a payout you may not read give the same 404, payout_not_found, so the answer\
+        \ does not reveal whether someone else's payout exists. A payout with status\
+        \ EXTERNAL is never returned to a merchant or a channel: it answers 404, as\
+        \ a payout that does not exist does. A payout with no distributions for you\
+        \ returns an empty page, not a 404."
+      operationId: getDistributionsByPayoutId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        description: "Whose payouts to read: merchant, or developer for a channel's\
+          \ own payouts. Case-insensitive; any other value is refused with 400 invalid_parameter."
+        required: true
+        schema:
+          type: string
+          enum:
+          - merchant
+          - developer
+      - name: account_id
+        in: path
+        description: "The merchant id when account_type is merchant, or the channel's\
+          \ developer id when it is developer. A merchant uses its own id. A channel\
+          \ uses its own developer id, or the id of a merchant its app is, or has\
+          \ been, connected to."
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        description: "The app to read for. Required when a channel reads a merchant's\
+          \ payouts through Violet's own dashboard, which serves every channel and\
+          \ so has to be told which one is meant: without it the answer is 400 missing_parameter,\
+          \ and the app has to be one the caller owns, or the answer is 403. Ignored\
+          \ in every other call, where the app is the one the credentials belong to."
+        schema:
+          type: integer
+          format: int32
+      - name: payout_id
+        in: path
+        description: "The payout's id: the id returned as id on a payout."
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        description: "Results per page, at most 100. Out-of-range values are adjusted\
+          \ rather than refused: above 100 becomes 100, and below 1 becomes 10. The\
+          \ size applied is returned in the response's size. (Violet's own dashboard\
+          \ has a ceiling of 500.)"
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        description: "Page to return, counting from 1. Values below 1 become 1. The\
+          \ response's number counts from 0, so page 1 comes back as number 0."
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      responses:
+        "200":
+          description: "The distributions on the payout, oldest first. May be an empty\
+            \ page."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDistribution'
+              examples:
+                The sale and the refund on a payout:
+                  description: The sale and the refund on a payout
+                  value:
+                    content:
+                    - id: 90211
+                      type: PAYMENT
+                      payout_account_id: 5678
+                      payout_account_type: MERCHANT
+                      currency: USD
+                      amount: 45000
+                      net_distribution_amount: 45000
+                      distribution_amount: 45000
+                      tax_amount: 0
+                      shipping_amount: 0
+                      commission: -5000
+                      app_id: 10193
+                      app_name: Sample Channel
+                      merchant_id: 10064
+                      merchant_name: Space Drinks
+                      merchant_commission_rate: 10.0
+                      payment_provider: STRIPE
+                      payment_service: STRIPE
+                      status: SENT
+                      bag_id: 64579
+                      bag_sub_total: 50000
+                      bag_commissionable_amount: 50000
+                      bag_shipping_total: 0
+                      bag_tax_total: 0
+                      bag_total: 50000
+                      totals_include_commission: true
+                      order_id: 54609
+                      order_total: 50000
+                      payout_id: 7301
+                      payout_amount: 34200
+                      payout_transfer_id: 88213
+                      date_created: 2026-09-10T14:02:30+0000
+                      date_last_modified: 2026-09-14T06:02:11+0000
+                    - id: 90377
+                      type: REFUND
+                      payout_account_id: 5678
+                      payout_account_type: MERCHANT
+                      currency: USD
+                      amount: -10800
+                      net_distribution_amount: -10800
+                      tax_amount: 0
+                      shipping_amount: 0
+                      commission: 5000
+                      commission_reversed_amount: 1200
+                      app_id: 10193
+                      app_name: Sample Channel
+                      merchant_id: 10064
+                      merchant_name: Space Drinks
+                      merchant_commission_rate: 10.0
+                      payment_provider: STRIPE
+                      payment_service: STRIPE
+                      status: SENT
+                      bag_id: 64579
+                      bag_sub_total: 50000
+                      bag_commissionable_amount: 50000
+                      bag_shipping_total: 0
+                      bag_tax_total: 0
+                      bag_total: 50000
+                      totals_include_commission: true
+                      order_id: 54609
+                      order_total: 50000
+                      payout_id: 7301
+                      payout_amount: 34200
+                      payout_transfer_id: 88213
+                      refund_id: 7890
+                      date_created: 2026-09-12T09:15:44+0000
+                      date_last_modified: 2026-09-14T06:02:11+0000
+                    pageable:
+                      page_number: 0
+                      page_size: 20
+                      sort:
+                        empty: false
+                        sorted: true
+                        unsorted: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    total_elements: 2
+                    total_pages: 1
+                    last: true
+                    size: 20
+                    number: 0
+                    sort:
+                      empty: false
+                      sorted: true
+                      unsorted: false
+                    number_of_elements: 2
+                    first: true
+                    empty: false
+        "400":
+          description: "The request could not be used and nothing was read. invalid_parameter:\
+            \ account_type is neither merchant nor developer. missing_parameter: a\
+            \ channel reading a merchant's payouts through Violet's own dashboard\
+            \ did not say which app (app_id)."
+          content:
+            application/json:
+              examples:
+                invalid_parameter:
+                  description: invalid_parameter
+                  value:
+                    message: Parameter 'account_type' is invalid.
+                    error: invalid_parameter
+                    code: 9001
+                missing_parameter:
+                  description: missing_parameter
+                  value:
+                    message: Required parameter 'app_id' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+        "401":
+          description: "The request was refused and nothing was read. invalid_api_credentials:\
+            \ the token is malformed or wrongly signed, which includes a token issued\
+            \ for another app id or app secret than the ones sent with it. A token\
+            \ that is expired, or missing, is refused with 401 as well. merchant_not_connected:\
+            \ the channel's app is not connected to the merchant in the path, so none\
+            \ of the merchant's payouts were read. Only a channel reading a merchant's\
+            \ payouts can get this answer: a merchant, or a channel reading its own\
+            \ payouts, is not refused this way. The same answer is given when the\
+            \ connection could not be confirmed."
+          content:
+            application/json:
+              examples:
+                invalid_api_credentials:
+                  description: invalid_api_credentials
+                  value:
+                    message: One or more of your API Credentials are invalid.
+                    error: invalid_api_credentials
+                    code: 9903
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant. Merchant must connect
+                      to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The credentials do not permit this read: for example a merchant\
+            \ reading another merchant's payouts, a channel reading another channel's,\
+            \ or a channel naming an app (app_id, through Violet's own dashboard)\
+            \ that it does not own. No payouts were read."
+          content:
+            application/json:
+              examples:
+                Access Denied:
+                  description: Access Denied
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "404":
+          description: "There is no payout with this id that the caller may read (payout_not_found).\
+            \ A payout that does not exist, one the caller may not read, and one with\
+            \ status EXTERNAL give the same answer."
+          content:
+            application/json:
+              examples:
+                payout_not_found:
+                  description: payout_not_found
+                  value:
+                    message: Payout identified by 99999 could not be found.
+                    error: payout_not_found
+                    code: 4469
+  /payments/{account_type}/{account_id}/payouts/{payout_id}:
+    get:
+      tags:
+      - Payments - Payouts
+      summary: Get Payout
+      description: "Returns one payout, by its id. A merchant reads its own payouts,\
+        \ whichever app they came through. A channel reads either its own payouts,\
+        \ with account_type developer, or the payouts of a merchant that its app is,\
+        \ or has been, connected to, with account_type merchant. Of such a merchant\
+        \ a channel sees the payouts made to the merchant's payout accounts for its\
+        \ own app, and no other payout of the merchant's. A payout that does not exist\
+        \ and a payout you may not read give the same 404, payout_not_found, so the\
+        \ answer does not reveal whether someone else's payout exists. A payout with\
+        \ status EXTERNAL is never returned to a merchant or a channel: it answers\
+        \ 404, as a payout that does not exist does. amount is the payout to the merchant's\
+        \ bank account, in the smallest unit of its currency (cents, for USD); on\
+        \ a channel's own payouts it is the payout to the channel's bank account."
+      operationId: getPayout
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        description: "Whose payouts to read: merchant, or developer for a channel's\
+          \ own payouts. Case-insensitive; any other value is refused with 400 invalid_parameter."
+        required: true
+        schema:
+          type: string
+          enum:
+          - merchant
+          - developer
+      - name: account_id
+        in: path
+        description: "The merchant id when account_type is merchant, or the channel's\
+          \ developer id when it is developer. A merchant uses its own id. A channel\
+          \ uses its own developer id, or the id of a merchant its app is, or has\
+          \ been, connected to."
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        description: "The app to read for. Required when a channel reads a merchant's\
+          \ payouts through Violet's own dashboard, which serves every channel and\
+          \ so has to be told which one is meant: without it the answer is 400 missing_parameter,\
+          \ and the app has to be one the caller owns, or the answer is 403. Ignored\
+          \ in every other call, where the app is the one the credentials belong to."
+        schema:
+          type: integer
+          format: int32
+      - name: payout_id
+        in: path
+        description: "The payout's id: the id returned as id on a payout."
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: The payout.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payout'
+              examples:
+                A paid payout:
+                  description: A paid payout
+                  value:
+                    id: 7301
+                    payout_account_id: 5678
+                    payout_account_type: MERCHANT
+                    amount: 34200
+                    currency: USD
+                    status: PAID
+                    payment_service: STRIPE
+                    external_id: po_1PqV3dK29KDiBVldXmN4tR8s
+                    summary:
+                      id: 5120
+                      payments_order_volume: 50000
+                      payments_commission: -5000
+                      payments_fees: 0
+                      payments_distributions: 45000
+                      refunds_order_volume: 50000
+                      refunds_commission: 1200
+                      refunds_fees: 0
+                      refunds_distributions: -10800
+                      net_amount: 34200
+                      unknown_amount: 0
+                      date_created: 2026-09-14T06:02:11+0000
+                      date_last_modified: 2026-09-14T06:02:11+0000
+                    date_created: 2026-09-14T06:02:11+0000
+                    date_settled: 2026-09-16T00:00:00+0000
+                    date_last_modified: 2026-09-16T06:00:05+0000
+        "400":
+          description: "The request could not be used and nothing was read. invalid_parameter:\
+            \ account_type is neither merchant nor developer. missing_parameter: a\
+            \ channel reading a merchant's payouts through Violet's own dashboard\
+            \ did not say which app (app_id)."
+          content:
+            application/json:
+              examples:
+                invalid_parameter:
+                  description: invalid_parameter
+                  value:
+                    message: Parameter 'account_type' is invalid.
+                    error: invalid_parameter
+                    code: 9001
+                missing_parameter:
+                  description: missing_parameter
+                  value:
+                    message: Required parameter 'app_id' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+        "401":
+          description: "The request was refused and nothing was read. invalid_api_credentials:\
+            \ the token is malformed or wrongly signed, which includes a token issued\
+            \ for another app id or app secret than the ones sent with it. A token\
+            \ that is expired, or missing, is refused with 401 as well. merchant_not_connected:\
+            \ the channel's app is not connected to the merchant in the path, so none\
+            \ of the merchant's payouts were read. Only a channel reading a merchant's\
+            \ payouts can get this answer: a merchant, or a channel reading its own\
+            \ payouts, is not refused this way. The same answer is given when the\
+            \ connection could not be confirmed."
+          content:
+            application/json:
+              examples:
+                invalid_api_credentials:
+                  description: invalid_api_credentials
+                  value:
+                    message: One or more of your API Credentials are invalid.
+                    error: invalid_api_credentials
+                    code: 9903
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant. Merchant must connect
+                      to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The credentials do not permit this read: for example a merchant\
+            \ reading another merchant's payouts, a channel reading another channel's,\
+            \ or a channel naming an app (app_id, through Violet's own dashboard)\
+            \ that it does not own. No payouts were read."
+          content:
+            application/json:
+              examples:
+                Access Denied:
+                  description: Access Denied
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "404":
+          description: "There is no payout with this id that the caller may read (payout_not_found).\
+            \ A payout that does not exist, one the caller may not read, and one with\
+            \ status EXTERNAL give the same answer."
+          content:
+            application/json:
+              examples:
+                payout_not_found:
+                  description: payout_not_found
+                  value:
+                    message: Payout identified by 99999 could not be found.
+                    error: payout_not_found
+                    code: 4469
+  /payments/{account_type}/{account_id}/payouts/external/{external_payout_id}:
+    get:
+      tags:
+      - Payments - Payouts
+      summary: Get Payout by External Id
+      description: "Returns one payout, by the payment provider's id for it (external_id)\
+        \ instead of by its id. If the provider's id is recorded on more than one\
+        \ payout, the payout with the lowest id that you may read is returned. A merchant\
+        \ reads its own payouts, whichever app they came through. A channel reads\
+        \ either its own payouts, with account_type developer, or the payouts of a\
+        \ merchant that its app is, or has been, connected to, with account_type merchant.\
+        \ Of such a merchant a channel sees the payouts made to the merchant's payout\
+        \ accounts for its own app, and no other payout of the merchant's. A payout\
+        \ that does not exist and a payout you may not read give the same 404, payout_not_found,\
+        \ so the answer does not reveal whether someone else's payout exists. A payout\
+        \ with status EXTERNAL is never returned to a merchant or a channel: it answers\
+        \ 404, as a payout that does not exist does. amount is the payout to the merchant's\
+        \ bank account, in the smallest unit of its currency (cents, for USD); on\
+        \ a channel's own payouts it is the payout to the channel's bank account."
+      operationId: getPayoutByExternalId
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        description: "Whose payouts to read: merchant, or developer for a channel's\
+          \ own payouts. Case-insensitive; any other value is refused with 400 invalid_parameter."
+        required: true
+        schema:
+          type: string
+          enum:
+          - merchant
+          - developer
+      - name: account_id
+        in: path
+        description: "The merchant id when account_type is merchant, or the channel's\
+          \ developer id when it is developer. A merchant uses its own id. A channel\
+          \ uses its own developer id, or the id of a merchant its app is, or has\
+          \ been, connected to."
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        description: "The app to read for. Required when a channel reads a merchant's\
+          \ payouts through Violet's own dashboard, which serves every channel and\
+          \ so has to be told which one is meant: without it the answer is 400 missing_parameter,\
+          \ and the app has to be one the caller owns, or the answer is 403. Ignored\
+          \ in every other call, where the app is the one the credentials belong to."
+        schema:
+          type: integer
+          format: int32
+      - name: external_payout_id
+        in: path
+        description: "The payment provider's id for the payout, as returned in external_id.\
+          \ For Stripe, the po_ id."
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The payout.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payout'
+              examples:
+                A paid payout:
+                  description: A paid payout
+                  value:
+                    id: 7301
+                    payout_account_id: 5678
+                    payout_account_type: MERCHANT
+                    amount: 34200
+                    currency: USD
+                    status: PAID
+                    payment_service: STRIPE
+                    external_id: po_1PqV3dK29KDiBVldXmN4tR8s
+                    summary:
+                      id: 5120
+                      payments_order_volume: 50000
+                      payments_commission: -5000
+                      payments_fees: 0
+                      payments_distributions: 45000
+                      refunds_order_volume: 50000
+                      refunds_commission: 1200
+                      refunds_fees: 0
+                      refunds_distributions: -10800
+                      net_amount: 34200
+                      unknown_amount: 0
+                      date_created: 2026-09-14T06:02:11+0000
+                      date_last_modified: 2026-09-14T06:02:11+0000
+                    date_created: 2026-09-14T06:02:11+0000
+                    date_settled: 2026-09-16T00:00:00+0000
+                    date_last_modified: 2026-09-16T06:00:05+0000
+        "400":
+          description: "The request could not be used and nothing was read. invalid_parameter:\
+            \ account_type is neither merchant nor developer. missing_parameter: a\
+            \ channel reading a merchant's payouts through Violet's own dashboard\
+            \ did not say which app (app_id)."
+          content:
+            application/json:
+              examples:
+                invalid_parameter:
+                  description: invalid_parameter
+                  value:
+                    message: Parameter 'account_type' is invalid.
+                    error: invalid_parameter
+                    code: 9001
+                missing_parameter:
+                  description: missing_parameter
+                  value:
+                    message: Required parameter 'app_id' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+        "401":
+          description: "The request was refused and nothing was read. invalid_api_credentials:\
+            \ the token is malformed or wrongly signed, which includes a token issued\
+            \ for another app id or app secret than the ones sent with it. A token\
+            \ that is expired, or missing, is refused with 401 as well. merchant_not_connected:\
+            \ the channel's app is not connected to the merchant in the path, so none\
+            \ of the merchant's payouts were read. Only a channel reading a merchant's\
+            \ payouts can get this answer: a merchant, or a channel reading its own\
+            \ payouts, is not refused this way. The same answer is given when the\
+            \ connection could not be confirmed."
+          content:
+            application/json:
+              examples:
+                invalid_api_credentials:
+                  description: invalid_api_credentials
+                  value:
+                    message: One or more of your API Credentials are invalid.
+                    error: invalid_api_credentials
+                    code: 9903
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant. Merchant must connect
+                      to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The credentials do not permit this read: for example a merchant\
+            \ reading another merchant's payouts, a channel reading another channel's,\
+            \ or a channel naming an app (app_id, through Violet's own dashboard)\
+            \ that it does not own. No payouts were read."
+          content:
+            application/json:
+              examples:
+                Access Denied:
+                  description: Access Denied
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+        "404":
+          description: "There is no payout with this payment provider id that the\
+            \ caller may read (payout_not_found). A payout that does not exist, one\
+            \ the caller may not read, and one with status EXTERNAL give the same\
+            \ answer."
+          content:
+            application/json:
+              examples:
+                payout_not_found:
+                  description: payout_not_found
+                  value:
+                    message: Payout identified by po_1QzXm4tR9zK29KDiBVldNc6e could
+                      not be found.
+                    error: payout_not_found
+                    code: 4469
+  /payments/{account_type}/{account_id}/payouts:
+    get:
+      tags:
+      - Payments - Payouts
+      summary: Get Payouts
+      description: "Returns a page of the payouts of the merchant or channel named\
+        \ in the path. A merchant reads its own payouts, whichever app they came through.\
+        \ A channel reads either its own payouts, with account_type developer, or\
+        \ the payouts of a merchant that its app is, or has been, connected to, with\
+        \ account_type merchant. Of such a merchant a channel sees the payouts made\
+        \ to the merchant's payout accounts for its own app, and no other payout of\
+        \ the merchant's. Payouts come newest first by creation date, and payouts\
+        \ created at the same moment come highest id first, so the order is the same\
+        \ on every page. A payout with status EXTERNAL is never listed to a merchant\
+        \ or a channel. amount is the payout to the merchant's bank account, in the\
+        \ smallest unit of its currency (cents, for USD); on a channel's own payouts\
+        \ it is the payout to the channel's bank account. When there is nothing to\
+        \ list, including a merchant with no payouts for your app, the answer is an\
+        \ empty page, not a 404. Search Payouts narrows the list by order, bag, status\
+        \ or date."
+      operationId: getPayouts
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        description: "Whose payouts to read: merchant, or developer for a channel's\
+          \ own payouts. Case-insensitive; any other value is refused with 400 invalid_parameter."
+        required: true
+        schema:
+          type: string
+          enum:
+          - merchant
+          - developer
+      - name: account_id
+        in: path
+        description: "The merchant id when account_type is merchant, or the channel's\
+          \ developer id when it is developer. A merchant uses its own id. A channel\
+          \ uses its own developer id, or the id of a merchant its app is, or has\
+          \ been, connected to."
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        description: "The app to read for. Required when a channel reads a merchant's\
+          \ payouts through Violet's own dashboard, which serves every channel and\
+          \ so has to be told which one is meant: without it the answer is 400 missing_parameter,\
+          \ and the app has to be one the caller owns, or the answer is 403. Ignored\
+          \ in every other call, where the app is the one the credentials belong to."
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        description: "Results per page, at most 100. Out-of-range values are adjusted\
+          \ rather than refused: above 100 becomes 100, and below 1 becomes 10. The\
+          \ size applied is returned in the response's size. (Violet's own dashboard\
+          \ has a ceiling of 500.)"
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        description: "Page to return, counting from 1. Values below 1 become 1. The\
+          \ response's number counts from 0, so page 1 comes back as number 0."
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      responses:
+        "200":
+          description: "The payouts, newest first. May be an empty page."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePayout'
+              examples:
+                Payouts, newest first:
+                  description: "Payouts, newest first"
+                  value:
+                    content:
+                    - id: 7355
+                      payout_account_id: 5678
+                      payout_account_type: MERCHANT
+                      amount: 19800
+                      currency: USD
+                      status: IN_TRANSIT
+                      payment_service: STRIPE
+                      external_id: po_1Q0aZ3K29KDiBVldHk7pLw2c
+                      summary:
+                        id: 5163
+                        payments_order_volume: 22000
+                        payments_commission: -2200
+                        payments_fees: 0
+                        payments_distributions: 19800
+                        refunds_order_volume: 0
+                        refunds_commission: 0
+                        refunds_fees: 0
+                        refunds_distributions: 0
+                        net_amount: 19800
+                        unknown_amount: 0
+                        date_created: 2026-09-21T06:01:40+0000
+                        date_last_modified: 2026-09-21T06:01:40+0000
+                      date_created: 2026-09-21T06:01:40+0000
+                      date_settled: 2026-09-23T00:00:00+0000
+                      date_last_modified: 2026-09-21T06:01:40+0000
+                    - id: 7301
+                      payout_account_id: 5678
+                      payout_account_type: MERCHANT
+                      amount: 34200
+                      currency: USD
+                      status: PAID
+                      payment_service: STRIPE
+                      external_id: po_1PqV3dK29KDiBVldXmN4tR8s
+                      summary:
+                        id: 5120
+                        payments_order_volume: 50000
+                        payments_commission: -5000
+                        payments_fees: 0
+                        payments_distributions: 45000
+                        refunds_order_volume: 50000
+                        refunds_commission: 1200
+                        refunds_fees: 0
+                        refunds_distributions: -10800
+                        net_amount: 34200
+                        unknown_amount: 0
+                        date_created: 2026-09-14T06:02:11+0000
+                        date_last_modified: 2026-09-14T06:02:11+0000
+                      date_created: 2026-09-14T06:02:11+0000
+                      date_settled: 2026-09-16T00:00:00+0000
+                      date_last_modified: 2026-09-16T06:00:05+0000
+                    pageable:
+                      page_number: 0
+                      page_size: 20
+                      sort:
+                        empty: false
+                        sorted: true
+                        unsorted: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    total_elements: 2
+                    total_pages: 1
+                    last: true
+                    size: 20
+                    number: 0
+                    sort:
+                      empty: false
+                      sorted: true
+                      unsorted: false
+                    number_of_elements: 2
+                    first: true
+                    empty: false
+                No payouts:
+                  description: No payouts
+                  value:
+                    content: []
+                    pageable:
+                      page_number: 0
+                      page_size: 20
+                      sort:
+                        empty: false
+                        sorted: true
+                        unsorted: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    total_elements: 0
+                    total_pages: 0
+                    last: true
+                    size: 20
+                    number: 0
+                    sort:
+                      empty: false
+                      sorted: true
+                      unsorted: false
+                    number_of_elements: 0
+                    first: true
+                    empty: true
+        "400":
+          description: "The request could not be used and nothing was read. invalid_parameter:\
+            \ account_type is neither merchant nor developer. missing_parameter: a\
+            \ channel reading a merchant's payouts through Violet's own dashboard\
+            \ did not say which app (app_id)."
+          content:
+            application/json:
+              examples:
+                invalid_parameter:
+                  description: invalid_parameter
+                  value:
+                    message: Parameter 'account_type' is invalid.
+                    error: invalid_parameter
+                    code: 9001
+                missing_parameter:
+                  description: missing_parameter
+                  value:
+                    message: Required parameter 'app_id' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+        "401":
+          description: "The request was refused and nothing was read. invalid_api_credentials:\
+            \ the token is malformed or wrongly signed, which includes a token issued\
+            \ for another app id or app secret than the ones sent with it. A token\
+            \ that is expired, or missing, is refused with 401 as well. merchant_not_connected:\
+            \ the channel's app is not connected to the merchant in the path, so none\
+            \ of the merchant's payouts were read. Only a channel reading a merchant's\
+            \ payouts can get this answer: a merchant, or a channel reading its own\
+            \ payouts, is not refused this way. The same answer is given when the\
+            \ connection could not be confirmed."
+          content:
+            application/json:
+              examples:
+                invalid_api_credentials:
+                  description: invalid_api_credentials
+                  value:
+                    message: One or more of your API Credentials are invalid.
+                    error: invalid_api_credentials
+                    code: 9903
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant. Merchant must connect
+                      to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The credentials do not permit this read: for example a merchant\
+            \ reading another merchant's payouts, a channel reading another channel's,\
+            \ or a channel naming an app (app_id, through Violet's own dashboard)\
+            \ that it does not own. No payouts were read."
+          content:
+            application/json:
+              examples:
+                Access Denied:
+                  description: Access Denied
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
   /payments/transfers/{transfer_id}:
     get:
       tags:
@@ -1506,6 +2397,277 @@ paths:
           description: "The credentials do not permit this search: for example a merchant\
             \ searching another merchant's distributions, or a channel searching another\
             \ developer's. Nothing was searched."
+          content:
+            application/json:
+              examples:
+                Access Denied:
+                  description: Access Denied
+                  value:
+                    message: You do not have permission to access this resource.
+                    error: insufficient_permissions
+                    code: 9901
+  /payments/{account_type}/{account_id}/payouts/search:
+    post:
+      tags:
+      - Payments - Payouts
+      summary: Search Payouts
+      description: "Returns the payouts of the merchant or channel named in the path\
+        \ that match every filter in the body. Use it to find the payouts that hold\
+        \ the money of one order or bag, or the payouts of a period. Filters combine\
+        \ with AND, an omitted field does not filter, and {} matches every payout\
+        \ the caller can see. A merchant reads its own payouts, whichever app they\
+        \ came through. A channel reads either its own payouts, with account_type\
+        \ developer, or the payouts of a merchant that its app is, or has been, connected\
+        \ to, with account_type merchant. Of such a merchant a channel sees the payouts\
+        \ made to the merchant's payout accounts for its own app, and no other payout\
+        \ of the merchant's. Payouts come newest first by creation date, and payouts\
+        \ created at the same moment come highest id first, so the order is the same\
+        \ on every page. A payout with status EXTERNAL is never returned to a merchant\
+        \ or a channel, and a search for that status matches nothing. amount is the\
+        \ payout to the merchant's bank account, in the smallest unit of its currency\
+        \ (cents, for USD); on a channel's own payouts it is the payout to the channel's\
+        \ bank account. A search that matches nothing returns an empty page, not a\
+        \ 404."
+      operationId: searchPayouts
+      parameters:
+      - name: X-Violet-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Secret
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: X-Violet-App-Id
+        in: header
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: account_type
+        in: path
+        description: "Whose payouts to read: merchant, or developer for a channel's\
+          \ own payouts. Case-insensitive; any other value is refused with 400 invalid_parameter."
+        required: true
+        schema:
+          type: string
+          enum:
+          - merchant
+          - developer
+      - name: account_id
+        in: path
+        description: "The merchant id when account_type is merchant, or the channel's\
+          \ developer id when it is developer. A merchant uses its own id. A channel\
+          \ uses its own developer id, or the id of a merchant its app is, or has\
+          \ been, connected to."
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: app_id
+        in: query
+        description: "The app to read for. Required when a channel reads a merchant's\
+          \ payouts through Violet's own dashboard, which serves every channel and\
+          \ so has to be told which one is meant: without it the answer is 400 missing_parameter,\
+          \ and the app has to be one the caller owns, or the answer is 403. Ignored\
+          \ in every other call, where the app is the one the credentials belong to."
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        description: "Results per page, at most 100. Out-of-range values are adjusted\
+          \ rather than refused: above 100 becomes 100, and below 1 becomes 10. The\
+          \ size applied is returned in the response's size. (Violet's own dashboard\
+          \ has a ceiling of 500.)"
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      - name: page
+        in: query
+        description: "Page to return, counting from 1. Values below 1 become 1. The\
+          \ response's number counts from 0, so page 1 comes back as number 0."
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      requestBody:
+        description: "The filters, all optional. Send {} to search without filters.\
+          \ The dates are inclusive and must be written with a numeric offset, as\
+          \ 2026-09-01T00:00:00+0000: the forms 2026-09-01T00:00:00Z and 2026-09-01T00:00:00+00:00\
+          \ are refused."
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayoutSearchRequest'
+            examples:
+              Every payout for one order:
+                description: Every payout for one order
+                value:
+                  order_id: 54609
+              Paid payouts settled in September 2026:
+                description: Paid payouts settled in September 2026
+                value:
+                  statuses:
+                  - PAID
+                  after_date_settled: 2026-09-01T00:00:00+0000
+                  before_date_settled: 2026-09-30T23:59:59+0000
+        required: true
+      responses:
+        "200":
+          description: "The matching payouts, newest first. May be an empty page."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePayout'
+              examples:
+                Paid payouts settled in September 2026:
+                  description: Paid payouts settled in September 2026
+                  value:
+                    content:
+                    - id: 7301
+                      payout_account_id: 5678
+                      payout_account_type: MERCHANT
+                      amount: 34200
+                      currency: USD
+                      status: PAID
+                      payment_service: STRIPE
+                      external_id: po_1PqV3dK29KDiBVldXmN4tR8s
+                      summary:
+                        id: 5120
+                        payments_order_volume: 50000
+                        payments_commission: -5000
+                        payments_fees: 0
+                        payments_distributions: 45000
+                        refunds_order_volume: 50000
+                        refunds_commission: 1200
+                        refunds_fees: 0
+                        refunds_distributions: -10800
+                        net_amount: 34200
+                        unknown_amount: 0
+                        date_created: 2026-09-14T06:02:11+0000
+                        date_last_modified: 2026-09-14T06:02:11+0000
+                      date_created: 2026-09-14T06:02:11+0000
+                      date_settled: 2026-09-16T00:00:00+0000
+                      date_last_modified: 2026-09-16T06:00:05+0000
+                    pageable:
+                      page_number: 0
+                      page_size: 20
+                      sort:
+                        empty: false
+                        sorted: true
+                        unsorted: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    total_elements: 1
+                    total_pages: 1
+                    last: true
+                    size: 20
+                    number: 0
+                    sort:
+                      empty: false
+                      sorted: true
+                      unsorted: false
+                    number_of_elements: 1
+                    first: true
+                    empty: false
+                No payouts match:
+                  description: No payouts match
+                  value:
+                    content: []
+                    pageable:
+                      page_number: 0
+                      page_size: 20
+                      sort:
+                        empty: false
+                        sorted: true
+                        unsorted: false
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    total_elements: 0
+                    total_pages: 0
+                    last: true
+                    size: 20
+                    number: 0
+                    sort:
+                      empty: false
+                      sorted: true
+                      unsorted: false
+                    number_of_elements: 0
+                    first: true
+                    empty: true
+        "400":
+          description: "The request could not be used and nothing was searched. empty_body:\
+            \ no body was sent; send {} to search without filters. invalid_parameter:\
+            \ account_type is neither merchant nor developer. missing_parameter: a\
+            \ channel searching a merchant's payouts through Violet's own dashboard\
+            \ did not say which app (app_id). A body that is not valid JSON, or a\
+            \ field that does not parse (an unknown status, a date not written like\
+            \ 2026-09-01T00:00:00+0000), is also refused with 400, as a plain-text\
+            \ description of the problem rather than this JSON body."
+          content:
+            application/json:
+              examples:
+                empty_body:
+                  description: empty_body
+                  value:
+                    message: Empty body in request. Expected PayoutSearchRequest object.
+                    error: empty_body
+                    code: 9910
+                invalid_parameter:
+                  description: invalid_parameter
+                  value:
+                    message: Parameter 'account_type' is invalid.
+                    error: invalid_parameter
+                    code: 9001
+                missing_parameter:
+                  description: missing_parameter
+                  value:
+                    message: Required parameter 'app_id' cannot be null or empty.
+                    error: missing_parameter
+                    code: 9002
+            text/plain:
+              schema:
+                type: string
+                description: "A body that is not valid JSON, or a field that does\
+                  \ not parse. The text is the JSON parser's own description of the\
+                  \ problem; its wording is not part of this contract."
+        "401":
+          description: "The request was refused and nothing was read. invalid_api_credentials:\
+            \ the token is malformed or wrongly signed, which includes a token issued\
+            \ for another app id or app secret than the ones sent with it. A token\
+            \ that is expired, or missing, is refused with 401 as well. merchant_not_connected:\
+            \ the channel's app is not connected to the merchant in the path, so none\
+            \ of the merchant's payouts were read. Only a channel reading a merchant's\
+            \ payouts can get this answer: a merchant, or a channel reading its own\
+            \ payouts, is not refused this way. The same answer is given when the\
+            \ connection could not be confirmed."
+          content:
+            application/json:
+              examples:
+                invalid_api_credentials:
+                  description: invalid_api_credentials
+                  value:
+                    message: One or more of your API Credentials are invalid.
+                    error: invalid_api_credentials
+                    code: 9903
+                merchant_not_connected:
+                  description: merchant_not_connected
+                  value:
+                    message: App not connected to merchant. Merchant must connect
+                      to your app before you can access their data.
+                    error: merchant_not_connected
+                    code: 7118
+        "403":
+          description: "The credentials do not permit this read: for example a merchant\
+            \ reading another merchant's payouts, a channel reading another channel's,\
+            \ or a channel naming an app (app_id, through Violet's own dashboard)\
+            \ that it does not own. No payouts were read."
           content:
             application/json:
               examples:
@@ -2466,24 +3628,24 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
     Sort:
       type: object
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
     PaymentPlatformConfiguration:
       type: object
@@ -3160,6 +4322,179 @@ components:
           type: boolean
         empty:
           type: boolean
+    Payout:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID
+          format: int32
+        payout_account_id:
+          type: integer
+          description: ID of the payout account this payout was made to.
+          format: int32
+        payout_account_type:
+          type: string
+          description: Payout Account Type
+          enum:
+          - MERCHANT
+          - DEVELOPER
+        amount:
+          type: integer
+          description: "Total amount of the payout, in the smallest unit of currency\
+            \ (for example, cents)."
+          format: int64
+        currency:
+          type: string
+          description: Currency that the payout was made in
+        status:
+          type: string
+          description: "Current state of the payout: PAID, PENDING, IN_TRANSIT, CANCELED\
+            \ or FAILED. EXTERNAL marks payouts recorded outside Violet and is never\
+            \ returned to merchants or channels."
+          enum:
+          - PAID
+          - PENDING
+          - IN_TRANSIT
+          - CANCELED
+          - FAILED
+          - EXTERNAL
+        payment_service:
+          type: string
+          description: Payment service that processed this payout
+          enum:
+          - STRIPE
+          - NUVEI
+          - CREDOVA
+          - EXTERNAL
+        external_id:
+          type: string
+          description: "ID of the payout at the payment provider. For Stripe, the\
+            \ po_ id."
+        summary:
+          $ref: '#/components/schemas/PayoutSummary'
+        date_created:
+          type: string
+          description: Date of payout creation
+          format: date-time
+        date_settled:
+          type: string
+          description: "Date the payout settles in your bank account. If this date\
+            \ is in the future, this is a tentative date of settlement and subject\
+            \ to change."
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of last payout update
+          format: date-time
+      description: Payouts to a given payout account
+    PayoutSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the payout summary.
+          format: int32
+        payments_order_volume:
+          type: integer
+          description: "Total value of the bags paid in this payout, including item\
+            \ prices, discounts, shipping and taxes, in the smallest unit of currency\
+            \ (for example, cents)."
+          format: int32
+        payments_commission:
+          type: integer
+          description: "Total commission earned by channels on the sales in this payout,\
+            \ in the smallest unit of currency (for example, cents)."
+          format: int32
+        payments_fees:
+          type: integer
+          description: "Total payment provider fees charged on the sales in this payout,\
+            \ in the smallest unit of currency (for example, cents)."
+          format: int32
+        payments_distributions:
+          type: integer
+          description: "Total amount of the distributions for the sales in this payout,\
+            \ before refunds are taken off, in the smallest unit of currency (for\
+            \ example, cents)."
+          format: int32
+        refunds_order_volume:
+          type: integer
+          description: "Total value of the bags refunded in this payout, in the smallest\
+            \ unit of currency (for example, cents). A bag counts once, however many\
+            \ of its refunds the payout includes."
+          format: int32
+        refunds_commission:
+          type: integer
+          description: "Total commission reversed by the refunds in this payout, in\
+            \ the smallest unit of currency (for example, cents)."
+          format: int32
+        refunds_fees:
+          type: integer
+          description: "Total payment provider fees on the refunds in this payout,\
+            \ in the smallest unit of currency (for example, cents)."
+          format: int32
+        refunds_distributions:
+          type: integer
+          description: "Total amount of the distributions for the refunds in this\
+            \ payout, in the smallest unit of currency (for example, cents). Zero\
+            \ or negative, because refunds reduce the payout."
+          format: int32
+        net_amount:
+          type: integer
+          description: "Net amount of the sales and refunds in this payout: payments_distributions\
+            \ plus refunds_distributions, in the smallest unit of currency (for example,\
+            \ cents)."
+          format: int32
+        unknown_amount:
+          type: integer
+          description: "Part of the payout that comes from payments the payment provider\
+            \ processed outside Violet orders, for example sales made outside Violet\
+            \ on the same payment provider account, less refunds of such payments,\
+            \ in the smallest unit of currency (for example, cents). It can be negative.\
+            \ It is not counted in the other amounts in this summary."
+          format: int32
+        date_created:
+          type: string
+          description: Date of when this summary was created.
+          format: date-time
+        date_last_modified:
+          type: string
+          description: Date of when this summary was last updated.
+          format: date-time
+      description: "Breakdown of the sales and refunds that make up a payout. All\
+        \ amounts are in the smallest unit of currency (for example, cents)."
+    PagePayout:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payout'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        first:
+          type: boolean
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        numberOfElements:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        empty:
+          type: boolean
     PayoutTransfer:
       type: object
       properties:
@@ -3560,6 +4895,62 @@ components:
           description: After date
           format: date-time
       description: Search Request for Distributions.
+    PayoutSearchRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the payout.
+          format: int32
+        statuses:
+          uniqueItems: true
+          type: array
+          description: "Statuses to match: PAID, PENDING, IN_TRANSIT, CANCELED, FAILED.\
+            \ Omit for all."
+          items:
+            type: string
+            description: "Statuses to match: PAID, PENDING, IN_TRANSIT, CANCELED,\
+              \ FAILED. Omit for all."
+            enum:
+            - PAID
+            - PENDING
+            - IN_TRANSIT
+            - CANCELED
+            - FAILED
+            - EXTERNAL
+        external_id:
+          type: string
+          description: "ID of the payout at the payment provider. For Stripe, the\
+            \ po_ id."
+        bag_id:
+          type: integer
+          description: Only payouts that include money from this bag.
+          format: int64
+        order_id:
+          type: integer
+          description: Only payouts that include money from this order.
+          format: int64
+        external_order_id:
+          type: string
+          description: Only payouts that include money from the order with this ID
+            on the merchant's ecommerce platform.
+        before_date_settled:
+          type: string
+          description: Only payouts settled on or before this date.
+          format: date-time
+        after_date_settled:
+          type: string
+          description: Only payouts settled on or after this date.
+          format: date-time
+        before_date_created:
+          type: string
+          description: Only payouts created on or before this date.
+          format: date-time
+        after_date_created:
+          type: string
+          description: Only payouts created on or after this date.
+          format: date-time
+      description: Search Request for Payouts
     PageTransferReversal:
       type: object
       properties:
