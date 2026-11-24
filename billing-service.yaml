@@ -1034,22 +1034,24 @@ paths:
       tags:
       - Payments - Distributions
       summary: Get Distributions by Payout Id
-      description: "Returns a page of the distributions on one payout: the sales,\
-        \ refunds and adjustments that make up the payout, each row's type saying\
-        \ which. A merchant reads its own payouts, whichever app they came through.\
-        \ A channel reads either its own payouts, with account_type developer, or\
-        \ the payouts of a merchant that its app is, or has been, connected to, with\
-        \ account_type merchant. Of such a merchant a channel sees the payouts made\
-        \ to the merchant's payout accounts for its own app, and no other payout of\
-        \ the merchant's. A channel reading a merchant's payout is given only the\
-        \ distributions of its own app. Distributions come oldest first by creation\
-        \ date, and distributions created at the same moment come lowest id first,\
-        \ so the order is the same on every page. A payout that does not exist and\
-        \ a payout you may not read give the same 404, payout_not_found, so the answer\
-        \ does not reveal whether someone else's payout exists. A payout with status\
-        \ EXTERNAL is never returned to a merchant or a channel: it answers 404, as\
-        \ a payout that does not exist does. A payout with no distributions for you\
-        \ returns an empty page, not a 404."
+      description: "Returns a page of the distributions on one payout: its sales,\
+        \ refunds, adjustments and dispute adjustments, each row's type saying which.\
+        \ The payout's summary totals the sales and refunds only, so adjustments and\
+        \ dispute adjustments appear here but not in the summary. A merchant reads\
+        \ its own payouts, whichever app they came through. A channel reads either\
+        \ its own payouts, with account_type developer, or the payouts of a merchant\
+        \ that its app is, or has been, connected to, with account_type merchant.\
+        \ Of such a merchant a channel sees the payouts made to the merchant's payout\
+        \ accounts for its own app, and no other payout of the merchant's. A channel\
+        \ reading a merchant's payout is given only the distributions of its own app.\
+        \ Distributions come oldest first by creation date, and distributions created\
+        \ at the same moment come lowest id first, so the order is the same on every\
+        \ page. A payout that does not exist and a payout you may not read give the\
+        \ same 404, payout_not_found, so the answer does not reveal whether someone\
+        \ else's payout exists. A payout with status EXTERNAL is never returned to\
+        \ a merchant or a channel: it answers 404, as a payout that does not exist\
+        \ does. A payout with no distributions for you returns an empty page, not\
+        \ a 404."
       operationId: getDistributionsByPayoutId
       parameters:
       - name: X-Violet-Token
@@ -2119,16 +2121,17 @@ paths:
         \ every refund of it. It is not the commission that refund reversed, so never\
         \ sum it across refunds. The commission that refund reversed is commission_reversed_amount,\
         \ with the same sign as commission on the row. Sum that instead. It can be\
-        \ empty on refunds recorded before 2026-10-01. net_distribution_amount is\
+        \ empty on refunds recorded before 2026-10-02. net_distribution_amount is\
         \ what the refund moved for that account, signed from its side: negative when\
         \ money is taken back, positive when it is paid, which a refund recorded with\
         \ a payment-provider fee credit can be. A Stripe refund records no fee credit:\
         \ the processing fee of the sale stays with whoever bore it, so payment_provider_total_fee\
         \ on its refund rows is 0 or absent. Older Stripe refund rows, and Nuvei refund\
-        \ rows, can carry a negative payment_provider_total_fee, which is a fee credited\
-        \ back. On the channel's row that movement is not the commission reversed\
-        \ on its own: it can also carry tax or duty the channel remits, and a correction\
-        \ for a refund discrepancy. On a bag whose payment distributions have totals_include_commission\
+        \ rows, can carry a negative payment_provider_total_fee, which is a fee credit\
+        \ that Violet worked out and recorded, not a fee the provider returned. On\
+        \ the channel's row that movement is not the commission reversed on its own:\
+        \ it can also carry tax or duty the channel remits, and a correction for a\
+        \ refund discrepancy. On a bag whose payment distributions have totals_include_commission\
         \ false, a refund reverses no commission at all and commission_reversed_amount\
         \ is 0. A refund row carries amount, equal to net_distribution_amount, and\
         \ no distribution_amount. A search that matches nothing returns an empty page,\
@@ -3597,6 +3600,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -3609,8 +3614,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -3628,24 +3631,24 @@ components:
           format: int64
         sort:
           $ref: '#/components/schemas/Sort'
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
     Sort:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PaymentPlatformConfiguration:
       type: object
@@ -3934,8 +3937,11 @@ components:
           format: int32
         type:
           type: string
-          description: "Type of this Distribution record. Can be {PAYMENT}, {REFUND},\
-            \ {ADJUSTMENT}, or {DISPUTE_ADJUSTMENT}."
+          description: "What this row records. {PAYMENT} is a sale. {REFUND} is a\
+            \ refund of a sale. {ADJUSTMENT} is a correction to what the merchant\
+            \ and the channel are owed on a bag. {DISPUTE_ADJUSTMENT} is money taken\
+            \ from a party, or given back to it, because of a dispute over the shopper's\
+            \ payment."
           enum:
           - PAYMENT
           - REFUND
@@ -3943,63 +3949,123 @@ components:
           - DISPUTE_ADJUSTMENT
         payout_account_id:
           type: integer
-          description: Unique identifier of the Violet Payout Account that this Distribution
-            is sent to.
+          description: "Unique identifier of the payout account this row is paid to,\
+            \ or taken from."
           format: int32
         payout_account_type:
           type: string
-          description: "Entity type of the Violet Payout Account associated with this\
-            \ Distribution. Can be either {DEVELOPER} or {MERCHANT}"
+          description: "Which party's payout account this row belongs to. Can be either\
+            \ {DEVELOPER} or {MERCHANT}."
           enum:
           - MERCHANT
           - DEVELOPER
         currency:
           type: string
-          description: Main currency (e.g. USD) of this Distribution.
+          description: "Currency of the amounts on this row, for example USD. The\
+            \ exception is `payout_amount`, which is in the currency of the payout."
         amount:
           type: integer
-          description: "Net amount, in fractional currency unit (e.g. cents), of this\
-            \ Distribution."
+          description: "What this row adds to what its party is owed, or takes from\
+            \ it, in the smallest unit of the currency, for example cents: positive\
+            \ adds, negative takes. See `net_distribution_amount` for how it works\
+            \ out on each type of row. It is always the same figure as `net_distribution_amount`."
           format: int32
         net_distribution_amount:
           type: integer
-          description: "The final amount to be distributed, in fractional currency\
-            \ unit (e.g. cents), after all fees, commissions, and discounts are applied."
+          description: "What this row adds to what its party is owed, or takes from\
+            \ it, in the smallest unit of the currency, for example cents, after commission,\
+            \ payment provider fees, and the tax and duty that apply to the party.\
+            \ Positive adds; negative takes. On a sale it is usually positive: for\
+            \ the merchant, its share of the bag; for the channel, its commission\
+            \ less the payment provider fees it pays, plus any tax or duty it remits.\
+            \ The channel's can be negative when those fees are larger than its commission.\
+            \ On a refund it is negative or 0: what the refund takes back from the\
+            \ party. On the channel's row of a refund made before 27 October 2026\
+            \ it can be positive. On an adjustment it is the adjustment as it was\
+            \ submitted, positive or negative. On a dispute adjustment it is negative\
+            \ when money is taken because of the dispute, and positive when it is\
+            \ given back after the dispute is won."
           format: int32
         distribution_amount:
           type: integer
-          description: "The initial distribution amount, in fractional currency unit\
-            \ (e.g. cents), before any deductions."
+          description: "On a sale, `net_distribution_amount` plus the payment provider\
+            \ fee this row's party pays, in the smallest unit of the currency, for\
+            \ example cents: the amount before that fee is taken off. Commission,\
+            \ tax and duty are already accounted for in it. On an adjustment or a\
+            \ dispute adjustment, the same figure as `net_distribution_amount`. Refund\
+            \ rows do not have it."
           format: int32
         tax_amount:
           type: integer
-          description: The total tax amount included in the distribution.
+          description: "Tax that is part of this row's amount, in the smallest unit\
+            \ of the currency, for example cents. It is on the row of the party that\
+            \ remits the tax (see `tax_remitter`) and is 0 on the other party's row.\
+            \ Positive or 0, including on a refund row, where `amount` is negative.\
+            \ 0 on an adjustment or a dispute adjustment."
           format: int32
         duty_amount:
           type: integer
-          description: The total duty amount included in the distribution.
+          description: "Duty that is part of this row's amount, in the smallest unit\
+            \ of the currency, for example cents. It is on the row of the party that\
+            \ remits the duty (see `duty_remitter`) and is 0 on the other party's\
+            \ row. Positive or 0, including on a refund row, where `amount` is negative.\
+            \ 0 on an adjustment or a dispute adjustment."
           format: int32
         shipping_amount:
           type: integer
-          description: The total shipping charges included in the distribution.
+          description: "Shipping that is part of this row's amount, in the smallest\
+            \ unit of the currency, for example cents. The merchant bears shipping,\
+            \ so it is on the merchant's row and is 0 on the channel's. Positive or\
+            \ 0 on a sale or a refund, including on a refund row, where `amount` is\
+            \ negative. On an adjustment or a dispute adjustment it holds the same\
+            \ signed figure as `amount`, whatever the adjustment was for, so on those\
+            \ rows it is not a shipping figure."
           format: int32
         commission:
           type: integer
-          description: "Amount of commission earned by channels, in fractional currency\
-            \ units (e.g. cents). On a refund distribution this is the whole bag's\
-            \ commission, not the part this refund reversed; see `commission_reversed_amount`."
+          description: "The channel's commission on the sale, in the smallest unit\
+            \ of the currency, for example cents. On a sale row it is negative on\
+            \ the merchant's row, where it is taken from the merchant, and positive\
+            \ on the channel's row, where it is earned. It is 0 when no commission\
+            \ applies. On a refund row it is the whole sale's commission, not the\
+            \ part this refund reversed, and the signs are the other way round: positive\
+            \ on the merchant's row and negative on the channel's. See `commission_reversed_amount`\
+            \ for the part the refund reversed. Adjustment and dispute adjustment\
+            \ rows do not have it. Where the bag's totals are already net of commission\
+            \ (`totals_include_commission` is false), it shows the commission the\
+            \ channel collected itself and is not taken from the merchant's amount."
           format: int32
         payment_provider_total_fee:
           type: integer
-          description: Total fee charged by the payment provider for this transaction.
+          description: "The payment provider's fee on the sale that this row's party\
+            \ pays, in the smallest unit of the currency, for example cents. On a\
+            \ sale it is a positive figure that reduces what the party is owed: it\
+            \ is on the row of the party that pays the fee and is 0 on the other row,\
+            \ and where the fee is split each row shows its part. A refund made on\
+            \ or after 27 October 2026 shows 0 on the row that paid the sale's fee,\
+            \ and the other row has no fee figure, because Stripe keeps the sale's\
+            \ fee when it refunds. Refunds made before then can show a negative figure\
+            \ on that row: a fee credit worked out by Violet, not a fee the provider\
+            \ returned. A refund through Nuvei can still show a negative figure. Adjustment\
+            \ and dispute adjustment rows do not have it."
           format: int32
         payment_provider_volume_fee:
           type: integer
-          description: Volume based fee charged by the payment provider for this transaction.
+          description: "The percentage-based part of `payment_provider_total_fee`,\
+            \ in the smallest unit of the currency, for example cents. It is 0 where\
+            \ the channel pays the fee, and on both rows where the fee is split between\
+            \ the channel and the merchant, even though the total is set, so the two\
+            \ parts do not always add up to the total. Same sign, and on the same\
+            \ rows, as `payment_provider_total_fee`."
           format: int32
         payment_provider_fixed_fee:
           type: integer
-          description: Fixed fee charged by the payment provider for this transaction.
+          description: "The fixed part of `payment_provider_total_fee`, in the smallest\
+            \ unit of the currency, for example cents. It is 0 where the channel pays\
+            \ the fee, and on both rows where the fee is split between the channel\
+            \ and the merchant, even though the total is set, so the two parts do\
+            \ not always add up to the total. Same sign, and on the same rows, as\
+            \ `payment_provider_total_fee`."
           format: int32
         app_id:
           type: integer
@@ -4018,15 +4084,20 @@ components:
           description: Name of the merchant associated with this Distribution.
         merchant_commission_rate:
           type: number
-          description: Commission Rate of the merchant associated with this Distribution.
+          description: "The commission rate the channel charges the merchant on this\
+            \ bag, as a percentage: 10.0 means 10 percent. On a refund row it is the\
+            \ rate as the bag stood when the refund was made."
           format: double
         payment_provider_transaction_id:
           type: string
-          description: Unique identifier of the payment transaction in the payment
-            service.
+          description: "Unique identifier of the payment provider's transaction for\
+            \ this row. On a sale, an adjustment or a dispute adjustment it is the\
+            \ shopper's payment. On a refund it is the provider's transaction for\
+            \ the refund."
         payment_provider:
           type: string
-          description: Payment service that processed this payment transaction.
+          description: The payment provider that processed the payment this row belongs
+            to.
           enum:
           - STRIPE
           - NUVEI
@@ -4034,7 +4105,9 @@ components:
           - EXTERNAL
         status:
           type: string
-          description: Current status of the distribution record.
+          description: "Where the row's amount stands in being paid to the party's\
+            \ payout account, which comes before a payout. A row on a payout can still\
+            \ be {PENDING}, and some rows have no status."
           enum:
           - SENT
           - REVERSED
@@ -4050,9 +4123,9 @@ components:
           format: int64
         bag_sub_total:
           type: integer
-          description: "The price of the Bag in the base currency prior to discounts,\
-            \ shipping, duties, taxes, and tips. In fractional currency unit (e.g.\
-            \ cents)."
+          description: "The price of the bag's items before discounts, shipping, duties,\
+            \ taxes and tips, in the smallest unit of the currency, for example cents.\
+            \ The same on every row of the bag."
           format: int32
         bag_commissionable_amount:
           type: integer
@@ -4067,48 +4140,64 @@ components:
           format: int32
         bag_shipping_total:
           type: integer
-          description: The sum of all shipping methods applied to the Bag in the base
-            currency. In fractional currency unit (e.g. cents).
+          description: "The sum of all shipping methods applied to the bag, in the\
+            \ smallest unit of the currency, for example cents. The same on every\
+            \ row of the bag."
           format: int32
         bag_tax_total:
           type: integer
-          description: The sum of all the taxes applied to the Bag in the base currency.
-            In fractional currency unit (e.g. cents).
+          description: "The sum of all the taxes applied to the bag, in the smallest\
+            \ unit of the currency, for example cents. The same on every row of the\
+            \ bag."
           format: int32
         bag_duty_total:
           type: integer
-          description: The sum of all the duties applied to the Bag in the base currency.
-            In fractional currency unit (e.g. cents).
+          description: "The sum of all the duties applied to the bag, in the smallest\
+            \ unit of the currency, for example cents. The same on every row of the\
+            \ bag."
           format: int32
         bag_discount_total:
           type: integer
-          description: The total discounts applied to the price of the Bag in the
-            base currency. In fractional currency unit (e.g. cents).
+          description: "The total discounts applied to the price of the bag, in the\
+            \ smallest unit of the currency, for example cents. The same on every\
+            \ row of the bag."
           format: int32
         bag_total:
           type: integer
-          description: "The sum of all item prices, discounts, shipping, and taxes\
-            \ applied to the Bag in the base currency. In fractional currency unit\
-            \ (e.g. cents)."
+          description: "The sum of all item prices, discounts, shipping, duties and\
+            \ taxes applied to the bag, in the smallest unit of the currency, for\
+            \ example cents. Where the bag's totals are net of commission (`totals_include_commission`\
+            \ is false), it is the total after the commission was deducted. The same\
+            \ on every row of the bag."
           format: int32
         gross_subtotal:
           type: integer
-          description: "The bag subtotal before commission deduction (GROSS amount).\
-            \ For orders where commission is pre-deducted, this represents the original\
-            \ shopper-paid amount. In fractional currency unit (e.g. cents)."
+          description: "The bag's subtotal before the channel's commission was deducted,\
+            \ in the smallest unit of the currency, for example cents. The same as\
+            \ `bag_sub_total`, except where the bag's totals are net of commission\
+            \ (`totals_include_commission` is false): there it is worked back up to\
+            \ what the subtotal was before the commission was deducted. Sale, adjustment\
+            \ and dispute adjustment rows have it; most refund rows do not."
           format: int32
         gross_total:
           type: integer
-          description: "The bag total before commission deduction (GROSS amount).\
-            \ For orders where commission is pre-deducted, this represents the original\
-            \ shopper-paid amount. In fractional currency unit (e.g. cents)."
+          description: "The bag's total before the channel's commission was deducted,\
+            \ in the smallest unit of the currency, for example cents. The same as\
+            \ `bag_total`, except where the bag's totals are net of commission (`totals_include_commission`\
+            \ is false): there it is worked back up to what the total was before the\
+            \ commission was deducted. Sale, adjustment and dispute adjustment rows\
+            \ have it; most refund rows do not."
           format: int32
         totals_include_commission:
           type: boolean
-          description: "Whether the bag totals include commission. If true (default),\
-            \ bag totals are GROSS basis and commission is calculated from them. If\
-            \ false, bag totals are NET basis (commission already deducted) and GROSS\
-            \ amounts are calculated backwards."
+          description: "Whether the bag's totals include the channel's commission.\
+            \ True for most bags: the totals are what the shopper paid, and the commission\
+            \ is taken from the merchant's share. False where the channel deducted\
+            \ its commission before the bag's totals were set: the totals are net\
+            \ of commission, the commission figures on the rows show what the channel\
+            \ collected itself and are not taken from the merchant's amount, and refunds\
+            \ of the bag reverse no commission. Rows written before this was recorded\
+            \ don't have it and are treated as true."
         external_order_id:
           type: string
           description: Unique identifier of the Order in the external ecommerce platform
@@ -4120,8 +4209,9 @@ components:
           format: int64
         order_total:
           type: integer
-          description: Total amount of the Violet Order. In fractional currency unit
-            (e.g. cents).
+          description: "Total of the order, across all of its bags, in the smallest\
+            \ unit of the order's currency, for example cents. The same on every row\
+            \ of the order."
           format: int32
         payout_id:
           type: integer
@@ -4129,7 +4219,9 @@ components:
           format: int32
         payout_amount:
           type: integer
-          description: Total amount of the payout this Distribution is a part of.
+          description: "The amount of the whole payout this row is part of, in the\
+            \ smallest unit of the payout's currency. The same on every row of the\
+            \ payout, so don't add it up across rows."
           format: int64
         payout_date:
           type: string
@@ -4142,9 +4234,9 @@ components:
           format: date-time
         date_payout_settled:
           type: string
-          description: "Time at which the Payout associated with this distribution\
-            \ settles in your bank account. If this date is in the future, this is\
-            \ a tentative date of settlement and subject to change. In ISO-8601 format."
+          description: "Time at which the payout this row is part of settles in the\
+            \ bank account it is paid to. If this date is in the future, it is a tentative\
+            \ date of settlement and subject to change. In ISO-8601 format."
           format: date-time
         payout_transfer_id:
           type: integer
@@ -4157,46 +4249,54 @@ components:
           format: int64
         adjustment_id:
           type: integer
-          description: "Unique identifier of the BagAdjustment associated with this\
-            \ Distribution, if any."
+          description: Unique identifier of the bag adjustment this row records. Only
+            adjustment rows have it.
           format: int64
         platform_code:
           type: string
           description: "Developer-specified identifier for the payment platform that\
             \ processed this Distribution (e.g., 'ACME_UK', 'ACME_US'). Populated\
-            \ at runtime from the associated PaymentPlatformConnection. Null for distributions\
-            \ created before multi-platform support."
+            \ at runtime from the associated payment platform connection. Null for\
+            \ distributions created before multi-platform support."
           readOnly: true
         refund_discrepancy:
           type: integer
-          description: "Discrepancy amount, if any, associated with this Refund. In\
-            \ fractional currency unit (e.g. cents). Refund discrepancies are present\
-            \ if the merchant does not provide sufficient line items when creating\
-            \ the refund in their ecommerce platform."
+          description: "By how much the merchant's refund was more than the line items\
+            \ it listed, as a negative amount in the smallest unit of the currency,\
+            \ for example cents. Only refund rows have it, and only when the refund\
+            \ was larger than its items. It is recorded as the merchant's platform\
+            \ sent it and is not converted to the currency of the row. The channel's\
+            \ row of the refund can carry a correction for it."
           format: int32
         idempotency_key:
           type: string
-          description: Unique key to prevent duplicate distributions. This is generated
-            by the Violet and unique for each distribution being processed.
+          description: "A key Violet sets on adjustment and dispute adjustment rows\
+            \ so that the same adjustment or dispute is not recorded twice. Sale and\
+            \ refund rows do not have one, except a sale row that is being held, which\
+            \ carries a marker giving the reason it is held."
         bag_transaction_fee_id:
           type: integer
-          description: "Unique identifier of the BagTransactionFee record applied\
-            \ to this Distribution, if any."
+          description: Unique identifier of the transaction fee submitted for this
+            bag that was applied to this row.
           format: int64
         transaction_fee_total_amount:
           type: integer
-          description: Total transaction fee amount applied to this Distribution in
-            minor units (e.g. cents).
+          description: "Total of the transaction fee applied to this row's bag, in\
+            \ the smallest unit of the currency, for example cents. A positive figure,\
+            \ the same on the merchant's row and the channel's row. Refund rows show\
+            \ the figure from their sale. Adjustment and dispute adjustment rows do\
+            \ not have it."
           format: int32
         transaction_fee_percentage_amount:
           type: integer
-          description: Percentage-based component of the transaction fee in minor
-            units (e.g. cents).
+          description: "Percentage-based part of the transaction fee, in the smallest\
+            \ unit of the currency, for example cents. Positive. On the same rows\
+            \ as `transaction_fee_total_amount`."
           format: int32
         transaction_fee_fixed_amount:
           type: integer
-          description: Fixed component of the transaction fee in minor units (e.g.
-            cents).
+          description: "Fixed part of the transaction fee, in the smallest unit of\
+            \ the currency, for example cents. Positive. On the same rows as `transaction_fee_total_amount`."
           format: int32
         fee_source_mode:
           type: string
@@ -4216,80 +4316,118 @@ components:
           enum:
           - APP
           - MERCHANT
+        return_commission_policy:
+          type: string
+          description: "The return commission policy the sale was made under: {REVERSE},\
+            \ where a refund takes back the commission on the part of the sale it\
+            \ refunds, or {RETAIN}, where the channel keeps its commission on refunds.\
+            \ Refund, adjustment and dispute adjustment rows show the policy of their\
+            \ sale. Under {RETAIN}, a refund's `commission_reversed_amount` is 0 and\
+            \ `commission_retained_amount` holds the commission the channel kept;\
+            \ under {REVERSE}, `commission_reversed_amount` holds the commission taken\
+            \ back and `commission_retained_amount` is not present. `commission` is\
+            \ the whole sale's commission under either policy. Sales made before the\
+            \ policy was recorded don't show it and are treated as {REVERSE}."
+          nullable: true
+          enum:
+          - REVERSE
+          - RETAIN
         tax_remitter:
           type: string
-          description: "Tax Remittance setting used to generate this Distribution.\
-            \ One of {APP} or {MERCHANT}."
+          description: "Who remits the tax on this bag: {APP}, the channel, or {MERCHANT}.\
+            \ The remitter's row shows the tax in `tax_amount`."
           enum:
           - APP
           - MERCHANT
         duty_remitter:
           type: string
-          description: "Duty Remittance setting used to generate this Distribution.\
-            \ One of {APP} or {MERCHANT}."
+          description: "Who remits the duty on this bag: {APP}, the channel, or {MERCHANT}.\
+            \ The remitter's row shows the duty in `duty_amount`."
           enum:
           - APP
           - MERCHANT
         date_created:
           type: string
-          description: Time at which the object was created. In ISO-8601 format.
+          description: Time at which the row was created. A sale row carries the date
+            its bag was created. In ISO-8601 format.
           format: date-time
         date_last_modified:
           type: string
-          description: Time at which the object was last modified. In ISO-8601 format.
+          description: Time at which the row was last modified. Adding the row to
+            a payout does not change it. In ISO-8601 format.
           format: date-time
-        paymentService:
+        payment_service:
           type: string
+          description: "Deprecated: the same value as payment_provider."
+          deprecated: true
           enum:
           - STRIPE
           - NUVEI
           - CREDOVA
           - EXTERNAL
-        paymentServiceTotalFee:
+        payment_service_total_fee:
           type: integer
+          description: "Deprecated: the same value as payment_provider_total_fee."
           format: int32
-        paymentServiceVolumeFee:
+          deprecated: true
+        payment_service_volume_fee:
           type: integer
+          description: "Deprecated: the same value as payment_provider_volume_fee."
           format: int32
-        paymentServiceFixedFee:
+          deprecated: true
+        payment_service_fixed_fee:
           type: integer
+          description: "Deprecated: the same value as payment_provider_fixed_fee."
           format: int32
-        externalTransactionId:
+          deprecated: true
+        external_transaction_id:
           type: string
+          description: "Deprecated: the same value as payment_provider_transaction_id."
+          deprecated: true
         commission_reversed_amount:
           type: integer
-          description: "The part of the bag's commission that this refund reversed,\
-            \ in fractional currency units (e.g. cents): the commission portion of\
-            \ what actually moved. Same sign as `commission` on the same row: negative\
-            \ on the channel's row, positive on the merchant's. Zero when the bag's\
-            \ commission was deducted before payment, because a refund then reverses\
-            \ none. Because it is the amount that moved, it is not strictly bounded\
-            \ by `commission`: currency conversion can put it a cent above. Present\
-            \ only on refund distributions. Null on payment and adjustment distributions,\
-            \ and on refund distributions recorded before this field existed that\
-            \ have not been filled in yet."
+          description: "The part of the sale's commission that this refund reversed,\
+            \ in the smallest unit of the currency, for example cents: the commission\
+            \ portion of what actually moved. Same sign as `commission` on the same\
+            \ row: positive on the merchant's row, negative on the channel's. 0 when\
+            \ the refund reverses no commission: where the channel keeps its commission\
+            \ on refunds (a retain return policy), or where the bag's commission was\
+            \ deducted before payment (`totals_include_commission` is false). Because\
+            \ it is the amount that moved, it is not strictly bounded by `commission`:\
+            \ currency conversion can put it a cent above. Present only on refund\
+            \ rows. Refunds made before 2 October 2026 don't have it unless it has\
+            \ been filled in."
           format: int32
           nullable: true
         commission_retained_amount:
           type: integer
-          description: "On a refund distribution under a retain return policy, the\
-            \ commission the channel kept instead of reversing, in fractional currency\
-            \ units. Same sign convention as commission_reversed_amount on the same\
-            \ row. Null under a reverse policy and on payment, adjustment and dispute\
-            \ distributions."
+          description: "On a refund under a retain return policy, the commission the\
+            \ channel kept instead of reversing, in the smallest unit of the currency,\
+            \ for example cents. Same sign as `commission_reversed_amount` on the\
+            \ same row: positive on the merchant's row, negative on the channel's.\
+            \ Present only on refund rows of a sale made under a retain return policy."
           format: int32
           nullable: true
         payment_platform_connection_id:
           type: integer
-          description: "Unique identifier of the PaymentPlatformConnection that processed\
-            \ this Distribution. Set on BOTH merchant and developer distributions\
-            \ for traceability. For DEVELOPER distributions: identifies the platform\
-            \ used for payment processing. For MERCHANT distributions: provides audit\
-            \ trail of which platform processed the payment."
+          description: Unique identifier of the payment platform connection that processed
+            the payment this row belongs to. The merchant's row and the channel's
+            row both carry it.
           format: int64
-      description: "Records detailing the financial transactions and distributions\
-        \ for a specific Bag, which includes a breakdown of fund allocations and payment\
-        \ gateway fees for Merchants and Channels."
+      description: "One party's share of a bag's sale, refund, adjustment or dispute\
+        \ adjustment. A sale or a refund gives the merchant a row and the channel\
+        \ a row. An adjustment or dispute adjustment gives a row to each party it\
+        \ affects. The channel's rows have `payout_account_type` {DEVELOPER} and the\
+        \ merchant's have {MERCHANT}. Amounts are whole numbers in the smallest unit\
+        \ of the currency in the `currency` field, for example cents. A figure that\
+        \ adds to what the row's party is owed is positive, and one that takes from\
+        \ it is negative, unless its description says otherwise. The figures about\
+        \ the bag or the order (`bag_sub_total`, `bag_commissionable_amount`, `bag_shipping_total`,\
+        \ `bag_tax_total`, `bag_duty_total`, `bag_discount_total`, `bag_total`, `gross_subtotal`,\
+        \ `gross_total` and `order_total`) are the same on every row for that bag\
+        \ or order, so don't add them up across rows. On a refund row they show the\
+        \ bag as it was when the refund was made. Fields with no value are left out\
+        \ of the response."
     PageDistribution:
       type: object
       properties:
@@ -4299,6 +4437,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4311,8 +4451,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4397,61 +4535,73 @@ components:
           format: int32
         payments_order_volume:
           type: integer
-          description: "Total value of the bags paid in this payout, including item\
-            \ prices, discounts, shipping and taxes, in the smallest unit of currency\
-            \ (for example, cents)."
+          description: "Total value of the bags whose sales are settled in this payout,\
+            \ in the smallest unit of the currency the sales were made in. Each bag\
+            \ is counted at its full total, on both the merchant's and the channel's\
+            \ payout. This is what the shopper paid for the bag, not this account's\
+            \ share."
           format: int32
         payments_commission:
           type: integer
-          description: "Total commission earned by channels on the sales in this payout,\
-            \ in the smallest unit of currency (for example, cents)."
+          description: "Channel commission on the sales in this payout. Negative on\
+            \ a merchant's payout, where it is taken from the merchant's sales, and\
+            \ positive on a channel's payout, where it is earned. 0 when no commission\
+            \ applies."
           format: int32
         payments_fees:
           type: integer
-          description: "Total payment provider fees charged on the sales in this payout,\
-            \ in the smallest unit of currency (for example, cents)."
+          description: "Payment provider fees on the sales in this payout that this\
+            \ account pays, as a positive amount. Depending on how fees are split\
+            \ between the merchant and the channel, this can be 0 on either payout."
           format: int32
         payments_distributions:
           type: integer
-          description: "Total amount of the distributions for the sales in this payout,\
-            \ before refunds are taken off, in the smallest unit of currency (for\
-            \ example, cents)."
+          description: "What this account is owed from the sales in this payout. Positive\
+            \ on a merchant's payout. On a channel's payout it can be negative, when\
+            \ the provider fees the channel pays are larger than the commission it\
+            \ earns."
           format: int32
         refunds_order_volume:
           type: integer
-          description: "Total value of the bags refunded in this payout, in the smallest\
-            \ unit of currency (for example, cents). A bag counts once, however many\
-            \ of its refunds the payout includes."
+          description: "Total value of the bags refunded in this payout. Each refunded\
+            \ bag counts once, at its full total, even when only part of it was refunded,\
+            \ so this is not the amount refunded."
           format: int32
         refunds_commission:
           type: integer
-          description: "Total commission reversed by the refunds in this payout, in\
-            \ the smallest unit of currency (for example, cents)."
+          description: "Commission returned by the refunds in this payout. Positive\
+            \ on a merchant's payout and negative on a channel's, the opposite sign\
+            \ of `payments_commission`. 0 when the refunds return no commission, for\
+            \ example when the channel keeps its commission on refunds. For refunds\
+            \ made before 2 October 2026, this can be the whole sale's commission\
+            \ rather than the part the refund returned."
           format: int32
         refunds_fees:
           type: integer
-          description: "Total payment provider fees on the refunds in this payout,\
-            \ in the smallest unit of currency (for example, cents)."
+          description: "Payment provider fees on the refunds in this payout. 0 for\
+            \ refunds made on or after 27 October 2026. Refunds made before then can\
+            \ show a negative figure: a fee credit worked out by Violet, not a fee\
+            \ the provider returned."
           format: int32
         refunds_distributions:
           type: integer
-          description: "Total amount of the distributions for the refunds in this\
-            \ payout, in the smallest unit of currency (for example, cents). Zero\
-            \ or negative, because refunds reduce the payout."
+          description: "What the refunds in this payout took from this account, as\
+            \ a negative amount or 0. On a channel's payout, refunds made before 27\
+            \ October 2026 can show a positive figure."
           format: int32
         net_amount:
           type: integer
-          description: "Net amount of the sales and refunds in this payout: payments_distributions\
-            \ plus refunds_distributions, in the smallest unit of currency (for example,\
-            \ cents)."
+          description: "`payments_distributions` plus `refunds_distributions`: what\
+            \ this account is owed from the sales and refunds in this payout. Negative\
+            \ when refunds outweigh sales. Adjustments and disputes settled in the\
+            \ same payout are not included, so this can differ from the payout amount."
           format: int32
         unknown_amount:
           type: integer
-          description: "Part of the payout that comes from payments the payment provider\
-            \ processed outside Violet orders, for example sales made outside Violet\
-            \ on the same payment provider account, less refunds of such payments,\
-            \ in the smallest unit of currency (for example, cents). It can be negative.\
-            \ It is not counted in the other amounts in this summary."
+          description: "Charges in this payout that can't be tied to a Violet order,\
+            \ less refunds of such charges, in the smallest unit of the currency the\
+            \ provider charged in. Positive or negative. This is the provider's full\
+            \ charge or refund amount, not only the part that reached this payout."
           format: int32
         date_created:
           type: string
@@ -4461,8 +4611,11 @@ components:
           type: string
           description: Date of when this summary was last updated.
           format: date-time
-      description: "Breakdown of the sales and refunds that make up a payout. All\
-        \ amounts are in the smallest unit of currency (for example, cents)."
+      description: "Totals for the sales and refunds settled in this payout, for the\
+        \ account the payout was made to. Amounts are whole numbers in the smallest\
+        \ unit of the currency the sales were made in, except `unknown_amount`, which\
+        \ is in the currency the provider charged in. Apart from `net_amount`, these\
+        \ are separate totals and don't add up to each other or to the payout amount."
     PagePayout:
       type: object
       properties:
@@ -4472,6 +4625,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4484,8 +4639,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -4960,6 +5113,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -4972,8 +5127,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -5107,6 +5260,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -5119,8 +5274,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -5432,6 +5585,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -5444,8 +5599,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -5464,6 +5617,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -5476,8 +5631,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -5570,6 +5723,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -5582,8 +5737,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -6236,6 +6389,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -6248,8 +6403,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
@@ -6542,6 +6695,8 @@ components:
         totalElements:
           type: integer
           format: int64
+        first:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -6554,8 +6709,6 @@ components:
           format: int32
         sort:
           $ref: '#/components/schemas/Sort'
-        first:
-          type: boolean
         pageable:
           $ref: '#/components/schemas/Pageable'
         numberOfElements:
