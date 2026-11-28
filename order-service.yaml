@@ -10464,6 +10464,8 @@ components:
         bag_id:
           type: integer
           format: int64
+        communicationPreferencesInternal:
+          $ref: '#/components/schemas/communication_preferences'
         bag_status:
           type: string
           enum:
@@ -10475,8 +10477,6 @@ components:
           - REFUNDED
           - REJECTED
           - CANCELED
-        communicationPreferencesInternal:
-          $ref: '#/components/schemas/communication_preferences'
         id:
           type: integer
           description: Unique ID of the Bag.
@@ -14964,8 +14964,6 @@ components:
             This value will only be populated if there are errors during processing
           items:
             $ref: '#/components/schemas/PayoutTransferError'
-        externalId:
-          type: string
         payoutExternalId:
           type: string
         paymentService:
@@ -14999,6 +14997,8 @@ components:
           items:
             type: integer
             format: int64
+        externalId:
+          type: string
         related_orders:
           uniqueItems: true
           type: array
